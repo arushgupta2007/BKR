@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>Join Meeting BKR</title>
+  <script src="/static/head_imports.js"></script>
+  <link rel="stylesheet" href="/static/join/css/main.css" />
+</head>
+
+<body>
+  <script src="/static/navbar.js"></script>
+  <div id="meeting_alert"></div>
+  <div id="name_alert"></div>
+  <div class="container d-flex h-100">
+    <div class="card mx-auto align-self-center" style="opacity: 90%; margin: 1em;">
+      <div class="card-header">
+        Join Meeting
+      </div>
+      <div class="card-body">
+        <form class="form-group" action="/session" method="post">
+          <label for="nameInput">Your Name</label>
+          <div class="form-group">
+            <input type="text" class="form-control" id="nameInput" aria-describedby="nameHelp" placeholder="Your Name"
+              name="name" required />
+            <small id="nameHelp" class="form-text text-muted">Shown to other people in the video chat</small>
+          </div>
+          <div class="form-group">
+            <label for="sessionID">Meeting ID</label>
+            <input type="number" class="form-control" id="sessionID" aria-describedby="sessionidHelp"
+              placeholder="Meeting ID" name="meeting_id" required />
+            <small id="sessionidHelp" class="form-text text-muted">Get it from the person who started the
+              meeting</small>
+          </div>
+          <div class="form-group">
+            <label for="sessionName">Meeting Code</label>
+            <input type="password" class="form-control" id="sessionName" aria-describedby="sessionHelp"
+              placeholder="Meeting Code" name="meeting_code" required />
+            <small id="sessionHelp" class="form-text text-muted">Get it from the person who started the meeting</small>
+          </div>
+          <input type="hidden" name="objective" value="join" />
+          <div class="form-group text-center">
+            <br />
+            <p>
+              <button class="btn btn btn-success" type="submit">
+                Join!
+              </button>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="/static/scripts_end_of_body.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const wrong = urlParams.get("wrong")
+    if (wrong === "name") {
+      $('#name_alert').append('<div class="alert alert-danger alert-dismissible fade show" role="alert">That Name has been occupied<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button ></div > ')
+      setTimeout(function () {
+        $("#alertdiv").remove();
+      }, 5000);
+    } else if (wrong === "meeting") {
+      $('#meeting_alert').append('<div class="alert alert-danger alert-dismissible fade show" role="alert">Wrong Meeting ID or Meeting Code<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button ></div > ')
+      setTimeout(function () {
+        $("#alertdiv").remove();
+      }, 5000);
+    }
+    function showalert(message, alerttype) {
+    }
+  </script>
+</body>
+
+</html>

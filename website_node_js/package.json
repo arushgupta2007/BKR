@@ -1,0 +1,18 @@
+{
+  "name": "website_node_js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "body-parser": "1.18.3",
+    "ejs": "2.6.1",
+    "express-session": "1.16.1",
+    "openvidu-node-client": "2.13.0"
+  }
+}
