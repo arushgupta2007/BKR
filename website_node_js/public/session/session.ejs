@@ -18,6 +18,7 @@
 	</link>
 	<link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen">
 	</link>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<script src="/static/session/js/openvidu-browser-2.13.0.js"></script>
 </head>
 
@@ -26,13 +27,17 @@
 		<div id="logged">
 			<div id="session">
 				<div id="session-header">
-					<h1 id="session-title"><%= sessionName %></h1>
+					<h1 id="session-title" style="margin-top:20px"><%= sessionName %></h1>
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionname" value="<%= sessionName %>"></input>
 						<input type="hidden" name="token" value="<%= token %>"></input>
-						<button id="buttonLeaveSession" class="btn btn-large btn-danger" type="submit"
+						<button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-lg" type="submit"
 							onclick="leaveSession()">
-							Leave Meeting</button>
+							<i class="material-icons" style="color:white;font-size:130%;">call_end</i>
+						</button>
+						<button id="toggleAudio" class="btn btn-warning btn-circle btn-lg">
+							<i class="material-icons" style="color:white;font-size:130%;">mic_off</i>
+						</button>
 					</form>
 				</div>
 				<div id="main-video" class="col-md-6">

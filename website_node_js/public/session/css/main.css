@@ -188,9 +188,14 @@ a:hover .demo-logo {
   display: inline-block;
 }
 
+#toggleAudio {
+  float: right;
+  margin: 20px;
+}
+
 #buttonLeaveSession {
   float: right;
-  margin-top: 20px;
+  margin: 20px;
 }
 
 #video-container video {
