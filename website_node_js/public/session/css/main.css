@@ -193,9 +193,19 @@ a:hover .demo-logo {
   margin: 20px;
 }
 
+#toggleVideo {
+  float: right;
+  margin: 20px;
+}
+
 #buttonLeaveSession {
   float: right;
   margin: 20px;
+}
+
+#dropdownMenuButton {
+  float: right;
+  margin: 20px
 }
 
 #video-container video {
@@ -336,4 +346,39 @@ table i {
 
 .userName {
   opacity: 0%;
+}
+
+.sidePanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: #dddddd;
+  opacity: 90%;
+  overflow: hidden;
+  padding-top: 60px;
+  transition: 0.5s;
+}
+
+.sidePanel .closebtn {
+  position: absolute;
+  top: 0;
+  left: 25px;
+  font-size: 130%;
+  margin-right: 50px;
+}
+
+#messages {
+  overflow-y: auto;
+  margin: 15px;
+  margin-bottom: 60px;
+}
+
+.private_chat {
+  float: right;
+  opacity: 0;
 }

@@ -80,9 +80,9 @@ app.post("/session/", (req, res) => {
     do {
       session_id = Math.floor(Math.random() * 10000000000);
     } while (session_id in mapSessions);
-    id_tracker[session_id] = 0;
-    var client_id = id_tracker[session_id];
-    id_tracker[sessionName] = 1;
+    id_tracker[session_id.toString()] = 0;
+    var client_id = id_tracker[session_id.toString()];
+    id_tracker[session_id.toString()] = 1;
     OV.createSession()
       .then((session) => {
         mapSessions[session_id] = session;
@@ -91,12 +91,7 @@ app.post("/session/", (req, res) => {
         session
           .generateToken(tokenOptions)
           .then((token) => {
-            console.log(token);
-
             mapSessionNamesTokens[session_id].push(token);
-            console.log(
-              "Created Session with id: " + session_id + " and token: " + token
-            );
             res.render(__dirname + "/public/session/session.ejs", {
               sessionName: session_id,
               token: token,
@@ -111,8 +106,8 @@ app.post("/session/", (req, res) => {
     var sessionName = req.body.meeting_id;
     var mySession = mapSessions[sessionName];
     if (session_code === codes[sessionName]) {
-      var client_id = id_tracker[sessionName];
-      id_tracker[sessionName] = id_tracker[sessionName] + 1;
+      var client_id = id_tracker[sessionName.toString()];
+      id_tracker[sessionName.toString()] = id_tracker[sessionName.toString()] + 1;
       mySession
         .generateToken(tokenOptions)
         .then((token) => {

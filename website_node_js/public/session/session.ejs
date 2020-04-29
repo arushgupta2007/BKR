@@ -23,21 +23,64 @@
 </head>
 
 <body>
+	<div id="sidePanel" class="sidepanel">
+		<button class="closebtn btn btn-light" style="font-size:200%" type="button" onclick="closeSidePanel()">&times;</button>
+		<div id="extraOptions" class="card" style="background-color:#bfbfbf;">
+			<div class="card-body" style="padding: 20px; margin: 20px;">
+				<div class="row">
+					<div class="col">
+						<button class="btn btn-primary" type="button" onclick="screenShare()">
+							<i class="material-icons" style="font-size:170%">screen_share</i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="messages" class="card">
+			<div class="card-header" style="text-align:center;">
+				<i class="material-icons" style="font-size: 300%;">chat</i>
+			</div>
+			<div class="card-body" id="messages_body" style="margin-top: 30px;">
+				<div style="text-align:center"><p>Chat Initialized</p></div>
+			</div>
+		</div>
+		<div class="fixed-bottom" style="position: fixed; bottom:0; width: 100%;">
+			<div class="card" style="margin:10px">
+				<div class="card-body">
+					<form class="form-inline" action="javascript:void(0)" autocomplete="off">
+						<div class="form-group">
+							<input type="text" placeholder="Enter You Message" class="form-control" id="message_to_send">
+						</div>
+						<button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
+							<span class="glyphicon glyphicon-send"></span> Send
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div id="main-container" class="container">
 		<div id="logged">
 			<div id="session">
 				<div id="session-header">
 					<h1 id="session-title" style="margin-top:20px"><%= sessionName %></h1>
+					<button class="btn btn-light" type="button" id="dropdownMenuButton"
+					 	onclick="openSidePanel()">
+						<i class="material-icons" style="font-size:230%;">more_vert</i>
+					</button>
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionname" value="<%= sessionName %>"></input>
 						<input type="hidden" name="token" value="<%= token %>"></input>
-						<button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-lg">
+						<button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-lg" type="submit" onclick="leaveSession()">
 							<i class="material-icons" style="color:white;font-size:130%;">call_end</i>
 						</button>
-						<button id="toggleAudio" class="btn btn-warning btn-circle btn-lg">
-							<i class="material-icons" style="color:white;font-size:130%;">mic_off</i>
-						</button>
 					</form>
+					<button id="toggleAudio" class="btn btn-success btn-circle btn-lg" onclick="toggleAudio()">
+						<i class="material-icons" id="toggleAudioIcon" style="color:white;font-size:130%;">mic_off</i>
+					</button>
+					<button id="toggleVideo" class="btn btn-primary btn-circle btn-lg" onclick="toggleVideo()">
+						<i class="material-icons" id="toggleVideoIcon" style="color:white;font-size:130%;">videocam_off</i>
+					</button>
 				</div>
 				<div id="main-video" class="col-md-6">
 					<p class="nickName"></p>
@@ -50,14 +93,48 @@
 	</div>
 
 	<script>
+		var publisher;
 		var sessionName = <%- JSON.stringify(sessionName) %>;
 		var token = <%- JSON.stringify(token) %>;
 		var nickName = <%- JSON.stringify(nickName) %>;
 		var userName = <%- JSON.stringify(userName) %>;
+		var audio = true;
+		var video = true;
 
-		console.warn('Request of TOKEN gone WELL (TOKEN:' + token + ')');
 		OV = new OpenVidu();
 		session = OV.initSession();
+
+		function sendMessage() {
+			session.signal({
+				data: nickName + "," + userName + "," + $("#message_to_send").val(),
+				to: [],
+				type: "chat",
+			}).then(() => {
+			}).catch((error) => {
+			})
+			$("#message_to_send").val("");
+		}
+
+		function setMessageOut() {
+			$("#dropdownMenuButton").html('<i class="material-icons" style="font-size:230%;">more_vert</i>');
+		}
+
+		session.on('signal:chat', (event) => {
+			var seprated_values = event.data.split(",")
+			var from_name = seprated_values[0];
+			var from_id = seprated_values[1];
+			var message = seprated_values[2];
+			var html_string;
+			if (from_id === userName.toString()) {
+				html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You: ' + message + ' </strong></div></div>'
+			} else {
+				html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
+				$("#dropdownMenuButton").html('<div class="spinner-grow" role="status"><span class="sr-only">New Message</span></div>');
+				setTimeout(setMessageOut, 1000);
+			}
+			$("#messages_body").append(html_string);
+		})
+
 		session.on('streamCreated', (event) => {
 			var subscriber = session.subscribe(event.stream, 'video-container');
 			subscriber.on('videoElementCreated', (event) => {
@@ -74,7 +151,7 @@
 				$('#session-title').text(sessionName);
 				$('#join').hide();
 				$('#session').show();
-				var publisher = OV.initPublisher('video-container', {
+				publisher = OV.initPublisher('video-container', {
 					audioSource: undefined,
 					videoSource: undefined,
 					publishAudio: true,
@@ -103,6 +180,69 @@
 			session.disconnect();
 		}
 
+		function toggleAudio() {
+			if (audio) {
+				audio = false;
+				$("#toggleAudioIcon").html("mic")
+				publisher.publishAudio(false);
+			} else {
+				audio = true;
+				$("#toggleAudioIcon").html("mic_off")
+				publisher.publishAudio(true);
+			}
+		}
+
+		function toggleVideo() {
+			if (video) {
+				video = false;
+				$("#toggleVideoIcon").html("videocam")
+				publisher.publishVideo(false);
+			} else {
+				video = true;
+				$("#toggleVideoIcon").html("videocam_off")
+				publisher.publishVideo(true);
+			}
+		}
+
+		function closeSidePanel() {
+			document.getElementById("sidePanel").style.width = "0px";
+		}
+
+		function openSidePanel() {
+			document.getElementById("sidePanel").style.width = "350px";
+		}
+
+		function screenShare() {
+			OV.getUserMedia({
+				audioSource: undefined,
+				videoSource: "screen",
+				publishAudio: true,
+				publishVideo: true,
+				resolution: '640x480',
+				frameRate: 30,
+				insertMode: 'APPEND',
+				mirror: false
+			}).then(mediaStream => {
+				var screenTrack = mediaStream.getVideoTracks()[0];
+				publisher.replaceTrack(screenTrack).then(() => {}).catch((err) => {console.log(err);});
+				screenTrack.addEventListener('ended', () => {
+					OV.getUserMedia({
+						audioSource: undefined,
+						videoSource: undefined,
+						publishAudio: true,
+						publishVideo: true,
+						resolution: '640x480',
+						frameRate: 30,
+						insertMode: 'APPEND',
+						mirror: false
+					}).then(videoStream => {
+						var videoTrack = videoStream.getVideoTracks()[0];
+						publisher.replaceTrack(videoTrack).then(() => {}).catch((err) => {console.log(err);});
+					})
+				})
+			}).catch((err) => {console.log(err);})
+		}
+
 		function appendUserData(videoElement, connection) {
 			var clientData;
 			var serverData;
@@ -119,9 +259,12 @@
 			var dataNode = document.createElement('div');
 			dataNode.className = "data-node";
 			dataNode.id = "data-" + nodeId;
-			dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
+			dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p><form class="form-inline private_chat" action="javascript:void(0)" autocomplete="off"><div class="form-group"><input type="text" placeholder="Private Chat" class="form-control"></div><button type="submit" class="btn btn-primary" style="margin-left:10px"><span class="glyphicon glyphicon-send"></span> Send</button></form>';
 			videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
 			addClickListener(videoElement, clientData, serverData);
+			if (serverData !== userName) {
+				addHoverListner_chat_icon(videoElement, dataNode, clientData, serverData, connection);
+			}
 		}
 
 		function removeUserData(connection) {
@@ -155,6 +298,19 @@
 					});
 				}
 			});
+		}
+
+		function addHoverListner_chat_icon(videoElement, dataNode_with_chat, nickName_of_user, id_user, connection_object) {
+			var form = dataNode_with_chat.querySelector('.private_chat')[0];
+			console.log("Hello: df: " + form.innerHTML);
+			videoElement.addEventListener('mouseover', function () {
+				videoElement.style.opacity = 0.3;
+				form.style.opacity = 0.8;
+			})
+			videoElement.addEventListener('mouseout', function () {
+				videoElement.style.opacity = 1;
+				form.style.opacity = 0;
+			})
 		}
 
 		function initMainVideo(videoElement, userData) {
