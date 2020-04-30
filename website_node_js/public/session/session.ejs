@@ -24,7 +24,8 @@
 
 <body>
 	<div id="sidePanel" class="sidepanel">
-		<button class="closebtn btn btn-light" style="font-size:200%" type="button" onclick="closeSidePanel()">&times;</button>
+		<button class="closebtn btn btn-light" style="font-size:200%" type="button"
+			onclick="closeSidePanel()">&times;</button>
 		<div id="extraOptions" class="card" style="background-color:#bfbfbf;">
 			<div class="card-body" style="padding: 20px; margin: 20px;">
 				<div class="row">
@@ -41,15 +42,19 @@
 				<i class="material-icons" style="font-size: 300%;">chat</i>
 			</div>
 			<div class="card-body" id="messages_body" style="margin-top: 30px;">
-				<div style="text-align:center"><p>Chat Initialized</p></div>
+				<div style="text-align:center">
+					<p>Chat Initialized</p>
+				</div>
 			</div>
 		</div>
 		<div class="fixed-bottom" style="position: fixed; bottom:0; width: 100%;">
 			<div class="card" style="margin:10px">
 				<div class="card-body">
 					<form class="form-inline" action="javascript:void(0)" autocomplete="off">
+						<input type="hidden" placeholder="" class="form-control" id="to_message_send" value="">
 						<div class="form-group">
-							<input type="text" placeholder="Enter You Message" class="form-control" id="message_to_send">
+							<input type="text" placeholder="Chat With Everybody!" class="form-control"
+								id="message_to_send">
 						</div>
 						<button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
 							<span class="glyphicon glyphicon-send"></span> Send
@@ -64,14 +69,14 @@
 			<div id="session">
 				<div id="session-header">
 					<h1 id="session-title" style="margin-top:20px"><%= sessionName %></h1>
-					<button class="btn btn-light" type="button" id="dropdownMenuButton"
-					 	onclick="openSidePanel()">
+					<button class="btn btn-light" type="button" id="dropdownMenuButton" onclick="openSidePanel()">
 						<i class="material-icons" style="font-size:230%;">more_vert</i>
 					</button>
 					<form action="/leave-session" method="post">
 						<input type="hidden" name="sessionname" value="<%= sessionName %>"></input>
 						<input type="hidden" name="token" value="<%= token %>"></input>
-						<button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-lg" type="submit" onclick="leaveSession()">
+						<button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-lg" type="submit"
+							onclick="leaveSession()">
 							<i class="material-icons" style="color:white;font-size:130%;">call_end</i>
 						</button>
 					</form>
@@ -79,7 +84,8 @@
 						<i class="material-icons" id="toggleAudioIcon" style="color:white;font-size:130%;">mic_off</i>
 					</button>
 					<button id="toggleVideo" class="btn btn-primary btn-circle btn-lg" onclick="toggleVideo()">
-						<i class="material-icons" id="toggleVideoIcon" style="color:white;font-size:130%;">videocam_off</i>
+						<i class="material-icons" id="toggleVideoIcon"
+							style="color:white;font-size:130%;">videocam_off</i>
 					</button>
 				</div>
 				<div id="main-video" class="col-md-6">
@@ -100,20 +106,11 @@
 		var userName = <%- JSON.stringify(userName) %>;
 		var audio = true;
 		var video = true;
+		var connection_list = {};
+		$('[data-toggle="tooltip"]').tooltip();
 
 		OV = new OpenVidu();
 		session = OV.initSession();
-
-		function sendMessage() {
-			session.signal({
-				data: nickName + "," + userName + "," + $("#message_to_send").val(),
-				to: [],
-				type: "chat",
-			}).then(() => {
-			}).catch((error) => {
-			})
-			$("#message_to_send").val("");
-		}
 
 		function setMessageOut() {
 			$("#dropdownMenuButton").html('<i class="material-icons" style="font-size:230%;">more_vert</i>');
@@ -123,7 +120,9 @@
 			var seprated_values = event.data.split(",")
 			var from_name = seprated_values[0];
 			var from_id = seprated_values[1];
-			var message = seprated_values[2];
+			var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
+			var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+
 			var html_string;
 			if (from_id === userName.toString()) {
 				html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You: ' + message + ' </strong></div></div>'
@@ -132,6 +131,19 @@
 				$("#dropdownMenuButton").html('<div class="spinner-grow" role="status"><span class="sr-only">New Message</span></div>');
 				setTimeout(setMessageOut, 1000);
 			}
+			$("#messages_body").append(html_string);
+		})
+
+		session.on('signal:private-chat', (event) => {
+			var seprated_values = event.data.split(",")
+			var from_name = seprated_values[0];
+			var from_id = seprated_values[1];
+			var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
+			var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+			console.log("Private-Chat");
+			var html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
+			$("#dropdownMenuButton").html('<div class="spinner-grow" role="status"><span class="sr-only">New Message</span></div>');
+			setTimeout(setMessageOut, 1000);
 			$("#messages_body").append(html_string);
 		})
 
@@ -144,6 +156,12 @@
 
 		session.on('streamDestroyed', (event) => {
 			removeUserData(event.stream.connection);
+			delete connection_list[event.stream.connection.connectionId];
+		});
+
+		session.on('connectionCreated', (event) => {
+			console.log(event.connection);
+			connection_list[event.connection.connectionId] = event.connection;
 		});
 
 		session.connect(token, { clientData: nickName })
@@ -212,6 +230,33 @@
 			document.getElementById("sidePanel").style.width = "350px";
 		}
 
+		function sendMessage() {
+			var to = $("#to_message_send").val();
+			if (to === "") {
+				session.signal({
+					data: nickName + "," + userName + "," + $("#message_to_send").val(),
+					to: [],
+					type: "chat",
+				}).then(() => {
+				}).catch((error) => {
+				})
+			} else {
+				session.signal({
+					data: nickName + "," + userName + "," + $("#message_to_send").val(),
+					to: [connection_list[to]],
+					type: "private-chat",
+				}).then(() => {
+				}).catch((error) => {
+				})
+				$("#to_message_send").val("");
+				$("#message_to_send").attr("placeholder", "Chat With Everybody!");
+				to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
+				var html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
+				$("#messages_body").append(html_string);
+			}
+			$("#message_to_send").val("");
+		}
+
 		function screenShare() {
 			OV.getUserMedia({
 				audioSource: undefined,
@@ -224,7 +269,7 @@
 				mirror: false
 			}).then(mediaStream => {
 				var screenTrack = mediaStream.getVideoTracks()[0];
-				publisher.replaceTrack(screenTrack).then(() => {}).catch((err) => {console.log(err);});
+				publisher.replaceTrack(screenTrack).then(() => { }).catch((err) => { console.log(err); });
 				screenTrack.addEventListener('ended', () => {
 					OV.getUserMedia({
 						audioSource: undefined,
@@ -237,10 +282,10 @@
 						mirror: false
 					}).then(videoStream => {
 						var videoTrack = videoStream.getVideoTracks()[0];
-						publisher.replaceTrack(videoTrack).then(() => {}).catch((err) => {console.log(err);});
+						publisher.replaceTrack(videoTrack).then(() => { }).catch((err) => { console.log(err); });
 					})
 				})
-			}).catch((err) => {console.log(err);})
+			}).catch((err) => { console.log(err); })
 		}
 
 		function appendUserData(videoElement, connection) {
@@ -259,12 +304,19 @@
 			var dataNode = document.createElement('div');
 			dataNode.className = "data-node";
 			dataNode.id = "data-" + nodeId;
-			dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p><form class="form-inline private_chat" action="javascript:void(0)" autocomplete="off"><div class="form-group"><input type="text" placeholder="Private Chat" class="form-control"></div><button type="submit" class="btn btn-primary" style="margin-left:10px"><span class="glyphicon glyphicon-send"></span> Send</button></form>';
+			if (nodeId === "main-videodata") {
+				dataNode.innerHTML = '<p class="nickName">You</p><p class="userName">' + serverData + '</p>';
+			} else {
+				dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><button type="button" class="chat_top_right btn btn-primary py-0" data-toggle="tooltip" data-placement="top" title="Private Chat"><i class="material-icons" style="font-size: 90%;">chat</i></button><p class="userName">' + serverData + '</p>';
+				var button_private_chat = dataNode.querySelector('.chat_top_right');
+				button_private_chat.addEventListener('click', () => {
+					$("#to_message_send").val(nodeId);
+					$("#message_to_send").attr("placeholder", "Private Chat with " + clientData);
+					openSidePanel();
+				})
+			}
 			videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
 			addClickListener(videoElement, clientData, serverData);
-			if (serverData !== userName) {
-				addHoverListner_chat_icon(videoElement, dataNode, clientData, serverData, connection);
-			}
 		}
 
 		function removeUserData(connection) {
@@ -291,7 +343,11 @@
 				var mainVideo = $('#main-video video').get(0);
 				if (mainVideo.srcObject !== videoElement.srcObject) {
 					$('#main-video').fadeOut("fast", () => {
-						$('#main-video p.nickName').html(clientData);
+						if (serverData.toString() === userName.toString()) {
+							$('#main-video p.nickName').html("You");
+						} else {
+							$('#main-video p.nickName').html(clientData);
+						}
 						$('#main-video p.userName').html(serverData);
 						mainVideo.srcObject = videoElement.srcObject;
 						$('#main-video').fadeIn("fast");
@@ -300,22 +356,13 @@
 			});
 		}
 
-		function addHoverListner_chat_icon(videoElement, dataNode_with_chat, nickName_of_user, id_user, connection_object) {
-			var form = dataNode_with_chat.querySelector('.private_chat')[0];
-			console.log("Hello: df: " + form.innerHTML);
-			videoElement.addEventListener('mouseover', function () {
-				videoElement.style.opacity = 0.3;
-				form.style.opacity = 0.8;
-			})
-			videoElement.addEventListener('mouseout', function () {
-				videoElement.style.opacity = 1;
-				form.style.opacity = 0;
-			})
-		}
-
 		function initMainVideo(videoElement, userData) {
 			$('#main-video video').get(0).srcObject = videoElement.srcObject;
-			$('#main-video p.nickName').html(userData.nickName);
+			if (userData.userName.toString() === userName.toString()) {
+				$('#main-video p.nickName').html("You");
+			} else {
+				$('#main-video p.nickName').html(userData.nickName);
+			}
 			$('#main-video p.userName').html(userData.userName);
 			$('#main-video video').prop('muted', true);
 		}

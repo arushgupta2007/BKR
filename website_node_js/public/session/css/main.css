@@ -378,7 +378,6 @@ table i {
   margin-bottom: 60px;
 }
 
-.private_chat {
+.chat_top_right {
   float: right;
-  opacity: 0;
 }
