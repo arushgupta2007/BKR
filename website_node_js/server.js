@@ -76,32 +76,41 @@ app.post("/session/", (req, res) => {
     role: role,
   };
   if (objective === "create") {
-    var session_id;
-    do {
-      session_id = Math.floor(Math.random() * 10000000000);
-    } while (session_id in mapSessions);
-    id_tracker[session_id.toString()] = 0;
-    var client_id = id_tracker[session_id.toString()];
-    id_tracker[session_id.toString()] = 1;
-    OV.createSession()
-      .then((session) => {
-        mapSessions[session_id] = session;
-        mapSessionNamesTokens[session_id] = [];
-        codes[session_id] = session_code;
-        session
-          .generateToken(tokenOptions)
-          .then((token) => {
-            mapSessionNamesTokens[session_id].push(token);
-            res.render(__dirname + "/public/session/session.ejs", {
-              sessionName: session_id,
-              token: token,
-              nickName: name_client,
-              userName: client_id,
-            });
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => console.log(err));
+    var lowerCaseLetters = /[a-z]/g;
+    var numbers = /[0-9]/g;
+    console.log(session_code.match(lowerCaseLetters));
+    console.log(session_code.match(numbers));
+    console.log(session_code >= 8);
+    if(session_code.match(lowerCaseLetters) && session_code.match(numbers) && session_code.length >= 8) {
+      var session_id;
+      do {
+        session_id = Math.floor(Math.random() * 10000000000);
+      } while (session_id in mapSessions);
+      id_tracker[session_id.toString()] = 0;
+      var client_id = id_tracker[session_id.toString()];
+      id_tracker[session_id.toString()] = 1;
+      OV.createSession()
+        .then((session) => {
+          mapSessions[session_id] = session;
+          mapSessionNamesTokens[session_id] = [];
+          codes[session_id] = session_code;
+          session
+            .generateToken(tokenOptions)
+            .then((token) => {
+              mapSessionNamesTokens[session_id].push(token);
+              res.render(__dirname + "/public/session/session.ejs", {
+                sessionName: session_id,
+                token: token,
+                nickName: name_client,
+                userName: client_id,
+              });
+            })
+            .catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
+    } else {
+      res.redirect("/create_new/?wrong=password&name=" + name_client);
+    }
   } else {
     var sessionName = req.body.meeting_id;
     var mySession = mapSessions[sessionName];
@@ -124,7 +133,7 @@ app.post("/session/", (req, res) => {
           console.error(error);
         });
     } else {
-      res.redirect("/join/?wrong=meeting");
+      res.redirect("/join/?wrong=meeting&name=" + name_client);
     }
   }
 });

@@ -12,7 +12,6 @@
 <body>
   <script src="/static/navbar.js"></script>
   <div id="meeting_alert"></div>
-  <div id="name_alert"></div>
   <div class="container d-flex h-100">
     <div class="card mx-auto align-self-center" style="opacity: 90%; margin: 1em;">
       <div class="card-header">
@@ -56,18 +55,13 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const wrong = urlParams.get("wrong")
-    if (wrong === "name") {
-      $('#name_alert').append('<div class="alert alert-danger alert-dismissible fade show" role="alert">That Name has been occupied<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button ></div > ')
-      setTimeout(function () {
-        $("#alertdiv").remove();
-      }, 5000);
-    } else if (wrong === "meeting") {
+    const name = urlParams.get("name")
+    if (wrong === "meeting") {
       $('#meeting_alert').append('<div class="alert alert-danger alert-dismissible fade show" role="alert">Wrong Meeting ID or Meeting Code<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button ></div > ')
+      $("#nameInput").val(name);
       setTimeout(function () {
         $("#alertdiv").remove();
       }, 5000);
-    }
-    function showalert(message, alerttype) {
     }
   </script>
 </body>
