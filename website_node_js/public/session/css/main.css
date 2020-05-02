@@ -188,26 +188,6 @@ a:hover .demo-logo {
   display: inline-block;
 }
 
-#toggleAudio {
-  float: right;
-  margin: 20px;
-}
-
-#toggleVideo {
-  float: right;
-  margin: 20px;
-}
-
-#buttonLeaveSession {
-  float: right;
-  margin: 20px;
-}
-
-#dropdownMenuButton {
-  float: right;
-  margin: 20px
-}
-
 #video-container video {
   position: relative;
   float: left;
@@ -329,7 +309,7 @@ table i {
   #not-logged {
     padding-top: inherit;
   }
-  .container {
+  .container-fluid {
     margin-right: 0 !important;
     margin-left: 0 !important;
   }
@@ -378,6 +358,13 @@ table i {
   margin-bottom: 60px;
 }
 
-.chat_top_right {
-  float: right;
+canvas {
+  border: 1px solid black;
+  width: 100%;
+  height: 60%;
+}
+
+.session-header-inner {
+    margin-top: 10px;
+    margin-right: 7px;
 }

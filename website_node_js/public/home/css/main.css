@@ -1,14 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo&family=Open+Sans&display=swap");
+
 body,
 html {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
+
 body {
-  font-family: "Archivo", sans-serif;
-  background-image: url("/static/home/images/bkr_home_background.jpg");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+    font-family: "Archivo", sans-serif;
+    background-image: url("/static/home/images/bkr_home_background.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }

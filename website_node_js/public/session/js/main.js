@@ -1,149 +1,69 @@
-var sessionName = <%- JSON.stringify(sessionName) %>;
-var token = <%- JSON.stringify(token) %>;
-var nickName = <%- JSON.stringify(nickName) %>;
+var to_paint = false;
+var clickX = new Array();
+var clickY = new Array();
+var clickDrag = new Array();
+var paint;
 
-console.warn("Request of TOKEN gone WELL (TOKEN:" + token + ")");
+context = document.getElementById("whiteboard").getContext("2d");
 
-OV = new OpenVidu();
+function addClick(x, y, dragging)
+{
+  clickX.push(x);
+  clickY.push(y);
+  clickDrag.push(dragging);
+}
 
-session = OV.initSession();
+function redraw(){
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height); // Clears the canvas
 
-session.on("streamCreated", (event) => {
-  var subscriber = session.subscribe(event.stream, "video-container");
-  subscriber.on("videoElementCreated", (event) => {
-    appendUserData(event.element, subscriber.stream.connection);
-  });
+  context.strokeStyle = "#df4b26";
+  context.lineJoin = "round";
+  context.lineWidth = 5;
+
+  for(var i=0; i < clickX.length; i++) {
+    context.beginPath();
+    if(clickDrag[i] && i){
+      context.moveTo(clickX[i-1], clickY[i-1]);
+     }else{
+       context.moveTo(clickX[i]-1, clickY[i]);
+     }
+     context.lineTo(clickX[i], clickY[i]);
+     context.closePath();
+     context.stroke();
+  }
+}
+
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+}
+
+var rect = document.getElementById("whiteboard").getBoundingClientRect();
+var offsetLeft = rect.left;
+var offsetTop = rect.top;
+
+$("#whiteboard").mousedown(function (e) {
+  var mouseX = e.pageX - offsetLeft;
+  var mouseY = e.pageY - offsetTop;
+  paint = true;
+  addClick(e.pageX - offsetLeft, e.pageY - offsetTop);
+  redraw();
+})
+
+$('#whiteboard').mousemove(function(e){
+  if(paint){
+    addClick(e.pageX - offsetLeft, e.pageY - offsetTop, true);
+    redraw();
+  }
 });
 
-session.on("streamDestroyed", (event) => {
-  removeUserData(event.stream.connection);
+$('#whiteboard').mouseup(function(e){
+  paint = false;
 });
 
-session
-  .connect(token, { clientData: nickName })
-  .then(() => {
-    $("#session-title").text(sessionName);
-    $("#join").hide();
-    $("#session").show();
-
-    if (isPublisher()) {
-      var publisher = OV.initPublisher("video-container", {
-        audioSource: undefined,
-        videoSource: undefined,
-        publishAudio: true,
-        publishVideo: true,
-        resolution: "640x480",
-        frameRate: 30,
-        insertMode: "APPEND",
-        mirror: false,
-      });
-
-      publisher.on("videoElementCreated", (event) => {
-    
-        var userData = {
-          nickName: nickName,
-          userName: nickName,
-        };
-        initMainVideo(event.element, userData);
-        appendUserData(event.element, userData);
-        $(event.element).prop("muted", true);
-      });
-
-      session.publish(publisher);
-    } else {
-      console.warn("You don't have permissions to publish");
-      initMainVideoThumbnail();
-    }
-  })
-  .catch((error) => {
-    console.warn(
-      "There was an error connecting to the session:",
-      error.code,
-      error.message
-    );
-  });
-
-function leaveSession() {
-  session.disconnect();
-}
-
-function appendUserData(videoElement, connection) {
-  var clientData;
-  var serverData;
-  var nodeId;
-  if (connection.nickName) {
-
-    clientData = connection.nickName;
-    serverData = connection.userName;
-    nodeId = "main-videodata";
-  } else {
-    clientData = JSON.parse(connection.data.split("%/%")[0]).clientData;
-    serverData = JSON.parse(connection.data.split("%/%")[1]).serverData;
-    nodeId = connection.connectionId;
-  }
-  var dataNode = document.createElement("div");
-  dataNode.className = "data-node";
-  dataNode.id = "data-" + nodeId;
-  dataNode.innerHTML =
-    '<p class="nickName">' +
-    clientData +
-    '</p><p class="userName">' +
-    serverData +
-    "</p>";
-  videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
-  addClickListener(videoElement, clientData, serverData);
-}
-
-function removeUserData(connection) {
-  var userNameRemoved = $("#data-" + connection.connectionId);
-  if (
-    $(userNameRemoved).find("p.userName").html() ===
-    $("#main-video p.userName").html()
-  ) {
-    cleanMainVideo();
-  }
-  $("#data-" + connection.connectionId).remove();
-}
-
-function removeAllUserData() {
-  $(".data-node").remove();
-}
-
-function cleanMainVideo() {
-  $("#main-video video").get(0).srcObject = null;
-  $("#main-video p").each(function () {
-    $(this).html("");
-  });
-}
-
-function addClickListener(videoElement, clientData, serverData) {
-  videoElement.addEventListener("click", function () {
-    var mainVideo = $("#main-video video").get(0);
-    if (mainVideo.srcObject !== videoElement.srcObject) {
-      $("#main-video").fadeOut("fast", () => {
-        $("#main-video p.nickName").html(clientData);
-        $("#main-video p.userName").html(serverData);
-        mainVideo.srcObject = videoElement.srcObject;
-        $("#main-video").fadeIn("fast");
-      });
-    }
-  });
-}
-
-function initMainVideo(videoElement, userData) {
-  $("#main-video video").get(0).srcObject = videoElement.srcObject;
-  $("#main-video p.nickName").html(userData.nickName);
-  $("#main-video p.userName").html(userData.userName);
-  $("#main-video video").prop("muted", true);
-}
-
-function initMainVideoThumbnail() {
-  $("#main-video video").css(
-    "background",
-    "url('images/subscriber-msg.jpg') round"
-  );
-}
-
-function isPublisher() {
-  return userName.includes("publisher");
-}
+// $('#whiteboard').mouseleave(function(e){
+//   paint = false;
+// });

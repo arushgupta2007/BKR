@@ -1,373 +1,447 @@
 <html>
 
 <head>
-	<title>BKR Meeting</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
-	</meta>
-	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
-	</link>
-	<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-		integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-		integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-	</link>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-		crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	</link>
-	<link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen">
-	</link>
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	<script src="/static/session/js/openvidu-browser-2.13.0.js"></script>
+    <title>BKR Meeting</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" ? />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    
+    <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script src="/static/session/js/openvidu-browser-2.13.0.js"></script>
 </head>
 
 <body>
-	<div id="sidePanel" class="sidepanel">
-		<button class="closebtn btn btn-light" style="font-size:200%" type="button"
-			onclick="closeSidePanel()">&times;</button>
-		<div id="extraOptions" class="card" style="background-color:#bfbfbf;">
-			<div class="card-body" style="padding: 20px; margin: 20px;">
-				<div class="row">
-					<div class="col">
-						<button class="btn btn-primary" type="button" onclick="screenShare()">
-							<i class="material-icons" style="font-size:170%">screen_share</i>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="messages" class="card">
-			<div class="card-header" style="text-align:center;">
-				<i class="material-icons" style="font-size: 300%;">chat</i>
-			</div>
-			<div class="card-body" id="messages_body" style="margin-top: 30px;">
-				<div style="text-align:center">
-					<p>Chat Initialized</p>
-				</div>
-			</div>
-		</div>
-		<div class="fixed-bottom" style="position: fixed; bottom:0; width: 100%;">
-			<div class="card" style="margin:10px">
-				<div class="card-body">
-					<form class="form-inline" action="javascript:void(0)" autocomplete="off">
-						<input type="hidden" placeholder="" class="form-control" id="to_message_send" value="">
-						<div class="form-group">
-							<input type="text" placeholder="Chat With Everybody!" class="form-control"
-								id="message_to_send">
-						</div>
-						<button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
-							<span class="glyphicon glyphicon-send"></span> Send
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="main-container" class="container">
-		<div id="logged">
-			<div id="session">
-				<div id="session-header">
-					<h1 id="session-title" style="margin-top:20px"><%= sessionName %></h1>
-					<button class="btn btn-light" type="button" id="dropdownMenuButton" onclick="openSidePanel()">
-						<i class="material-icons" style="font-size:230%;">more_vert</i>
-					</button>
-					<form action="/leave-session" method="post">
-						<input type="hidden" name="sessionname" value="<%= sessionName %>"></input>
-						<input type="hidden" name="token" value="<%= token %>"></input>
-						<button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-lg" type="submit"
-							onclick="leaveSession()">
-							<i class="material-icons" style="color:white;font-size:130%;">call_end</i>
-						</button>
-					</form>
-					<button id="toggleAudio" class="btn btn-success btn-circle btn-lg" onclick="toggleAudio()">
-						<i class="material-icons" id="toggleAudioIcon" style="color:white;font-size:130%;">mic_off</i>
-					</button>
-					<button id="toggleVideo" class="btn btn-primary btn-circle btn-lg" onclick="toggleVideo()">
-						<i class="material-icons" id="toggleVideoIcon"
-							style="color:white;font-size:130%;">videocam_off</i>
-					</button>
-				</div>
-				<div id="main-video" class="col-md-6">
-					<p class="nickName"></p>
-					<p class="userName"></p>
-					<video autoplay="true" playsinline="true"></video>
-				</div>
-				<div id="video-container" class="col-md-6"></div>
-			</div>
-		</div>
-	</div>
+    <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalLabel">White Board</h3>
+                </div>
+                <div class="modal-body">
+                    <canvas id="whiteboard"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="share_meeting_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Share Meeting</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Share this ID: <%= sessionName %> with the session code to allow somebody else to join the meeting</p>
+                    <h4>OR</h4>
+                    <p>Give this link: <a id="share_meeting_link"> https://192.168.1.18:8000/join_meeting/?id=<%= sessionName %></a> with the meeting code to allow somebody else to join the meeting</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
 
-	<script>
-		var publisher;
-		var sessionName = <%- JSON.stringify(sessionName) %>;
-		var token = <%- JSON.stringify(token) %>;
-		var nickName = <%- JSON.stringify(nickName) %>;
-		var userName = <%- JSON.stringify(userName) %>;
-		var audio = true;
-		var video = true;
-		var connection_list = {};
-		$('[data-toggle="tooltip"]').tooltip();
+        </div>
+    </div>
+    <div id="sidePanel" class="sidepanel">
+        <button class="closebtn btn btn-light" style="font-size:200%" type="button" onclick="closeSidePanel()">&times;</button>
+        <div id="messages" class="card">
+            <div class="card-header" style="text-align:center;">
+                <i class="material-icons" style="font-size: 300%;">chat</i>
+            </div>
+            <div class="card-body" id="messages_body" style="margin-top: 30px;">
+                <div style="text-align:center">
+                    <p>Chat Initialized</p>
+                </div>
+            </div>
+        </div>
+        <div class="fixed-bottom" style="position: fixed; bottom:0; width: 100%;">
+            <div class="card" style="margin:10px">
+                <div class="card-body">
+                    <form class="form-inline" action="javascript:void(0)" autocomplete="off">
+                        <input type="hidden" placeholder="" class="form-control" id="to_message_send" value="">
+                        <div class="form-group">
+                            <input type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
+                            <span class="glyphicon glyphicon-send"></span> Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--
+    <form action="javascript:void(0)">
+       <input type="text" id="leaveSession_name" name="sessionname" hidden/>
+       <input type="text" id="leaveSession_token" name="token" hidden/>
+       <input type="text" id="leaveSession_nickName" name="nickName" hidden/>
+       <button class="session-header-inner btn btn-danger" id="leaveSessionButton" type="submit" onclick="leaveSession()">
+        <i class="material-icons">
+            call_end
+        </i>
+    </button>
+   </form>
+-->
+   
+    <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark py-1">
+        <a href="/" class="navbar-brand mr-0 mr-md-2" aria-label="BKR">
+           <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;"/>
+        </a>
+        <ul class="navbar-nav ml-md-auto">
+            <li class="nav-item session-header-inner">
+                <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46">
+                    <i class="material-icons" style="color:white;font-size:100%;">chat</i>
+                </buton>
+            </li>
+            <li class="nav-item session-header-inner">
+                <button class="btn btn-primary btn-circle btn-sm" onclick="screenShare()" style="background-color:#5E90E7">
+                    <i class="material-icons" style="color:white;font-size:100%;">screen_share</i>
+                </button>
+            </li>
+            <li class="nav-item session-header-inner">
+                <button class="btn btn-warning btn-circle btn-sm" onclick="whiteboard_open()">
+                    <i class='fas fa-chalkboard' style="color:white;font-size:100%;"></i>
+                </button>
+            </li>
+            <li class="nav-item session-header-inner">
+                <button class="btn btn-info btn-circle btn-sm" onclick="shareMeeting()">
+                    <i class="material-icons" style="color:white;font-size:100%;">share</i>
+                </button>
+            </li>
+            <li class="nav-item session-header-inner">
+                <button id="toggleVideo" class="btn btn-primary btn-circle btn-sm" onclick="toggleVideo()">
+                    <i class="material-icons" id="toggleVideoIcon"
+                    style="color:white;font-size:100%;">videocam_off</i>
+                </button>
+            </li>
+            <li class="nav-item session-header-inner">
+                <button id="toggleAudio" class="btn btn-success btn-circle btn-sm" onclick="toggleAudio()">
+                    <i class="material-icons" id="toggleAudioIcon" style="color:white;font-size:100%;">mic_off</i>
+                </button>
+            </li>
+            <li class="nav-item session-header-inner">
+                <form action="/leave-session" method="post">
+                    <input type="hidden" name="sessionname" value="<%= sessionName %>"/>
+                    <input type="hidden" name="token" value="<%= token %>"/>
+                    <button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-sm" type="submit"
+                    onclick="leaveSession()">
+                        <i class="material-icons" style="color:white;font-size:100%;">call_end</i>
+                    </button>
+                </form>
+           </li>
+       </ul>
+    </header>
+    
+    <div id="main-container" class="container-fluid" style="margin-left: 30px;">
+        <div id="logged">
+            <div id="session">
+                <div id="main-video" class="col-md-6">
+                    <p class="nickName"></p>
+                    <p class="userName"></p>
+                    <video autoplay="true" playsinline="true"></video>
+                </div>
+                <div id="video-container" class="col-md-6"></div>
+            </div>
+        </div>
+    </div>
 
-		OV = new OpenVidu();
-		session = OV.initSession();
+    <script>
+        var publisher;
+        var sessionName = <%- JSON.stringify(sessionName) %> ;
+        var token = <%- JSON.stringify(token) %> ;
+        var nickName = <%- JSON.stringify(nickName) %> ;
+        var userName = <%- JSON.stringify(userName) %> ;
+        var meetingName = <%- JSON.stringify(meetingName) %> ;
+        var audio = true;
+        var video = true;
+        var connection_list = {};
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#share_meeting_link").attr("href", "/join_meting/?id=" + sessionName)
+        
+        OV = new OpenVidu();
+        session = OV.initSession();
 
-		function setMessageOut() {
-			$("#dropdownMenuButton").html('<i class="material-icons" style="font-size:230%;">more_vert</i>');
-		}
+        session.on('signal:chat', (event) => {
+            var seprated_values = event.data.split(",")
+            var from_name = seprated_values[0];
+            var from_id = seprated_values[1];
+            var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
+            var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
 
-		session.on('signal:chat', (event) => {
-			var seprated_values = event.data.split(",")
-			var from_name = seprated_values[0];
-			var from_id = seprated_values[1];
-			var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
-			var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+            var html_string;
+            if (from_id === userName.toString()) {
+                html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You: ' + message + ' </strong></div></div>'
+            } else {
+                html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
+            }
+            $("#messages_body").append(html_string);
+        })
 
-			var html_string;
-			if (from_id === userName.toString()) {
-				html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You: ' + message + ' </strong></div></div>'
-			} else {
-				html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
-				$("#dropdownMenuButton").html('<div class="spinner-grow" role="status"><span class="sr-only">New Message</span></div>');
-				setTimeout(setMessageOut, 1000);
-			}
-			$("#messages_body").append(html_string);
-		})
+        session.on('signal:private-chat', (event) => {
+            var seprated_values = event.data.split(",")
+            var from_name = seprated_values[0];
+            var from_id = seprated_values[1];
+            var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
+            var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+            console.log("Private-Chat");
+            var html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
+            $("#messages_body").append(html_string);
+        })
 
-		session.on('signal:private-chat', (event) => {
-			var seprated_values = event.data.split(",")
-			var from_name = seprated_values[0];
-			var from_id = seprated_values[1];
-			var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
-			var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
-			console.log("Private-Chat");
-			var html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
-			$("#dropdownMenuButton").html('<div class="spinner-grow" role="status"><span class="sr-only">New Message</span></div>');
-			setTimeout(setMessageOut, 1000);
-			$("#messages_body").append(html_string);
-		})
+        session.on('streamCreated', (event) => {
+            var subscriber = session.subscribe(event.stream, 'video-container');
+            subscriber.on('videoElementCreated', (event) => {
+                appendUserData(event.element, subscriber.stream.connection);
+            });
+        });
 
-		session.on('streamCreated', (event) => {
-			var subscriber = session.subscribe(event.stream, 'video-container');
-			subscriber.on('videoElementCreated', (event) => {
-				appendUserData(event.element, subscriber.stream.connection);
-			});
-		});
+        session.on('streamDestroyed', (event) => {
+            removeUserData(event.stream.connection);
+            delete connection_list[event.stream.connection.connectionId];
+        });
 
-		session.on('streamDestroyed', (event) => {
-			removeUserData(event.stream.connection);
-			delete connection_list[event.stream.connection.connectionId];
-		});
+        session.on('connectionCreated', (event) => {
+            console.log(event.connection);
+            connection_list[event.connection.connectionId] = event.connection;
+        });
+        session.on('connectionDestroyed', (event) => {
+            console.log("Destoyed!");
+        });
 
-		session.on('connectionCreated', (event) => {
-			console.log(event.connection);
-			connection_list[event.connection.connectionId] = event.connection;
-		});
+        session.connect(token, {
+                clientData: nickName
+            })
+            .then(() => {
+                $('#session-title').text(meetingName);
+                $('#join').hide();
+                $('#session').show();
+                publisher = OV.initPublisher('video-container', {
+                    audioSource: undefined,
+                    videoSource: undefined,
+                    publishAudio: true,
+                    publishVideo: true,
+                    resolution: '640x480',
+                    frameRate: 30,
+                    insertMode: 'APPEND',
+                    mirror: false
+                });
+                publisher.on('videoElementCreated', (event) => {
+                    var userData = {
+                        nickName: nickName,
+                        userName: userName
+                    };
+                    initMainVideo(event.element, userData);
+                    appendUserData(event.element, userData);
+                    $(event.element).prop('muted', true);
+                });
+                session.publish(publisher);
+            })
+            .catch(error => {
+                console.warn('There was an error connecting to the session:', error.code, error.message);
+            });
 
-		session.connect(token, { clientData: nickName })
-			.then(() => {
-				$('#session-title').text(sessionName);
-				$('#join').hide();
-				$('#session').show();
-				publisher = OV.initPublisher('video-container', {
-					audioSource: undefined,
-					videoSource: undefined,
-					publishAudio: true,
-					publishVideo: true,
-					resolution: '640x480',
-					frameRate: 30,
-					insertMode: 'APPEND',
-					mirror: false
-				});
-				publisher.on('videoElementCreated', (event) => {
-					var userData = {
-						nickName: nickName,
-						userName: userName
-					};
-					initMainVideo(event.element, userData);
-					appendUserData(event.element, userData);
-					$(event.element).prop('muted', true);
-				});
-				session.publish(publisher);
-			})
-			.catch(error => {
-				console.warn('There was an error connecting to the session:', error.code, error.message);
-			});
+        function leaveSession() {
+            session.disconnect();
+        }
 
-		function leaveSession() {
-			session.disconnect();
-		}
+        function toggleAudio() {
+            if (audio) {
+                audio = false;
+                $("#toggleAudioIcon").html("mic")
+                publisher.publishAudio(false);
+            } else {
+                audio = true;
+                $("#toggleAudioIcon").html("mic_off")
+                publisher.publishAudio(true);
+            }
+        }
 
-		function toggleAudio() {
-			if (audio) {
-				audio = false;
-				$("#toggleAudioIcon").html("mic")
-				publisher.publishAudio(false);
-			} else {
-				audio = true;
-				$("#toggleAudioIcon").html("mic_off")
-				publisher.publishAudio(true);
-			}
-		}
+        function toggleVideo() {
+            if (video) {
+                video = false;
+                $("#toggleVideoIcon").html("videocam")
+                publisher.publishVideo(false);
+            } else {
+                video = true;
+                $("#toggleVideoIcon").html("videocam_off")
+                publisher.publishVideo(true);
+            }
+        }
 
-		function toggleVideo() {
-			if (video) {
-				video = false;
-				$("#toggleVideoIcon").html("videocam")
-				publisher.publishVideo(false);
-			} else {
-				video = true;
-				$("#toggleVideoIcon").html("videocam_off")
-				publisher.publishVideo(true);
-			}
-		}
+        function closeSidePanel() {
+            document.getElementById("sidePanel").style.width = "0px";
+        }
 
-		function closeSidePanel() {
-			document.getElementById("sidePanel").style.width = "0px";
-		}
+        function openSidePanel() {
+            document.getElementById("sidePanel").style.width = "350px";
+        }
 
-		function openSidePanel() {
-			document.getElementById("sidePanel").style.width = "350px";
-		}
+        function whiteboard_open() {
+            $('#whiteboard_model').modal({
+                keyboard: false
+            });
+        }
 
-		function sendMessage() {
-			var to = $("#to_message_send").val();
-			if (to === "") {
-				session.signal({
-					data: nickName + "," + userName + "," + $("#message_to_send").val(),
-					to: [],
-					type: "chat",
-				}).then(() => {
-				}).catch((error) => {
-				})
-			} else {
-				session.signal({
-					data: nickName + "," + userName + "," + $("#message_to_send").val(),
-					to: [connection_list[to]],
-					type: "private-chat",
-				}).then(() => {
-				}).catch((error) => {
-				})
-				$("#to_message_send").val("");
-				$("#message_to_send").attr("placeholder", "Chat With Everybody!");
-				to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
-				var html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
-				$("#messages_body").append(html_string);
-			}
-			$("#message_to_send").val("");
-		}
+        function shareMeeting() {
+            $("#share_meeting_modal").modal()
+        }
 
-		function screenShare() {
-			OV.getUserMedia({
-				audioSource: undefined,
-				videoSource: "screen",
-				publishAudio: true,
-				publishVideo: true,
-				resolution: '640x480',
-				frameRate: 30,
-				insertMode: 'APPEND',
-				mirror: false
-			}).then(mediaStream => {
-				var screenTrack = mediaStream.getVideoTracks()[0];
-				publisher.replaceTrack(screenTrack).then(() => { }).catch((err) => { console.log(err); });
-				screenTrack.addEventListener('ended', () => {
-					OV.getUserMedia({
-						audioSource: undefined,
-						videoSource: undefined,
-						publishAudio: true,
-						publishVideo: true,
-						resolution: '640x480',
-						frameRate: 30,
-						insertMode: 'APPEND',
-						mirror: false
-					}).then(videoStream => {
-						var videoTrack = videoStream.getVideoTracks()[0];
-						publisher.replaceTrack(videoTrack).then(() => { }).catch((err) => { console.log(err); });
-					})
-				})
-			}).catch((err) => { console.log(err); })
-		}
+        function sendMessage() {
+            var to = $("#to_message_send").val();
+            if (to === "") {
+                session.signal({
+                    data: nickName + "," + userName + "," + $("#message_to_send").val(),
+                    to: [],
+                    type: "chat",
+                }).then(() => {}).catch((error) => {})
+            } else {
+                session.signal({
+                    data: nickName + "," + userName + "," + $("#message_to_send").val(),
+                    to: [connection_list[to]],
+                    type: "private-chat",
+                }).then(() => {}).catch((error) => {})
+                $("#to_message_send").val("");
+                $("#message_to_send").attr("placeholder", "Chat With Everybody!");
+                to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
+                var html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
+                $("#messages_body").append(html_string);
+            }
+            $("#message_to_send").val("");
+        }
 
-		function appendUserData(videoElement, connection) {
-			var clientData;
-			var serverData;
-			var nodeId;
-			if (connection.nickName) {
-				clientData = connection.nickName;
-				serverData = connection.userName;
-				nodeId = 'main-videodata';
-			} else {
-				clientData = JSON.parse(connection.data.split('%/%')[0]).clientData;
-				serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
-				nodeId = connection.connectionId;
-			}
-			var dataNode = document.createElement('div');
-			dataNode.className = "data-node";
-			dataNode.id = "data-" + nodeId;
-			if (nodeId === "main-videodata") {
-				dataNode.innerHTML = '<p class="nickName">You</p><p class="userName">' + serverData + '</p>';
-			} else {
-				dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><button type="button" class="chat_top_right btn btn-primary py-0" data-toggle="tooltip" data-placement="top" title="Private Chat"><i class="material-icons" style="font-size: 90%;">chat</i></button><p class="userName">' + serverData + '</p>';
-				var button_private_chat = dataNode.querySelector('.chat_top_right');
-				button_private_chat.addEventListener('click', () => {
-					$("#to_message_send").val(nodeId);
-					$("#message_to_send").attr("placeholder", "Private Chat with " + clientData);
-					openSidePanel();
-				})
-			}
-			videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
-			addClickListener(videoElement, clientData, serverData);
-		}
+        function screenShare() {
+            OV.getUserMedia({
+                audioSource: undefined,
+                videoSource: "screen",
+                publishAudio: true,
+                publishVideo: true,
+                resolution: '640x480',
+                frameRate: 30,
+                insertMode: 'APPEND',
+                mirror: false
+            }).then(mediaStream => {
+                var screenTrack = mediaStream.getVideoTracks()[0];
+                publisher.replaceTrack(screenTrack).then(() => {}).catch((err) => {
+                    console.log(err);
+                });
+                screenTrack.addEventListener('ended', () => {
+                    OV.getUserMedia({
+                        audioSource: undefined,
+                        videoSource: undefined,
+                        publishAudio: true,
+                        publishVideo: true,
+                        resolution: '640x480',
+                        frameRate: 30,
+                        insertMode: 'APPEND',
+                        mirror: false
+                    }).then(videoStream => {
+                        var videoTrack = videoStream.getVideoTracks()[0];
+                        publisher.replaceTrack(videoTrack).then(() => {}).catch((err) => {
+                            console.log(err);
+                        });
+                    })
+                })
+            }).catch((err) => {
+                console.log(err);
+            })
+        }
 
-		function removeUserData(connection) {
-			var userNameRemoved = $("#data-" + connection.connectionId);
-			if ($(userNameRemoved).find('p.userName').html() === $('#main-video p.userName').html()) {
-				cleanMainVideo();
-			}
-			$("#data-" + connection.connectionId).remove();
-		}
+        function appendUserData(videoElement, connection) {
+            var clientData;
+            var serverData;
+            var nodeId;
+            if (connection.nickName) {
+                clientData = connection.nickName;
+                serverData = connection.userName;
+                nodeId = 'main-videodata';
+            } else {
+                clientData = JSON.parse(connection.data.split('%/%')[0]).clientData;
+                serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
+                nodeId = connection.connectionId;
+            }
+            var dataNode = document.createElement('div');
+            dataNode.className = "data-node";
+            dataNode.id = "data-" + nodeId;
+            if (nodeId === "main-videodata") {
+                dataNode.innerHTML = '<p class="nickName">You</p><p class="userName">' + serverData + '</p>';
+            } else {
+                dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><button type="button" class="chat_top_right btn btn-primary py-0" data-toggle="tooltip" data-placement="top" title="Private Chat"><i class="material-icons" style="font-size: 90%;">chat</i></button><p class="userName">' + serverData + '</p>';
+                var button_private_chat = dataNode.querySelector('.chat_top_right');
+                button_private_chat.addEventListener('click', () => {
+                    $("#to_message_send").val(nodeId);
+                    $("#message_to_send").attr("placeholder", "Private Chat with " + clientData);
+                    openSidePanel();
+                })
+            }
+            videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
+            addClickListener(videoElement, clientData, serverData);
+        }
 
-		function removeAllUserData() {
-			$(".data-node").remove();
-		}
+        function removeUserData(connection) {
+            var userNameRemoved = $("#data-" + connection.connectionId);
+            if ($(userNameRemoved).find('p.userName').html() === $('#main-video p.userName').html()) {
+                cleanMainVideo();
+            }
+            $("#data-" + connection.connectionId).remove();
+        }
 
-		function cleanMainVideo() {
-			$('#main-video video').get(0).srcObject = null;
-			$('#main-video p').each(function () {
-				$(this).html('');
-			});
-		}
+        function removeAllUserData() {
+            $(".data-node").remove();
+        }
 
-		function addClickListener(videoElement, clientData, serverData) {
-			videoElement.addEventListener('click', function () {
-				var mainVideo = $('#main-video video').get(0);
-				if (mainVideo.srcObject !== videoElement.srcObject) {
-					$('#main-video').fadeOut("fast", () => {
-						if (serverData.toString() === userName.toString()) {
-							$('#main-video p.nickName').html("You");
-						} else {
-							$('#main-video p.nickName').html(clientData);
-						}
-						$('#main-video p.userName').html(serverData);
-						mainVideo.srcObject = videoElement.srcObject;
-						$('#main-video').fadeIn("fast");
-					});
-				}
-			});
-		}
+        function cleanMainVideo() {
+            $('#main-video video').get(0).srcObject = null;
+            $('#main-video p').each(function() {
+                $(this).html('');
+            });
+        }
 
-		function initMainVideo(videoElement, userData) {
-			$('#main-video video').get(0).srcObject = videoElement.srcObject;
-			if (userData.userName.toString() === userName.toString()) {
-				$('#main-video p.nickName').html("You");
-			} else {
-				$('#main-video p.nickName').html(userData.nickName);
-			}
-			$('#main-video p.userName').html(userData.userName);
-			$('#main-video video').prop('muted', true);
-		}
+        function addClickListener(videoElement, clientData, serverData) {
+            videoElement.addEventListener('click', function() {
+                var mainVideo = $('#main-video video').get(0);
+                if (mainVideo.srcObject !== videoElement.srcObject) {
+                    $('#main-video').fadeOut("fast", () => {
+                        if (serverData.toString() === userName.toString()) {
+                            $('#main-video p.nickName').html("You");
+                        } else {
+                            $('#main-video p.nickName').html(clientData);
+                        }
+                        $('#main-video p.userName').html(serverData);
+                        mainVideo.srcObject = videoElement.srcObject;
+                        $('#main-video').fadeIn("fast");
+                    });
+                }
+            });
+        }
 
-	</script>
+        function initMainVideo(videoElement, userData) {
+            $('#main-video video').get(0).srcObject = videoElement.srcObject;
+            if (userData.userName.toString() === userName.toString()) {
+                $('#main-video p.nickName').html("You");
+            } else {
+                $('#main-video p.nickName').html(userData.nickName);
+            }
+            $('#main-video p.userName').html(userData.userName);
+            $('#main-video video').prop('muted', true);
+        }
+    </script>
+    <script src="/static/session/js/main.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,24 @@
+1. Do not show meeting ID in header, but show meeting description
+2. Reduce header font-size
+3. Header diffrent color
+4. Color theme (Gray, Black, White, Blue)
+5. Main Video not there upto 4 participants
+6. Small Video small 
+7. Extra Options Dropdown and not on chat
+8. Chat Button on header
+9. Sign in
+10. Store Prev Meetings (collapsable)
+11. URL Redirect without code
+12. Guest Joining
+13. Email / Phone NO.
+14. Message font-size Down
+15. Message Name different color
+16. Put name in header
+17. sticky footer
+18. Show list of participants (in prev meeting)
+19. Show 4 Active participants
+20. Show prticipant's initials just when they start talking
+21. Mute / close Video  somebody / all
+22. Save Chat
+23. fullscreen per user
+24. 

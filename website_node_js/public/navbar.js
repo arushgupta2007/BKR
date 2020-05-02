@@ -1,6 +1,8 @@
 document.write('\
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">\
-  <a class="navbar-brand" href="#">BKR</a>\
+<nav class="navbar navbar-expand-sm navbar-dark py-1" style="background-color:#51504f;">\
+  <a class="navbar-brand" href="#">\
+    <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;"/>\
+  </a>\
   <button\
     class="navbar-toggler"\
     type="button"\
