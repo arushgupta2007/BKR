@@ -1,370 +1,422 @@
 #main-container {
-  padding-bottom: 80px;
+    padding-bottom: 80px;
 }
 
 .vertical-center {
-  width: -webkit-fit-content;
-  width: fit-content;
-  margin: auto;
+    width: -webkit-fit-content;
+    width: fit-content;
+    margin: auto;
 }
 
 .vertical-center#not-logged form {
-  width: -moz-fit-content;
-  margin: auto;
+    width: -moz-fit-content;
+    margin: auto;
 }
 
 .vertical-center#not-logged table {
-  width: -moz-fit-content;
-  margin: auto;
+    width: -moz-fit-content;
+    margin: auto;
 }
 
 .vertical-center table {
-  margin-top: 3em !important;
+    margin-top: 3em !important;
 }
 
 .horizontal-center {
-  margin: 0 auto;
+    margin: 0 auto;
 }
 
 .form-control {
-  color: #0088aa;
-  font-weight: bold;
+    color: #0088aa;
+    font-weight: bold;
 }
 
 .form-control:focus {
-  border-color: #0088aa;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
-    0 0 8px rgba(0, 136, 170, 0.6);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
-    0 0 8px rgba(0, 136, 170, 0.6);
+    border-color: #0088aa;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px rgba(0, 136, 170, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+        0 0 8px rgba(0, 136, 170, 0.6);
 }
 
 input.btn {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .btn {
-  font-weight: bold !important;
+    font-weight: bold !important;
 }
 
 .btn-success {
-  background-color: #06d362 !important;
-  border-color: #06d362;
+    background-color: #06d362 !important;
+    border-color: #06d362;
 }
 
 .btn-success:hover {
-  background-color: #1abd61 !important;
-  border-color: #1abd61;
+    background-color: #1abd61 !important;
+    border-color: #1abd61;
 }
 
 .btn-info {
-  background-color: #0088aa !important;
-  border-color: #0088aa;
+    background-color: #0088aa !important;
+    border-color: #0088aa;
 }
 
 .btn-info:hover {
-  background-color: #00708c !important;
-  border-color: #00708c;
+    background-color: #00708c !important;
+    border-color: #00708c;
 }
 
 .btn-warning {
-  background-color: #ffcc00 !important;
-  border-color: #ffcc00;
-  color: #4d4d4d;
+    background-color: #ffcc00 !important;
+    border-color: #ffcc00;
+    color: #4d4d4d;
 }
 
 .btn-warning:hover {
-  background-color: #eabb3a !important;
-  border-color: #eabb3a;
-  color: #4d4d4d;
+    background-color: #eabb3a !important;
+    border-color: #eabb3a;
+    color: #4d4d4d;
 }
 
 .btn-warning:active {
-  color: #4d4d4d;
+    color: #4d4d4d;
 }
 
 .btn-warning:focus {
-  color: #4d4d4d;
+    color: #4d4d4d;
 }
 
 .btn-warning:active:focus {
-  color: #4d4d4d;
+    color: #4d4d4d;
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 60px;
-  background-color: #4d4d4d;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #4d4d4d;
 }
 
 .footer .text-muted {
-  margin: 20px 0;
-  float: left;
-  color: #ccc;
+    margin: 20px 0;
+    float: left;
+    color: #ccc;
 }
 
 .openvidu-logo {
-  height: 35px;
-  float: right;
-  margin: 12px 0;
-  -webkit-transition: all 0.1s ease-in-out;
-  -moz-transition: all 0.1s ease-in-out;
-  -o-transition: all 0.1s ease-in-out;
-  transition: all 0.1s ease-in-out;
+    height: 35px;
+    float: right;
+    margin: 12px 0;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -o-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 
 .openvidu-logo:hover {
-  -webkit-filter: grayscale(0.5);
-  filter: grayscale(0.5);
+    -webkit-filter: grayscale(0.5);
+    filter: grayscale(0.5);
 }
 
 .demo-logo {
-  margin: 0;
-  height: 22px;
-  float: left;
-  padding-right: 8px;
+    margin: 0;
+    height: 22px;
+    float: left;
+    padding-right: 8px;
 }
 
 a:hover .demo-logo {
-  -webkit-filter: brightness(0.7);
-  filter: brightness(0.7);
+    -webkit-filter: brightness(0.7);
+    filter: brightness(0.7);
 }
 
 #join {
-  padding-top: 40px;
+    padding-top: 40px;
 }
 
 #not-logged {
-  padding-top: 40px;
+    padding-top: 40px;
 }
 
 #join-dialog h1 {
-  color: #4d4d4d;
-  font-weight: bold;
-  text-align: center;
+    color: #4d4d4d;
+    font-weight: bold;
+    text-align: center;
 }
 
 #join-dialog label {
-  color: #0088aa;
+    color: #0088aa;
 }
 
 #join-dialog input.btn {
-  margin-top: 15px;
+    margin-top: 15px;
 }
 
 #join-dialog hr {
-  background: #4d4d4d;
+    background: #4d4d4d;
 }
 
 #img-div {
-  text-align: center;
-  padding-bottom: 3em;
+    text-align: center;
+    padding-bottom: 3em;
 }
 
 #img-div img {
-  height: 15%;
+    height: 15%;
 }
 
 #logged {
-  width: 100%;
+    width: 100%;
 }
 
 #join {
-  max-width: 700px;
-  margin: auto;
+    max-width: 700px;
+    margin: auto;
 }
 
 #session-header {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 #session-header form {
-  display: inline;
+    display: inline;
 }
 
 #session-title {
-  display: inline-block;
+    display: inline-block;
 }
 
 #video-container video {
-  position: relative;
-  float: left;
-  width: 50%;
-  cursor: pointer;
+    position: relative;
+    float: left;
+    width: 50%;
+    cursor: pointer;
 }
 
 #video-container div {
-  float: left;
-  width: 50%;
-  position: relative;
-  margin-left: -50%;
+    float: left;
+    width: 50%;
+    position: relative;
+    margin-left: -50%;
 }
 
 #video-container p {
-  display: inline-block;
-  background: #f8f8f8;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #777777;
-  font-weight: bold;
-  border-bottom-right-radius: 4px;
+    display: inline-block;
+    background: #f8f8f8;
+    padding-left: 5px;
+    padding-right: 5px;
+    color: #777777;
+    font-weight: bold;
+    border-bottom-right-radius: 4px;
 }
 
 #video-container p.userName {
-  float: right;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 0px;
-  font-weight: lighter;
-  font-size: 12px;
-  background: #777777;
-  color: #f8f8f8;
+    float: right;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 0px;
+    font-weight: lighter;
+    font-size: 12px;
+    background: #777777;
+    color: #f8f8f8;
 }
 
 video {
-  width: 100%;
-  height: auto;
+    width: 100%;
+    height: auto;
 }
 
 #main-video p {
-  position: absolute;
-  display: inline-block;
-  background: #f8f8f8;
-  padding-left: 5px;
-  padding-right: 5px;
-  font-size: 22px;
-  color: #777777;
-  font-weight: bold;
-  border-bottom-right-radius: 4px;
+    position: absolute;
+    display: inline-block;
+    background: #f8f8f8;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-size: 22px;
+    color: #777777;
+    font-weight: bold;
+    border-bottom-right-radius: 4px;
 }
 
 #main-video p.userName {
-  position: absolute;
-  right: 0;
-  font-size: 16px !important;
-  margin-right: 15px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 0px;
-  font-weight: lighter;
-  font-size: 12px;
-  background: #777777;
-  color: #f8f8f8;
+    position: absolute;
+    right: 0;
+    font-size: 16px !important;
+    margin-right: 15px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 0px;
+    font-weight: lighter;
+    font-size: 12px;
+    background: #777777;
+    color: #f8f8f8;
 }
 
 #session img {
-  width: 100%;
-  height: auto;
-  display: inline-block;
-  object-fit: contain;
-  vertical-align: baseline;
+    width: 100%;
+    height: auto;
+    display: inline-block;
+    object-fit: contain;
+    vertical-align: baseline;
 }
 
 #session #video-container img {
-  position: relative;
-  float: left;
-  width: 50%;
-  cursor: pointer;
-  object-fit: cover;
-  height: 180px;
+    position: relative;
+    float: left;
+    width: 50%;
+    cursor: pointer;
+    object-fit: cover;
+    height: 180px;
 }
 
 table i {
-  cursor: pointer;
-  margin-left: 1em;
+    cursor: pointer;
+    margin-left: 1em;
 }
 
 #tooltip-div {
-  text-align: left;
+    text-align: left;
 }
 
 #tooltip-div hr {
-  margin: 5px 0;
+    margin: 5px 0;
 }
 
 #login-info {
-  text-align: right;
+    text-align: right;
 }
 
 #login-info form {
-  display: inline;
+    display: inline;
 }
 
 #login-info div {
-  display: inline;
-  margin-right: 1em;
+    display: inline;
+    margin-right: 1em;
 }
 
 #name-user {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 /* xs ans md screen resolutions*/
 
 @media screen and (max-width: 991px) {
-  #join {
-    padding-top: inherit;
-  }
+    #join {
+        padding-top: inherit;
+    }
 
-  #not-logged {
-    padding-top: inherit;
-  }
-  .container-fluid {
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-  .vertical-center {
-    padding-top: 10px;
-  }
-  #img-div {
-    padding-bottom: 1em;
-  }
-  #img-div img {
-    height: 10%;
-  }
+    #not-logged {
+        padding-top: inherit;
+    }
+
+    .container-fluid {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    .vertical-center {
+        padding-top: 10px;
+    }
+
+    #img-div {
+        padding-bottom: 1em;
+    }
+
+    #img-div img {
+        height: 10%;
+    }
 }
 
 .userName {
-  opacity: 0%;
+    opacity: 0%;
 }
 
 .sidePanel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 0;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  right: 0;
-  background-color: #dddddd;
-  opacity: 90%;
-  overflow: hidden;
-  padding-top: 60px;
-  transition: 0.5s;
+    display: inline-block;
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background-color: #dddddd;
+    opacity: 90%;
+    overflow: hidden;
+    transition: 0.5s;
 }
 
 .sidePanel .closebtn {
-  position: absolute;
-  top: 0;
-  left: 25px;
-  font-size: 130%;
-  margin-right: 50px;
+    position: absolute;
+    top: 0;
+    left: 15px;
+    font-size: 70%;
+    background-color:transparent;
+}
+
+#chat_icon_side_panel {
+    position: absolute;
+    top: 0;
+    right: 15px;
+    font-size: 70%;
+    margin-top: 10px;
+    background-color:transparent;
+}
+
+#to_whom_message_side_panel {
+    margin-top: 5px;
 }
 
 #messages {
-  overflow-y: auto;
-  margin: 15px;
-  margin-bottom: 60px;
+    margin: 5px;
+    height: 90%;
+}
+
+#messages_body {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#message_header {
+    text-align:center;
+}
+
+#message_footer {
+    text-align:center;
 }
 
 canvas {
-  border: 1px solid black;
-  width: 100%;
-  height: 60%;
+    border: 1px solid black;
+    width: 100%;
+    height: 60%;
 }
 
 .session-header-inner {
     margin-top: 10px;
     margin-right: 7px;
+}
+
+.meetingOptionsExtra {
+    height: 100%;
+    display: inline-block;
+    background-color: #6c757d;
+}
+
+.send_button_sidebar_container {
+    width: 100%;
+    background-color: #6c757d;
+}
+
+.message_sent {
+    font-size: 10px;
+    margin: 5px;
+    max-width: 100%;
+}
+
+#message_to_send {
+    font-size: 10px;
+}
+
+body {
+    overflow-x: hidden;
 }

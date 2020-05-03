@@ -116,7 +116,7 @@ app.post("/session/", (req, res) => {
                 })
                 .catch((err) => console.log(err));
         } else {
-            res.redirect("/create_new/?wrong=password&name=" + name_client);
+            res.redirect("/create_new/?wrong=password&name=" + name_client + "&meeting_name=" + name_meeting);
         }
     } else {
         var sessionName = req.body.meeting_id;

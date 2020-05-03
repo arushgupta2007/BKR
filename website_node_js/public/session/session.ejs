@@ -24,88 +24,14 @@
 </head>
 
 <body>
-    <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="modalLabel">White Board</h3>
-                </div>
-                <div class="modal-body">
-                    <canvas id="whiteboard"></canvas>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="share_meeting_modal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Share Meeting</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Share this ID: <%= sessionName %> with the session code to allow somebody else to join the meeting</p>
-                    <h4>OR</h4>
-                    <p>Give this link: <a id="share_meeting_link"> https://192.168.1.18:8000/join_meeting/?id=<%= sessionName %></a> with the meeting code to allow somebody else to join the meeting</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    <div id="sidePanel" class="sidepanel">
-        <button class="closebtn btn btn-light" style="font-size:200%" type="button" onclick="closeSidePanel()">&times;</button>
-        <div id="messages" class="card">
-            <div class="card-header" style="text-align:center;">
-                <i class="material-icons" style="font-size: 300%;">chat</i>
-            </div>
-            <div class="card-body" id="messages_body" style="margin-top: 30px;">
-                <div style="text-align:center">
-                    <p>Chat Initialized</p>
-                </div>
-            </div>
-        </div>
-        <div class="fixed-bottom" style="position: fixed; bottom:0; width: 100%;">
-            <div class="card" style="margin:10px">
-                <div class="card-body">
-                    <form class="form-inline" action="javascript:void(0)" autocomplete="off">
-                        <input type="hidden" placeholder="" class="form-control" id="to_message_send" value="">
-                        <div class="form-group">
-                            <input type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send">
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
-                            <span class="glyphicon glyphicon-send"></span> Send
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-<!--
-    <form action="javascript:void(0)">
-       <input type="text" id="leaveSession_name" name="sessionname" hidden/>
-       <input type="text" id="leaveSession_token" name="token" hidden/>
-       <input type="text" id="leaveSession_nickName" name="nickName" hidden/>
-       <button class="session-header-inner btn btn-danger" id="leaveSessionButton" type="submit" onclick="leaveSession()">
-        <i class="material-icons">
-            call_end
-        </i>
-    </button>
-   </form>
--->
-   
-    <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark py-1">
+    <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark py-1" id="navbar_session">
         <a href="/" class="navbar-brand mr-0 mr-md-2" aria-label="BKR">
            <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;"/>
         </a>
+        <span class="navbar-text mr-0 mr-md-2 mx-auto"><%= meetingName %></span>
         <ul class="navbar-nav ml-md-auto">
             <li class="nav-item session-header-inner">
-                <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46">
+                <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46;border-color:#7D7C46">
                     <i class="material-icons" style="color:white;font-size:100%;">chat</i>
                 </buton>
             </li>
@@ -147,6 +73,98 @@
            </li>
        </ul>
     </header>
+    <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalLabel">White Board</h3>
+                </div>
+                <div class="modal-body">
+                    <canvas id="whiteboard"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="share_meeting_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Share Meeting</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>Share this ID: <%= sessionName %> with the session code to allow somebody else to join the meeting</p>
+                    <h4>OR</h4>
+                    <p>Give this link: <a id="share_meeting_link"> https://192.168.1.18:8000/join_meeting/?id=<%= sessionName %></a> with the meeting code to allow somebody else to join the meeting</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<!--
+    <div id="sidePanel" class="sidepanel">
+        <div id="messages" class="card">
+            <div class="card-header" style="text-align:center;">
+               <button class="closebtn btn btn-light" style="font-size:200%;background-color:transparent;" type="button" onclick="closeSidePanel()">&times;</button>
+                <i class="material-icons" style="font-size: 300%;">chat</i>
+            </div>
+            <div class="card-body" id="messages_body" style="margin-top: 30px;">
+            </div>
+        </div>
+        <div class="fixed-bottom" style="position: fixed; bottom:0; width:100%;" id="message_form_div">
+            <form class="form-inline" action="javascript:void(0)" autocomplete="off" style="display: block;">
+                <input type="hidden" placeholder="" class="form-control" id="to_message_send" value="">
+                <div class="form-group">
+                    <input type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
+                    <i class="material-icons">send</i>
+                </button>
+            </form>
+        </div>
+    </div>
+-->
+   
+   <div class="sidePanel" id="sidePanel">
+        <div class="card" id="messages">
+            <div class="card-header p-0" id="message_header">
+                   <button class="closebtn btn btn-light" type="button" onclick="closeSidePanel()">&times;</button>
+                   <h6 id="to_whom_message_side_panel">Broadcast</h6>
+                    <i class="material-icons" id="chat_icon_side_panel">chat</i>
+            </div>
+            <div class="card-body p-1 m-1" id="messages_body" style="margin-top:30px;margin-bottom:30px;"></div>
+            <div class="card-footer p-1" id="message_footer">
+                <form action="javascript:void(0)" autocomplete="off" style="text-align:center;">
+                    <input class="form-control" id="to_message_send" type="hidden" />
+                    <div class="send_button_sidebar_container">
+                        <button type="submit" class="btn btn-primary btn-sm" onclick="sendMessage()">
+                        <i class="material-icons" style="color:white;font-size:100%;">send</i>
+                    </button>
+                    </div>
+                    <div class="form-group">
+                        <textarea type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send" style="margin:3px;" rows="6"></textarea>
+                    </div>
+               </form>
+            </div>
+        </div>
+   </div>
+    
+   <div class="meetingOptionsExtra">
+       <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
+           <button type="button" class="btn btn-secondary" onclick="openParticipantList()">
+               <i class="material-icons" style="color:white;">group</i>
+           </button>
+           <button type="button" class="btn btn-secondary" onclick="openPrevMeetings()">
+               <i class="material-icons" style="color:white;">perm_contact_calendar</i>
+           </button>
+       </div>
+   </div>
     
     <div id="main-container" class="container-fluid" style="margin-left: 30px;">
         <div id="logged">
@@ -172,7 +190,18 @@
         var video = true;
         var connection_list = {};
         $('[data-toggle="tooltip"]').tooltip();
-        $("#share_meeting_link").attr("href", "/join_meting/?id=" + sessionName)
+        $("#share_meeting_link").attr("href", "/join_meting/?id=" + sessionName);
+        init_every_time();
+        $(window).resize(init_every_time);
+        
+        function init_every_time() {
+            $(".sidePanel").css("margin-top", $("#navbar_session").height() + 7);
+            if ($("#navbar_session").height() > 100) {
+                $("#messages").css("height", "78%");
+            } else {
+                $("#messages").css("height", "90%");
+            }
+        }
         
         OV = new OpenVidu();
         session = OV.initSession();
@@ -186,11 +215,13 @@
 
             var html_string;
             if (from_id === userName.toString()) {
-                html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You: ' + message + ' </strong></div></div>'
+                html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><strong>You: ' + message + ' </strong></div></div>'
             } else {
-                html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
+                html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
             }
             $("#messages_body").append(html_string);
+            var message_body = document.getElementById("messages_body");
+            message_body.scrollTop = message_body.scrollHeight;
         })
 
         session.on('signal:private-chat', (event) => {
@@ -199,9 +230,10 @@
             var from_id = seprated_values[1];
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
-            console.log("Private-Chat");
-            var html_string = '<div class="card"><div class="card-body text-danger" style="font-size:150%;"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
+            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
             $("#messages_body").append(html_string);
+            var message_body = document.getElementById("messages_body");
+            message_body.scrollTop = message_body.scrollHeight;
         })
 
         session.on('streamCreated', (event) => {
@@ -217,11 +249,10 @@
         });
 
         session.on('connectionCreated', (event) => {
-            console.log(event.connection);
             connection_list[event.connection.connectionId] = event.connection;
         });
         session.on('connectionDestroyed', (event) => {
-            console.log("Destoyed!");
+            delete connection_list[event.connection.connectionId];
         });
 
         session.connect(token, {
@@ -267,7 +298,7 @@
                 publisher.publishAudio(false);
             } else {
                 audio = true;
-                $("#toggleAudioIcon").html("mic_off")
+                $("#toggleAudioIcon").html("mic_off");
                 publisher.publishAudio(true);
             }
         }
@@ -303,24 +334,29 @@
         }
 
         function sendMessage() {
-            var to = $("#to_message_send").val();
-            if (to === "") {
-                session.signal({
-                    data: nickName + "," + userName + "," + $("#message_to_send").val(),
-                    to: [],
-                    type: "chat",
-                }).then(() => {}).catch((error) => {})
-            } else {
-                session.signal({
-                    data: nickName + "," + userName + "," + $("#message_to_send").val(),
-                    to: [connection_list[to]],
-                    type: "private-chat",
-                }).then(() => {}).catch((error) => {})
-                $("#to_message_send").val("");
-                $("#message_to_send").attr("placeholder", "Chat With Everybody!");
-                to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
-                var html_string = '<div class="card"><div class="card-body text-success" style="font-size:150%;"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
-                $("#messages_body").append(html_string);
+            var message = $("#message_to_send").val();
+            if (message !== "") {
+                var to = $("#to_message_send").val();
+                if (to === "") {
+                    session.signal({
+                        data: nickName + "," + userName + "," + message,
+                        to: [],
+                        type: "chat",
+                    }).then(() => {}).catch((error) => {})
+                } else {
+                    session.signal({
+                        data: nickName + "," + userName + "," + message,
+                        to: [connection_list[to]],
+                        type: "private-chat",
+                    }).then(() => {}).catch((error) => {})
+                    $("#to_message_send").val("");
+                    $("#message_to_send").attr("placeholder", "Chat With Everybody!");
+                    to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
+                    var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
+                    $("#messages_body").append(html_string);
+                    var message_body = document.getElementById("messages_body");
+                    message_body.scrollTop = message_body.scrollHeight;
+                }
             }
             $("#message_to_send").val("");
         }

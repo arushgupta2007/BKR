@@ -55,9 +55,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const wrong = urlParams.get("wrong")
         const name = urlParams.get("name");
+        const meeting_name = urlParams.get("meeting_name");
         if (wrong === "password") {
             $('#password_alert').append('<div class="alert alert-danger alert-dismissible fade show" role="alert">Meeting Code is very insecure<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button ></div > ')
             $("#nameInput").val(name);
+            $("#meetingNameInput").val(meeting_name);
             setTimeout(function() {
                 $("#alertdiv").remove();
             }, 5000);
