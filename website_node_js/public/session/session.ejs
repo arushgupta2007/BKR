@@ -4,29 +4,29 @@
     <title>BKR Meeting</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" ? />
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-    
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    
+
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-    
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-    
+
     <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
-    
+
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    
+
     <script src="/static/session/js/openvidu-browser-2.13.0.js"></script>
 </head>
 
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark py-1" id="navbar_session">
         <a href="/" class="navbar-brand mr-0 mr-md-2" aria-label="BKR">
-           <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;"/>
+            <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;" />
         </a>
         <span class="navbar-text mr-0 mr-md-2 mx-auto"><%= meetingName %></span>
         <ul class="navbar-nav ml-md-auto">
@@ -52,8 +52,7 @@
             </li>
             <li class="nav-item session-header-inner">
                 <button id="toggleVideo" class="btn btn-primary btn-circle btn-sm" onclick="toggleVideo()">
-                    <i class="material-icons" id="toggleVideoIcon"
-                    style="color:white;font-size:100%;">videocam_off</i>
+                    <i class="material-icons" id="toggleVideoIcon" style="color:white;font-size:100%;">videocam_off</i>
                 </button>
             </li>
             <li class="nav-item session-header-inner">
@@ -63,15 +62,14 @@
             </li>
             <li class="nav-item session-header-inner">
                 <form action="/leave-session" method="post">
-                    <input type="hidden" name="sessionname" value="<%= sessionName %>"/>
-                    <input type="hidden" name="token" value="<%= token %>"/>
-                    <button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-sm" type="submit"
-                    onclick="leaveSession()">
+                    <input type="hidden" name="sessionname" value="<%= sessionName %>" />
+                    <input type="hidden" name="token" value="<%= token %>" />
+                    <button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-sm" type="submit" onclick="leaveSession()">
                         <i class="material-icons" style="color:white;font-size:100%;">call_end</i>
                     </button>
                 </form>
-           </li>
-       </ul>
+            </li>
+        </ul>
     </header>
     <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -107,36 +105,13 @@
 
         </div>
     </div>
-<!--
-    <div id="sidePanel" class="sidepanel">
-        <div id="messages" class="card">
-            <div class="card-header" style="text-align:center;">
-               <button class="closebtn btn btn-light" style="font-size:200%;background-color:transparent;" type="button" onclick="closeSidePanel()">&times;</button>
-                <i class="material-icons" style="font-size: 300%;">chat</i>
-            </div>
-            <div class="card-body" id="messages_body" style="margin-top: 30px;">
-            </div>
-        </div>
-        <div class="fixed-bottom" style="position: fixed; bottom:0; width:100%;" id="message_form_div">
-            <form class="form-inline" action="javascript:void(0)" autocomplete="off" style="display: block;">
-                <input type="hidden" placeholder="" class="form-control" id="to_message_send" value="">
-                <div class="form-group">
-                    <input type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send">
-                </div>
-                <button type="submit" class="btn btn-primary" style="margin-left:10px" onclick="sendMessage()">
-                    <i class="material-icons">send</i>
-                </button>
-            </form>
-        </div>
-    </div>
--->
-   
-   <div class="sidePanel" id="sidePanel">
+
+    <div class="sidePanel" id="sidePanel">
         <div class="card" id="messages">
             <div class="card-header p-0" id="message_header">
-                   <button class="closebtn btn btn-light" type="button" onclick="closeSidePanel()">&times;</button>
-                   <h6 id="to_whom_message_side_panel">Broadcast</h6>
-                    <i class="material-icons" id="chat_icon_side_panel">chat</i>
+                <button class="closebtn btn btn-light" type="button" onclick="closeSidePanel()">&times;</button>
+                <h6 id="to_whom_message_side_panel">Broadcast</h6>
+                <i class="material-icons" id="chat_icon_side_panel">chat</i>
             </div>
             <div class="card-body p-1 m-1" id="messages_body" style="margin-top:30px;margin-bottom:30px;"></div>
             <div class="card-footer p-1" id="message_footer">
@@ -144,37 +119,33 @@
                     <input class="form-control" id="to_message_send" type="hidden" />
                     <div class="send_button_sidebar_container">
                         <button type="submit" class="btn btn-primary btn-sm" onclick="sendMessage()">
-                        <i class="material-icons" style="color:white;font-size:100%;">send</i>
-                    </button>
+                            <i class="material-icons" style="color:white;font-size:100%;">send</i>
+                        </button>
                     </div>
                     <div class="form-group">
                         <textarea type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send" style="margin:3px;" rows="6"></textarea>
                     </div>
-               </form>
+                </form>
             </div>
         </div>
-   </div>
+    </div>
     
-   <div class="meetingOptionsExtra">
-       <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
-           <button type="button" class="btn btn-secondary" onclick="openParticipantList()">
-               <i class="material-icons" style="color:white;">group</i>
-           </button>
-           <button type="button" class="btn btn-secondary" onclick="openPrevMeetings()">
-               <i class="material-icons" style="color:white;">perm_contact_calendar</i>
-           </button>
-       </div>
-   </div>
-    
-    <div id="main-container" class="container-fluid" style="margin-left: 30px;">
-        <div id="logged">
-            <div id="session">
-                <div id="main-video" class="col-md-6">
-                    <p class="nickName"></p>
-                    <p class="userName"></p>
-                    <video autoplay="true" playsinline="true"></video>
-                </div>
-                <div id="video-container" class="col-md-6"></div>
+    <div id="main-container" class="container-fluid p-0">
+        <div class="meetingOptionsExtra">
+            <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
+                <button type="button" class="btn btn-secondary" onclick="toggleParticipantList()">
+                    <i class="material-icons" style="color:white;">group</i>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="togglePrevMeetings()">
+                    <i class="material-icons" style="color:white;">perm_contact_calendar</i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="participantList_sideBar"></div>
+        
+        <div class="inline-block" id="video_container">
+            <div class="row row-cols-2" id="video_row">
             </div>
         </div>
     </div>
@@ -193,7 +164,7 @@
         $("#share_meeting_link").attr("href", "/join_meting/?id=" + sessionName);
         init_every_time();
         $(window).resize(init_every_time);
-        
+
         function init_every_time() {
             $(".sidePanel").css("margin-top", $("#navbar_session").height() + 7);
             if ($("#navbar_session").height() > 100) {
@@ -201,8 +172,20 @@
             } else {
                 $("#messages").css("height", "90%");
             }
+            var height_of_meetingExtraOptions = $(window).height() - $("#navbar_session").height() - 8;
+            $(".meetingOptionsExtra").css("height", height_of_meetingExtraOptions.toString() + "px");
+            $("#participantList_sideBar").css("height", height_of_meetingExtraOptions.toString() + "px");
+            
+            var width_of_video_row = $(window).width() - 50;
+            $("#video_row").css("width", width_of_video_row.toString() + "px");
+            $("#video_row").css("margin-left", "50px");
+            var max_width_video_container = $(window).height() - $("#navbar_session").height() - 8;
+            $("#video_row").css("max-height", max_width_video_container.toString() + "px");
+            if ($("#participantList_sideBar").width() > 10) {
+                toggleParticipantList();
+            }
         }
-        
+
         OV = new OpenVidu();
         session = OV.initSession();
 
@@ -237,10 +220,21 @@
         })
 
         session.on('streamCreated', (event) => {
-            var subscriber = session.subscribe(event.stream, 'video-container');
-            subscriber.on('videoElementCreated', (event) => {
-                appendUserData(event.element, subscriber.stream.connection);
-            });
+            var subscriber = session.subscribe(event.stream, undefined);
+            var card_participant = document.createElement("div");
+            card_participant.setAttribute("id", "card-" + event.target.connection.connectionId);
+            card_participant.className = "card";
+            var card_body = document.createElement("div");
+            card_body.setAttribute("id", "card-body-" + event.target.connection.connectionId);
+            card_body.className = "card-body p-1";
+            var video = document.createElement("video");
+            video.setAttribute("id", "vid-" + event.target.connection.connectionId);
+            video.className = "video-user"; 
+            card_body.appendChild(video);
+            card_participant.appendChild(card_body);
+            document.getElementById("participantList_sideBar").appendChild(card_participant);
+            subscriber.addVideoElement(video);
+            appendUserData(video, subscriber.stream.connection, card_participant);
         });
 
         session.on('streamDestroyed', (event) => {
@@ -259,10 +253,7 @@
                 clientData: nickName
             })
             .then(() => {
-                $('#session-title').text(meetingName);
-                $('#join').hide();
-                $('#session').show();
-                publisher = OV.initPublisher('video-container', {
+                publisher = OV.initPublisher(undefined, {
                     audioSource: undefined,
                     videoSource: undefined,
                     publishAudio: true,
@@ -272,15 +263,26 @@
                     insertMode: 'APPEND',
                     mirror: false
                 });
-                publisher.on('videoElementCreated', (event) => {
-                    var userData = {
-                        nickName: nickName,
-                        userName: userName
-                    };
-                    initMainVideo(event.element, userData);
-                    appendUserData(event.element, userData);
-                    $(event.element).prop('muted', true);
-                });
+                var card_participant = document.createElement("div");
+                card_participant.setAttribute("id", "card-mine");
+                card_participant.className = "card";
+                var card_body = document.createElement("div");
+                card_body.setAttribute("id", "card-body-mine");
+                card_body.className = "card-body p-1";
+                $(card_body).css("text-align", "center")
+                var video = document.createElement("video");
+                video.setAttribute("id", "vid-mine");
+                video.className = "video-user"; 
+                card_body.appendChild(video);
+                card_participant.appendChild(card_body);
+                document.getElementById("participantList_sideBar").appendChild(card_participant);
+                publisher.addVideoElement(video);
+                var userData = {
+                    nickName: nickName,
+                    userName: userName
+                };
+                appendUserData(video, userData, card_participant);
+                $(video).prop('muted', true);
                 session.publish(publisher);
             })
             .catch(error => {
@@ -321,6 +323,27 @@
 
         function openSidePanel() {
             document.getElementById("sidePanel").style.width = "350px";
+        }
+        
+        function toggleParticipantList() {
+            var selector = $("#openParticipantList").data("target");
+            if ($("#participantList_sideBar").width() < 10) {
+                var width_of_part_list;
+                if ($(window).width() <= 768) {
+                    $("#participantList_sideBar").animate({width: "100%"});
+                    width_of_part_list = $(window).width();
+                } else if ($(window).width() <= 992) {
+                    $("#participantList_sideBar").animate({width: "33%"});
+                    width_of_part_list = $(window).width() * (1 / 3);
+                } else {
+                    $("#participantList_sideBar").animate({width: "20%"});
+                    width_of_part_list = $(window).width() * (1 / 5);
+                }
+                $("#video_container").animate({marginLeft: width_of_part_list.toString()});
+            } else {
+                $("#participantList_sideBar").animate({width: "0"});
+                $("#video_container").animate({marginLeft: "0"});
+            }
         }
 
         function whiteboard_open() {
@@ -398,83 +421,37 @@
             })
         }
 
-        function appendUserData(videoElement, connection) {
+        function appendUserData(videoElement, connection, card_element) {
             var clientData;
             var serverData;
             var nodeId;
             if (connection.nickName) {
                 clientData = connection.nickName;
                 serverData = connection.userName;
-                nodeId = 'main-videodata';
+                nodeId = 'mine';
             } else {
                 clientData = JSON.parse(connection.data.split('%/%')[0]).clientData;
                 serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
                 nodeId = connection.connectionId;
             }
-            var dataNode = document.createElement('div');
-            dataNode.className = "data-node";
-            dataNode.id = "data-" + nodeId;
-            if (nodeId === "main-videodata") {
-                dataNode.innerHTML = '<p class="nickName">You</p><p class="userName">' + serverData + '</p>';
-            } else {
-                dataNode.innerHTML = '<p class="nickName">' + clientData + '</p><button type="button" class="chat_top_right btn btn-primary py-0" data-toggle="tooltip" data-placement="top" title="Private Chat"><i class="material-icons" style="font-size: 90%;">chat</i></button><p class="userName">' + serverData + '</p>';
-                var button_private_chat = dataNode.querySelector('.chat_top_right');
-                button_private_chat.addEventListener('click', () => {
-                    $("#to_message_send").val(nodeId);
-                    $("#message_to_send").attr("placeholder", "Private Chat with " + clientData);
-                    openSidePanel();
-                })
-            }
-            videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
-            addClickListener(videoElement, clientData, serverData);
+//            var data_node = document.createElement("div");
+//            data_node.setAttribute("id", nodeId);
+//            data_node.className = "data-node inline-block";
+//            data_node.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
+//            videoElement.parentNode.insertBefore(dataNode, videoElement.nextSibling);
+            console.log("Hello World!");
+            var card_header = document.createElement("div");
+            card_header.className = "card-header p-1";
+            card_header.setAttribute("id", "card-header-" + nodeId)
+            card_header.innerHTML = '<p class="nickName"><strong>' + clientData + '</strong></p><p class="userName">' + serverData + '</p>';
+            card_element.insertBefore(card_header, videoElement.parentNode);
+            $(card_element).css("margin", "10px");
         }
 
-        function removeUserData(connection) {
-            var userNameRemoved = $("#data-" + connection.connectionId);
-            if ($(userNameRemoved).find('p.userName').html() === $('#main-video p.userName').html()) {
-                cleanMainVideo();
-            }
-            $("#data-" + connection.connectionId).remove();
-        }
-
-        function removeAllUserData() {
-            $(".data-node").remove();
-        }
-
-        function cleanMainVideo() {
-            $('#main-video video').get(0).srcObject = null;
-            $('#main-video p').each(function() {
-                $(this).html('');
-            });
-        }
+        function removeUserData(connection) {}
 
         function addClickListener(videoElement, clientData, serverData) {
-            videoElement.addEventListener('click', function() {
-                var mainVideo = $('#main-video video').get(0);
-                if (mainVideo.srcObject !== videoElement.srcObject) {
-                    $('#main-video').fadeOut("fast", () => {
-                        if (serverData.toString() === userName.toString()) {
-                            $('#main-video p.nickName').html("You");
-                        } else {
-                            $('#main-video p.nickName').html(clientData);
-                        }
-                        $('#main-video p.userName').html(serverData);
-                        mainVideo.srcObject = videoElement.srcObject;
-                        $('#main-video').fadeIn("fast");
-                    });
-                }
-            });
-        }
-
-        function initMainVideo(videoElement, userData) {
-            $('#main-video video').get(0).srcObject = videoElement.srcObject;
-            if (userData.userName.toString() === userName.toString()) {
-                $('#main-video p.nickName').html("You");
-            } else {
-                $('#main-video p.nickName').html(userData.nickName);
-            }
-            $('#main-video p.userName').html(userData.userName);
-            $('#main-video video').prop('muted', true);
+            videoElement.addEventListener('click', function() {});
         }
     </script>
     <script src="/static/session/js/main.js"></script>
