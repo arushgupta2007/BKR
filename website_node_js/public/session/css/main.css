@@ -1,6 +1,7 @@
 #main-container {
     white-space: nowrap;
     display: inline-block;
+    overflow: hidden;
 }
 
 .form-control {
@@ -20,18 +21,54 @@ input.btn {
     font-weight: bold;
 }
 
+#video_container {
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    text-align: center;
+}
+
+#video_container .card {
+    margin: 0 auto;
+}
+
+@media (min-width:300px) and (min-height:300px) {
+    #video_container .card {
+        width: 250px;
+    }   
+}
+
+@media (min-width:400px) and (min-height:400px) {
+    #video_container .card {
+        width: 350px;
+    }   
+}
+
+@media (min-width:500px) and (min-height:500px) {
+    #video_container .card {
+        width: 450px;
+    }   
+}
+
+@media (min-width:600px) and (min-height:600px) {
+    #video_container .card {
+        width: 550px;
+    }   
+}
+
+#video_container .card {
+    margin: 10px;
+    border: 0px solid;
+}
+
 #video_container video {
     position: relative;
     float: left;
-    width: 50%;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
     cursor: pointer;
-}
-
-#video_container div {
-    float: left;
-    width: 50%;
-    position: relative;
-    margin-left: -50%;
+    border-radius: 10px;
 }
 
 #video_container p {
@@ -199,16 +236,14 @@ canvas {
     display: inline-block;
 }
 
-#video_row {
-    margin-left: 25px;   
-}
-
 .video-user {
     margin-top: 10px;
     margin-bottom: 10px;
     border-radius: 10px;
     max-width: inherit;
     max-height: inherit;
+    transition: .5s ease;
+    backface-visibility: hidden;
 }
 
 #participantList_sideBar {
@@ -227,8 +262,29 @@ canvas {
 
 .nickName {
     margin: 0;
+    font-size: 10px;
+}
+
+.button_list_video {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+button.for-desktop {
+    margin: 3px;
+}
+
+button.private-chat-desktop {
+    background-color: #7D7C46;
+    border-color: #7D7C46;
 }
 
 body {
-    overflow-x: hidden;
+    overflow: hidden;
 }
