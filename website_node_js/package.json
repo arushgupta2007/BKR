@@ -9,10 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
     "body-parser": "1.18.3",
+    "cookie-session": "^1.4.0",
     "ejs": "2.6.1",
+    "express": "^4.17.1",
     "express-session": "1.16.1",
-    "openvidu-node-client": "2.13.0"
+    "mongodb": "^3.5.7",
+    "mongoose": "^5.9.13",
+    "openvidu-node-client": "2.13.0",
+    "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0"
   }
 }

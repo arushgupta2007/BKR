@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>BKR Video Confrenicng Software</title>
+    <script src="/public/javascripts/head_imports.js"></script>
+    <link rel="stylesheet" href="/public/stylesheets/home_page.css" />
+</head>
+
+<body>
+    <script src="/public/javascripts/nabar.js"></script>
+    <div class="container" style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+      ">
+        <div class="card p-3" style="
+          background: rgba(253, 253, 150, 0.8);
+          overflow: hidden;
+          border-width: 0ch;
+        ">
+            <div class="card-body">
+                <div class="card float-left border border-dark rounded-lg" style="background: rgba(255, 255, 255, 1);">
+                    <div class="card-body p-2 bd-highlight">
+                        <h5 style="font-size: 95%;">
+                            Connecting Friends and Family with the Internet<br />
+                        </h5>
+                        <h5 style="text-align: center;">
+                            #<strong>B</strong>aat<strong>K</strong>arte<strong>R</strong>aho
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fixed-bottom">
+            <div class="row">
+                <div class="col-4">
+                    <a href="create_meeting/" class="btn btn-danger" style="width: 100%;">
+                        <h5>New Meeting</h5>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="join_meeting/" class="btn btn-success" style="width: 100%;">
+                        <h5>Join Meeting</h5>
+                    </a>
+                </div>
+                <div class="col-4">
+                    <a href="schedule_meeting/" class="btn btn-primary" style="width: 100%;">
+                        <h5>Schedule Meeting</h5>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/public/javascripts/script_imports.js"></script>
+    <script>
+        var user = undefined;
+        var status = <%- JSON.stringify(status_logged) %>;
+        if (status === "Yes") {
+            user = <%- JSON.stringify(user) %>;
+            $("#joinUsLink").hide();
+            console.log(user.profilePhoto);            
+            $("#navbar").append('<img src="'+ user.profilePhoto + '" alt="Profile Photo" width="27" height="27" style="border-radius:100%;"></img>')
+        }
+    </script>
+</body>
+
+</html>

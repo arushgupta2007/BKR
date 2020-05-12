@@ -12,12 +12,37 @@ var fs = require("fs");
 var session = require("express-session");
 var https = require("https");
 var bodyParser = require("body-parser");
+var passport = require("passport");
+var passport_setup = require("./config/passport_setup");
+var mongoose = require("mongoose");
+console.log("Mongoose Version: ")
+console.log(mongoose.version);
+var cookieSession = require("cookie-session");
+var keys = require("./config/keys");
+var userModel = require("./models/user_model")
+var meetingsModel = require("./models/meeting_model");
+
+var mongoDB = 'mongodb://127.0.0.1/BKR';
+mongoose.connect(mongoDB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
 var app = express();
 var options = {
     key: fs.readFileSync("openvidukey.pem"),
     cert: fs.readFileSync("openviducert.pem"),
 };
 var http = require("http").createServer(options, app);
+
+app.use(cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [keys.cookie.encryptKey],
+}))
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(
     session({
         saveUninitialized: true,
@@ -55,15 +80,41 @@ var id_tracker = {};
 
 app.use("/static", express.static("public"));
 app.get("/", function (req, res) {
-    res.sendFile(__dirname + "/public/home/home.html");
+    console.log(req.user);        
+    if (req.user) {
+        res.render(__dirname + "/public/home/home.ejs", {status_logged: "Yes", user: req.user});
+    } else {
+        res.render(__dirname + "/public/home/home.ejs", {status_logged: "No", user: "Not logged in"});
+    }
 });
 
 app.get("/create_new/", function (req, res) {
-    res.sendFile(__dirname + "/public/create/create.html");
+    if (req.user) {
+        res.render(__dirname + "/public/create/create.ejs", {status_logged: "Yes", user: req.user});
+    } else {
+        res.render(__dirname + "/public/create/create.ejs", {status_logged: "No", user: "Not logged in"});
+    }
 });
 app.get("/join/", function (req, res) {
-    res.render(__dirname + "/public/join/join.ejs");
+    if (req.user) {
+        res.render(__dirname + "/public/join/join.ejs", {status_logged: "Yes", user: req.user});
+    } else {
+        res.render(__dirname + "/public/join/join.ejs", {status_logged: "No", user: "Not logged in"});
+    }
 });
+
+app.get("/auth/logout", (req, res) => {
+    req.logout();
+    res.redirect("/");
+})
+
+app.get("/auth/google", passport.authenticate("google", {
+    scope:["profile"],
+}));
+
+app.get("/auth/google/redirect", passport.authenticate("google"), (req, res) => {
+    res.redirect("/");
+})
 
 app.post("/session/", (req, res) => {
     var name_client = req.body.name;
@@ -83,7 +134,7 @@ app.post("/session/", (req, res) => {
         var numbers = /[0-9]/g;
         console.log(session_code.match(lowerCaseLetters));
         console.log(session_code.match(numbers));
-        console.log(session_code >= 8);
+        console.log(session_code.length >= 8);
         if (session_code.match(lowerCaseLetters) && session_code.match(numbers) && session_code.length >= 8) {
             var session_id;
             do {
@@ -95,22 +146,53 @@ app.post("/session/", (req, res) => {
             OV.createSession()
                 .then((session) => {
                     mapSessions[session_id] = session;
-                    mapSessionNamesTokens[session_id] = [];
-                    name_codes[session_id] = {
-                        name: name_meeting,
-                        code: session_code,
-                    };
+                    // mapSessionNamesTokens[session_id] = [];
+                    // name_codes[session_id] = {
+                    //     name: name_meeting,
+                    //     code: session_code,
+                    // };
+                    console.log("Type Of");
+                    console.log(typeof session);
+                    console.log(session);                                      
                     session
                         .generateToken(tokenOptions)
                         .then((token) => {
-                            mapSessionNamesTokens[session_id].push(token);
-                            res.render(__dirname + "/public/session/session.ejs", {
-                                sessionName: session_id,
-                                token: token,
-                                nickName: name_client,
-                                userName: client_id,
-                                meetingName: name_meeting,
-                            });
+                            // mapSessionNamesTokens[session_id].push(token);
+                            console.log("error would be here if at all!!!");
+                            
+                            meetingsModel({
+                                meetingID:session_id,
+                                meetingName:name_meeting,
+                                tokens:[token],
+                                code: session_code,
+                                next_id: 1,
+                            }).save().then((newMeeting) => {
+                                if (req.user) {
+                                    console.log("req.user: User is " + req.user);
+                                    userModel.findById(req.user._id, function (err, user) {
+                                        if (user) {
+                                            if (!user.meetings.includes(session_id)) {
+                                                user.meetings.push(session_id);
+                                                user.save();
+                                                console.log(newMeeting);
+                                                newMeeting.usersPrev.push(req.user._id);
+                                                newMeeting.save();
+                                            }
+                                        } else {
+                                            console.log("userModel.findById: No User Found");
+                                        }
+                                    })
+                                } else {
+                                    console.log("!req.user: user is not logged in");
+                                }
+                                res.render(__dirname + "/public/session/session.ejs", {
+                                    sessionName: session_id,
+                                    token: token,
+                                    nickName: name_client,
+                                    userName: 0,
+                                    meetingName: name_meeting,
+                                });
+                            })                           
                         })
                         .catch((err) => console.log(err));
                 })
@@ -119,57 +201,118 @@ app.post("/session/", (req, res) => {
             res.redirect("/create_new/?wrong=password&name=" + name_client + "&meeting_name=" + name_meeting);
         }
     } else {
-        var sessionName = req.body.meeting_id;
-        var mySession = mapSessions[sessionName];
-        if (name_codes[sessionName] !== undefined) {
-            if (session_code === name_codes[sessionName].code) {
-                var client_id = id_tracker[sessionName.toString()];
-                id_tracker[sessionName.toString()] = id_tracker[sessionName.toString()] + 1;
-                mySession
+        var sessionID = req.body.meeting_id;
+        // var mySession = mapSessions[sessionID];
+        meetingsModel.findOne({meetingID: sessionID}).then((meetingToJoin) => {
+            if (meetingToJoin) {
+                if (meetingToJoin.code === session_code) {
+                    var mySession = mapSessions[sessionID];
+                    var client_id = meetingToJoin.next_id;
+                    mySession
                     .generateToken(tokenOptions)
                     .then((token) => {
-                        mapSessionNamesTokens[sessionName].push(token);
-                        res.render(__dirname + "/public/session/session.ejs", {
-                            sessionId: mySession.getSessionId(),
-                            token: token,
-                            nickName: name_client,
-                            userName: client_id,
-                            sessionName: sessionName,
-                            meetingName: name_codes[sessionName].name,
+                        meetingToJoin.tokens.push(token);
+                        meetingToJoin.next_id = meetingToJoin.next_id + 1;
+                        meetingToJoin.save().then((meeting) => {
+                            if (req.user) {
+                                console.log("req.user: User is " + req.user);
+                                userModel.findById(req.user._id, function (err, user) {
+                                    if (user) {
+                                        if (!user.meetings.includes(sessionID)) {
+                                            user.meetings.push(sessionID);
+                                            user.save();
+                                            newMeeting.usersPrev.push(req.user._id);
+                                            newMeeting.save();
+                                        }
+                                    } else {
+                                        console.log("userModel.findById: No User Found");
+                                    }
+                                })
+                            } else {
+                                console.log("!req.user: user is not logged in");
+                            }
+                            res.render(__dirname + "/public/session/session.ejs", {
+                                token: token,
+                                nickName: name_client,
+                                userName: client_id,
+                                sessionName: sessionID,
+                                meetingName: meeting.meetingName,
+                            });
                         });
                     })
                     .catch((error) => {
                         console.error(error);
                     });
+                } else {
+                    res.redirect("/join/?wrong=meeting&name=" + name_client);    
+                }
             } else {
                 res.redirect("/join/?wrong=meeting&name=" + name_client);
             }
-        } else {
-            res.redirect("/join/?wrong=meeting&name=" + name_client);
-        }
+        })
+        // if (name_codes[sessionID] !== undefined) {
+        //     if (session_code === name_codes[sessionID].code) {
+        //         var client_id = id_tracker[sessionID.toString()];
+        //         id_tracker[sessionID.toString()] = id_tracker[sessionID.toString()] + 1;
+        //         mySession
+        //             .generateToken(tokenOptions)
+        //             .then((token) => {
+        //                 mapSessionNamesTokens[sessionID].push(token);
+        //                 res.render(__dirname + "/public/session/session.ejs", {
+        //                     token: token,
+        //                     nickName: name_client,
+        //                     userName: client_id,
+        //                     sessionName: sessionID,
+        //                     meetingName: name_codes[sessionID].name,
+        //                 });
+        //             })
+        //             .catch((error) => {
+        //                 console.error(error);
+        //             });
+        //     } else {
+        //         res.redirect("/join/?wrong=meeting&name=" + name_client);
+        //     }
+        // } else {
+        //     res.redirect("/join/?wrong=meeting&name=" + name_client);
+        // }
     }
 });
+
+function deleteMeeting(session_id, meeting) {
+    delete mapSessions[session_id];
+    console.log("Deleting!!!!");
+    usersArray = meeting.usersPrev;
+    for (user of usersArray) {
+        userModel.deleteOne({_id: user}, function(err){});
+    }
+    meetingsModel.deleteOne({meetingID: session_id}).catch((err, b, c) => {})
+}
 
 app.post("/leave-session", (req, res) => {
     var sessionName = req.body.sessionname;
     var token = req.body.token;
     var name_client = req.body.nickName;
 
-    if (mapSessions[sessionName] && mapSessionNamesTokens[sessionName]) {
-        var tokens = mapSessionNamesTokens[sessionName];
+    if (mapSessions[sessionName]) {
+        meetingsModel.findOne({meetingID: sessionName}).then((meeting) => {
+        var tokens = meeting.tokens;
         var index = tokens.indexOf(token);
         if (index !== -1) {
             tokens.splice(index, 1);
+            meeting.save().then((meeting_recv) => {
+                if (meeting_recv.tokens.length == 0) {
+                    deleteMeeting(sessionName, meeting_recv);
+                }
+            });
         } else {
             console.log("Problems in the app server: the TOKEN wasn't valid");
             res.redirect("/");
         }
-        if (tokens.length == 0) {
-            delete mapSessions[sessionName];
-        }
         res.redirect("/");
+        })
     } else {
-        var msg = "Problems in the app server: the SESSION does not exist";
+        console.log("Problems in the app server: the SESSION does not exist");
+        console.log(mapSessions);        
         res.redirect("/");
     }
 });

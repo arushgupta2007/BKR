@@ -94,9 +94,9 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p>Share this ID: <%= sessionName %> with the session code to allow somebody else to join the meeting</p>
+                    <p>Give this link: <a id="share_meeting_link"> https://192.168.1.18:8000/join/?wrong=nothing&id=<%= sessionName %></a> with the meeting code to allow somebody else to join the meeting</p>
                     <h4>OR</h4>
-                    <p>Give this link: <a id="share_meeting_link"> https://192.168.1.18:8000/join_meeting/?id=<%= sessionName %></a> with the meeting code to allow somebody else to join the meeting</p>
+                    <p>Share this ID: <%= sessionName %> with the session code to allow somebody else to join the meeting</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
