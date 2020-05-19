@@ -57,13 +57,25 @@
     </div>
     <script src="/static/scripts_end_of_body.js"></script>
     <script>
-        var user = undefined;
-        var status = <%- JSON.stringify(status_logged) %>;
-        if (status === "Yes") {
-            user = <%- JSON.stringify(user) %>;
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var photoURL = user.photoURL;
+            var uid = user.uid;
             $("#joinUsLink").hide();
-            console.log(user.profilePhoto);            
-            $("#navbar").append('<img src="'+ user.profilePhoto + '" alt="Profile Photo" width="27" height="27" style="border-radius:100%;"></img>')
+            $("#navbar").append('<button onclick="logout()" class="btn" style="background-color:transparent;border: none"><i class="fas fa-sign-out-alt"></i></button><img src="' + photoURL + '" alt="Profile Photo" width="27" height="27" style="border-radius:100%;"></img>')
+          } else {
+            
+          }
+        }, function(error) {
+          console.log(error);
+        });
+
+        function logout() {
+            firebase.auth().signOut();
+            location.reload();
         }
     </script>
 </body>

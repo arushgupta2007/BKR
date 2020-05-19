@@ -14,6 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
     <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
@@ -73,15 +75,15 @@
     </header>
     <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+            <div class="modal-content" id="whiteboard-model-content">
                 <div class="modal-header">
                     <h3 class="modal-title" id="modalLabel">White Board</h3>
                 </div>
-                <div class="modal-body">
-                    <canvas id="whiteboard"></canvas>
+                <div class="modal-body" id="canvas-container">
+                    <!-- <canvas id="whiteboard"></canvas> -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="backToVideoAudio()">Close</button>
                 </div>
             </div>
         </div>
@@ -154,6 +156,32 @@
             </div>
         </div>
     </div>
+
+    <script>
+        p5.disableFriendlyErrors = true;
+        var array_of_mouse_loactions = [];
+        let sketch = function(p) {
+            p.setup = function(){
+                // var width = window.document.getElementById("canvas-container").style.width;
+                // var height = $(window).width - 100;
+                p.createCanvas(500, 500);
+                p.background(0);
+            }
+            p.mouseDragged = function () {
+                array_of_mouse_loactions.push({x: p.mouseX, y: p.mouseY});
+            }
+
+            p.draw = function () {
+                if (array_of_mouse_loactions[0]) {
+                    p.noStroke();
+                    p.fill(255);
+                    p.ellipse(array_of_mouse_loactions[0].x, array_of_mouse_loactions[0].y, 36, 36)
+                    array_of_mouse_loactions.shift();
+                }
+            }
+        };
+        new p5(sketch, 'canvas-container');
+    </script>
 
     <script>
         var publisher;
@@ -281,14 +309,19 @@
                 card_body.appendChild(video);
                 card_participant.appendChild(card_body);
                 document.getElementById("participantList_sideBar").appendChild(card_participant);
-                publisher.addVideoElement(video);
-                var userData = {
-                    nickName: nickName,
-                    userName: userName
-                };
-                appendUserData(video, userData, card_participant);
-                $(video).prop('muted', true);
-                session.publish(publisher);
+                console.log("Added Element");
+                setTimeout(function () {
+                    publisher.addVideoElement(video);
+                    var userData = {
+                        nickName: nickName,
+                        userName: userName
+                    };
+                    console.log("adding data");
+                    
+                    appendUserData(video, userData, card_participant);
+                    $(video).prop('muted', true);
+                    session.publish(publisher);
+                }, 5000);
             })
             .catch(error => {
                 console.warn('There was an error connecting to the session:', error.code, error.message);
@@ -357,6 +390,7 @@
             $('#whiteboard_model').modal({
                 keyboard: false
             });
+            whiteboard_share();
         }
 
         function shareMeeting() {
@@ -407,24 +441,49 @@
                     console.log(err);
                 });
                 screenTrack.addEventListener('ended', () => {
-                    OV.getUserMedia({
-                        audioSource: undefined,
-                        videoSource: undefined,
-                        publishAudio: true,
-                        publishVideo: true,
-                        resolution: '640x480',
-                        frameRate: 30,
-                        insertMode: 'APPEND',
-                        mirror: false
-                    }).then(videoStream => {
-                        var videoTrack = videoStream.getVideoTracks()[0];
-                        publisher.replaceTrack(videoTrack).then(() => {}).catch((err) => {
-                            console.log(err);
-                        });
-                    })
+                    backToVideoAudio();
                 })
             }).catch((err) => {
                 console.log(err);
+            })
+        }
+
+        function whiteboard_share() {
+            var canvasStream = document.getElementById('defaultCanvas0').captureStream(30).getVideoTracks()[0];
+            OV.getUserMedia({
+                audioSource: undefined,
+                videoSource: canvasStream,
+                publishAudio: true,
+                publishVideo: true,
+                resolution: '640x480',
+                frameRate: 30,
+                insertMode: 'APPEND',
+                mirror: false
+            }).then(mediaStream => {
+                var screenTrack = mediaStream.getVideoTracks()[0];
+                publisher.replaceTrack(screenTrack).then(() => {}).catch((err) => {
+                    console.log(err);
+                });
+            }).catch((err) => {
+                console.log(err);
+            })
+        }
+
+        function backToVideoAudio() {
+            OV.getUserMedia({
+                audioSource: undefined,
+                videoSource: undefined,
+                publishAudio: audio,
+                publishVideo: video,
+                resolution: '640x480',
+                frameRate: 30,
+                insertMode: 'APPEND',
+                mirror: false
+            }).then(videoStream => {
+                var videoTrack = videoStream.getVideoTracks()[0];
+                publisher.replaceTrack(videoTrack).then(() => {}).catch((err) => {
+                    console.log(err);
+                });
             })
         }
 

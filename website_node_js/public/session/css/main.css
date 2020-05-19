@@ -285,6 +285,14 @@ button.private-chat-desktop {
     border-color: #7D7C46;
 }
 
+#whiteboard-model-content {
+    overflow: hidden;
+}
+
+#canvas-container {
+    overflow: auto;
+}
+
 body {
     overflow: hidden;
 }

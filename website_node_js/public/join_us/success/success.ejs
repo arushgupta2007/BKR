@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BKR Auth Success</title>
+    <script src="/static/head_imports.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css" />
+    <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                var displayName = user.displayName;
+                var email = user.email;
+                var photoUrl = user.photoURL;
+                var id_to_keep = user.uid;
+                var phone_no = user.phoneNumber;
+                var data = {
+                    name: displayName,
+                    email: email,
+                    photoUrl: photoUrl,
+                    phone_no: phone_no,
+                    id_to_keep: id_to_keep,
+                }
+                $.ajax({
+                    url: "http://localhost:8000/join_us/addUser/",
+                    type: "POST",
+                    data: data,
+                    success: function() {
+                        window.location.replace("http://localhost:8000/");              
+                    },
+                    error: function (error) {
+                        console.log("Error: " + error);
+                    }
+                })
+            } else {
+                window.location.replace("http://localhost:8000/join_us/");
+            }
+        })
+    </script>
+</head>
+<body>
+    
+</body>
+</html>

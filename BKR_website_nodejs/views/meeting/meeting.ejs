@@ -194,6 +194,14 @@
         OV = new OpenVidu();
         session = OV.initSession();
 
+        session.on('publisherStartSpeaking', (event) => {
+            console.log('Publisher ' + event.connection.connectionId + ' start speaking');
+        });
+
+        session.on('publisherStopSpeaking', (event) => {
+            console.log('Publisher ' + event.connection.connectionId + ' stop speaking');
+        });
+
         session.on('signal:chat', (event) => {
             var seprated_values = event.data.split(",")
             var from_name = seprated_values[0];
@@ -263,6 +271,9 @@
             document.getElementById("participantList_sideBar").appendChild(card_participant);
             subscriber.addVideoElement(video);
             appendUserData(video, subscriber.stream.connection, card_participant);
+            subscriber.on('streamAudioVolumeChange', (event) => {
+                console.log('Publisher audio volume change from ' + event.value.oldValue + ' to' + event.value.newValue);
+            });
         });
 
         session.on('streamDestroyed', (event) => {
@@ -556,20 +567,6 @@
                 $(button_list_desktop).css("opacity", "0");
             })
             $(card_element).css("margin", "10px");
-            setTimeout(initMainVids, 1000, videoElement, nodeId);
-        }
-        
-        function initMainVids(videoElement, nodeId) {
-            if (Object.keys(active_users).length < 2) {
-                active_users[nodeId] = 0;
-                if (Object.keys(active_users).length === 1) {
-                    document.getElementById("video-main-1").srcObject = videoElement.srcObject;
-                    $("#video-1-container").css("width", $("#video-main-1").width().toString() + "px")
-                } else {
-                    document.getElementById("video-main-2").srcObject = videoElement.srcObject;
-                    $("#video-2-container").css("width", $("#video-main-2").width().toString() + "px")
-                }
-            }
         }
 
         function removeUserData(connection) {}

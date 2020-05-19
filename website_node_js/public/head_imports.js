@@ -10,4 +10,18 @@ document.write('\
   rel="stylesheet"\
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"\
 />\
+<script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>\
+<script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>\
+<script>\
+    var firebaseConfig = {\
+        apiKey: "AIzaSyAAHNLr2B40uA5E_2VOFvpF7VxCs_jDjmI",\
+        authDomain: "baatkarteraho2007.firebaseapp.com",\
+        databaseURL: "https://baatkarteraho2007.firebaseio.com",\
+        projectId: "baatkarteraho2007",\
+        storageBucket: "baatkarteraho2007.appspot.com",\
+        messagingSenderId: "642785637257",\
+        appId: "1:642785637257:web:329a9b49035881087fe758"\
+    };\
+    firebase.initializeApp(firebaseConfig);\
+</script>\
 ');

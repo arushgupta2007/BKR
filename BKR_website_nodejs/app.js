@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
-var session = require("express-session");
+var cookieSession = require("cookie-session");
 var keys = require("./config/keys.js");
 var passport = require("passport");
 
@@ -26,11 +26,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use("/public", express.static(path.join(__dirname, 'public')));
-app.use(session({
-    secret: keys.cookie.encryptKey,
-    saveUninitialized: false,
-    resave: false,
-}));
+app.use(cookieSession({
+  maxAge: 24 * 60 * 60 * 1000,
+  keys: [keys.cookie.encryptKey],
+}))
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(

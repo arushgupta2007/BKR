@@ -7,7 +7,7 @@ module.exports = {
         encryptKey: "HereIsWhateverIWantToUseToEncrypt!!!"
     },
     openvidu: {
-        url: "https://localhost:4443/",
-        key: "MY_SECRET",
+        url: "https://ec2-3-17-189-175.us-east-2.compute.amazonaws.com",
+        key: "BaatKarteRaho",
     }
 } 

@@ -4,8 +4,8 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     name: String,
     profilePhoto: String,
-    googleId: String,
-    facebookId: String,
+    phoneNo: String,
+    commonId:String,
     meetings: [Number],
 })
 
