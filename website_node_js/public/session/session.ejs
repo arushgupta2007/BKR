@@ -158,102 +158,151 @@
     </div>
 
     <script>
-        p5.disableFriendlyErrors = true;
+        // script to create whiteboard
+        // keep track of where the mouse has been dragged on
         var array_of_mouse_loactions = [];
+        // sketch for p5 js
         let sketch = function(p) {
+            // setup function
             p.setup = function(){
-                // var width = window.document.getElementById("canvas-container").style.width;
-                // var height = $(window).width - 100;
+                /* var width = window.document.getElementById("canvas-container").style.width;
+                // var height = $(window).width - 100; */
+                // create canvas with size 500, 500
                 p.createCanvas(500, 500);
+                // background of black color
                 p.background(0);
             }
+            // function called when mouse is dragged
             p.mouseDragged = function () {
+                // push mouse position to mouse positions array
                 array_of_mouse_loactions.push({x: p.mouseX, y: p.mouseY});
             }
-
+            // draw function
             p.draw = function () {
+                // check if mouse locations array has first item
                 if (array_of_mouse_loactions[0]) {
+                    // mouse location array has first item
+                    // draw circle around that location
                     p.noStroke();
                     p.fill(255);
                     p.ellipse(array_of_mouse_loactions[0].x, array_of_mouse_loactions[0].y, 36, 36)
+                    // remove first element from mouse locations array
                     array_of_mouse_loactions.shift();
                 }
             }
         };
+        // create new canvas with prev defined sketch in div of id canvas-container
         new p5(sketch, 'canvas-container');
     </script>
 
     <script>
+        // script for main stuff
+        // define publisher as global var
         var publisher;
+        // get session id to display on share modal
         var sessionName = <%- JSON.stringify(sessionName) %> ;
+        // get token needed by OpenVidu
         var token = <%- JSON.stringify(token) %> ;
+        // get nickname of user to show to other users and the user itself
         var nickName = <%- JSON.stringify(nickName) %> ;
+        // get unique username to diffrentiate between users
         var userName = <%- JSON.stringify(userName) %> ;
+        // get meeting name to display on navbar
         var meetingName = <%- JSON.stringify(meetingName) %> ;
+        // keep track of video and audio status using booleans
         var audio = true;
         var video = true;
+        // keep connection list for private chat and others
         var connection_list = {};
+        // keep list for active user to be displayed on main container
         var active_users = {}
+        // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
+        // set url of #share_meeting_link
         $("#share_meeting_link").attr("href", "/join_meting/?id=" + sessionName);
+        // initialize every thing
         init_every_time();
+        // every time window resizes, initialize every thing
         $(window).resize(init_every_time);
 
+        // function init_every_time
         function init_every_time() {
+            // set margin of side panel as navbar's height + offset
             $(".sidePanel").css("margin-top", $("#navbar_session").height() + 7);
+            // set messages side panel's height dynamically
             if ($("#navbar_session").height() > 100) {
                 $("#messages").css("height", "78%");
             } else {
                 $("#messages").css("height", "90%");
             }
+            // set height of meeting extra options
             var height_of_meetingExtraOptions = $(window).height() - $("#navbar_session").height() - 8;
             $(".meetingOptionsExtra").css("height", height_of_meetingExtraOptions.toString() + "px");
             $("#participantList_sideBar").css("height", height_of_meetingExtraOptions.toString() + "px");
             $("#video_container").css("height", height_of_meetingExtraOptions.toString() + "px")
             
+            // set width of main container
             var max_width_video_container = $(window).width() - 50;
             $("#video_container").css("width", max_width_video_container.toString() + "px");
             
+            // toggle participant list if open
             if ($("#participantList_sideBar").width() > 10) {
                 toggleParticipantList();
             }
+            // set margin of main container as 50px
             $("#video_container").css("margin-left", "50px");
         }
+
+        // initialize OpenVidu
         OV = new OpenVidu();
+        // start session
         session = OV.initSession();
 
+        // function ran when public chat message recvied
         session.on('signal:chat', (event) => {
+            // split values
             var seprated_values = event.data.split(",")
             var from_name = seprated_values[0];
             var from_id = seprated_values[1];
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
 
+            // create html template of message
             var html_string;
             if (from_id === userName.toString()) {
                 html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><strong>You: ' + message + ' </strong></div></div>'
             } else {
                 html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
             }
+            // append html template with message in DOM
             $("#messages_body").append(html_string);
             var message_body = document.getElementById("messages_body");
+            // scroll to bottom when new message recv
             message_body.scrollTop = message_body.scrollHeight;
         })
 
+        // function ran when private chat message has been recv
         session.on('signal:private-chat', (event) => {
+            // split values
             var seprated_values = event.data.split(",")
             var from_name = seprated_values[0];
             var from_id = seprated_values[1];
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+            // create html template
             var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
+            // append html template with message to DOM
             $("#messages_body").append(html_string);
             var message_body = document.getElementById("messages_body");
+            // scroll to bottom when new message has been recv
             message_body.scrollTop = message_body.scrollHeight;
         })
 
+        // function ran when new user connects
         session.on('streamCreated', (event) => {
+            // subscribe to it's stream
             var subscriber = session.subscribe(event.stream, undefined);
+            // create html template to put in participant list
             var card_participant = document.createElement("div");
             card_participant.setAttribute("id", "card-" + event.target.connection.connectionId);
             card_participant.className = "card p-0";
@@ -266,26 +315,38 @@
             card_body.appendChild(video);
             card_participant.appendChild(card_body);
             document.getElementById("participantList_sideBar").appendChild(card_participant);
+            // connect OpenVidu with video element
             subscriber.addVideoElement(video);
+            // apend user data and buttons to the video
             appendUserData(video, subscriber.stream.connection, card_participant);
         });
 
+        // function ran when some user disconnect's stream the meeting
         session.on('streamDestroyed', (event) => {
+            // remove user data
             removeUserData(event.stream.connection);
+            // delete user from connection list
             delete connection_list[event.stream.connection.connectionId];
         });
 
+        // function ran when new connection is created
         session.on('connectionCreated', (event) => {
+            // append to connection list
             connection_list[event.connection.connectionId] = event.connection;
         });
+
+        // function ran when some user exits meeting
         session.on('connectionDestroyed', (event) => {
+            // delete from connection list
             delete connection_list[event.connection.connectionId];
         });
 
+        // join meeting
         session.connect(token, {
                 clientData: nickName
             })
             .then(() => {
+                // init publisher
                 publisher = OV.initPublisher(undefined, {
                     audioSource: undefined,
                     videoSource: undefined,
@@ -296,6 +357,7 @@
                     insertMode: 'APPEND',
                     mirror: false
                 });
+                // create html template for user
                 var card_participant = document.createElement("div");
                 card_participant.setAttribute("id", "card-mine");
                 card_participant.className = "card p-0";
@@ -310,62 +372,85 @@
                 card_participant.appendChild(card_body);
                 document.getElementById("participantList_sideBar").appendChild(card_participant);
                 console.log("Added Element");
+                // set timeout of 5000 to connect video to OpenVidu and append user data and publish user's stream
                 setTimeout(function () {
                     publisher.addVideoElement(video);
                     var userData = {
                         nickName: nickName,
                         userName: userName
                     };
-                    console.log("adding data");
-                    
                     appendUserData(video, userData, card_participant);
                     $(video).prop('muted', true);
                     session.publish(publisher);
                 }, 5000);
             })
             .catch(error => {
+                // log error if there
                 console.warn('There was an error connecting to the session:', error.code, error.message);
             });
 
+        // function ran when user presses exit meeting button
         function leaveSession() {
+            // disconnet the session
             session.disconnect();
         }
 
+        // function ran when toggle audio button is pressed
         function toggleAudio() {
             if (audio) {
+                // change boolean
                 audio = false;
+                // change icon
                 $("#toggleAudioIcon").html("mic")
+                // stop publishing stream
                 publisher.publishAudio(false);
             } else {
+                // change boolean
                 audio = true;
+                // change icon
                 $("#toggleAudioIcon").html("mic_off");
+                // start publishing audio
                 publisher.publishAudio(true);
             }
         }
 
+        // function ran when toggle video button is pressed
         function toggleVideo() {
             if (video) {
+                // change boolean
                 video = false;
+                // change icon
                 $("#toggleVideoIcon").html("videocam")
+                // stop publishing audio
                 publisher.publishVideo(false);
             } else {
+                // change boolean
                 video = true;
+                // change icon
                 $("#toggleVideoIcon").html("videocam_off")
+                // start publishing video
                 publisher.publishVideo(true);
             }
         }
 
+        // function ran when sidepanel has open close
         function closeSidePanel() {
             document.getElementById("sidePanel").style.width = "0px";
         }
 
+        // function ran when sidepanel has to open
         function openSidePanel() {
             document.getElementById("sidePanel").style.width = "350px";
         }
         
+        // toggle participant list function ran when user click participant list button
         function toggleParticipantList() {
+            // get target element
             var selector = $("#openParticipantList").data("target");
+            // check if taget element is open
             if ($("#participantList_sideBar").width() < 10) {
+                // taget element is close
+                // check how much space should the participant list take
                 var width_of_part_list;
                 if ($(window).width() <= 768) {
                     var width_screen = $(window).width() - 50;
@@ -380,52 +465,71 @@
                 }
                 $("#video_container").animate({marginLeft: width_of_part_list.toString()});
             } else {
+                // taget element is open
+                // close target element
                 $("#participantList_sideBar").animate({width: "0"});
                 var width_of_extraOptions = 50;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
             }
         }
 
+        // function ran when user clicks on whiteboard button
         function whiteboard_open() {
             $('#whiteboard_model').modal({
                 keyboard: false
             });
+            // initialize stream of white board
             whiteboard_share();
         }
 
+        // function ran when user clicks on share button
         function shareMeeting() {
             $("#share_meeting_modal").modal()
         }
 
+        // function ran when user clicks on send message button
         function sendMessage() {
+            // get message
             var message = $("#message_to_send").val();
+            // check if message is empty
             if (message !== "") {
+                // get recver of message
                 var to = $("#to_message_send").val();
+                // check if recver of message is empty
                 if (to === "") {
+                    // send message to every one
                     session.signal({
                         data: nickName + "," + userName + "," + message,
                         to: [],
                         type: "chat",
                     }).then(() => {}).catch((error) => {})
                 } else {
+                    // send message to particular person
                     session.signal({
                         data: nickName + "," + userName + "," + message,
                         to: [connection_list[to]],
                         type: "private-chat",
                     }).then(() => {}).catch((error) => {})
+                    // reset value of recvier
                     $("#to_message_send").val("");
+                    // create html template to render in the users page
                     $("#message_to_send").attr("placeholder", "Chat With Everybody!");
                     to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
                     var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
+                    // append html template with message to DOM
                     $("#messages_body").append(html_string);
                     var message_body = document.getElementById("messages_body");
+                    // scroll to bottom
                     message_body.scrollTop = message_body.scrollHeight;
                 }
             }
+            // reset message value
             $("#message_to_send").val("");
         }
 
+        // function called when user presses share screen button
         function screenShare() {
+            // get screen media stream
             OV.getUserMedia({
                 audioSource: undefined,
                 videoSource: "screen",
@@ -436,19 +540,27 @@
                 insertMode: 'APPEND',
                 mirror: false
             }).then(mediaStream => {
+                // get video track of media stream
                 var screenTrack = mediaStream.getVideoTracks()[0];
+                // replace current track with media stream's video track
                 publisher.replaceTrack(screenTrack).then(() => {}).catch((err) => {
+                    // log error if any
                     console.log(err);
                 });
+                // function ran when screen share ends
                 screenTrack.addEventListener('ended', () => {
+                    // switch back to video and audio
                     backToVideoAudio();
                 })
             }).catch((err) => {
+                // log error if there
                 console.log(err);
             })
         }
 
+        // function ran at whiteboard_open()
         function whiteboard_share() {
+            // get canvas's video track at 30 fps
             var canvasStream = document.getElementById('defaultCanvas0').captureStream(30).getVideoTracks()[0];
             OV.getUserMedia({
                 audioSource: undefined,
@@ -460,37 +572,49 @@
                 insertMode: 'APPEND',
                 mirror: false
             }).then(mediaStream => {
+                // get video tracks of media stream
                 var screenTrack = mediaStream.getVideoTracks()[0];
+                // replace current video track with video track of canvas
                 publisher.replaceTrack(screenTrack).then(() => {}).catch((err) => {
+                    // log error if there
                     console.log(err);
                 });
             }).catch((err) => {
+                // log error if there
                 console.log(err);
             })
         }
 
+        // function to swicth back to video and audio ran at screenShare() and 
+        // when user clicks close at whiteboard model
         function backToVideoAudio() {
+            // get video and audio media stream
             OV.getUserMedia({
                 audioSource: undefined,
                 videoSource: undefined,
-                publishAudio: audio,
-                publishVideo: video,
+                publishAudio: true,
+                publishVideo: true,
                 resolution: '640x480',
                 frameRate: 30,
                 insertMode: 'APPEND',
                 mirror: false
             }).then(videoStream => {
+                // get video tracks of media stream
                 var videoTrack = videoStream.getVideoTracks()[0];
+                // replace current video track with video track of video and audio
                 publisher.replaceTrack(videoTrack).then(() => {}).catch((err) => {
+                    // log error if there
                     console.log(err);
                 });
             })
         }
 
+        // function ran when user joins meeting or other user joins meeting
         function appendUserData(videoElement, connection, card_element) {
-            var clientData;
-            var serverData;
-            var nodeId;
+            // get important data
+            var clientData; // nickname
+            var serverData; // user name
+            var nodeId; // connection id
             if (connection.nickName) {
                 clientData = connection.nickName;
                 serverData = connection.userName;
@@ -500,12 +624,14 @@
                 serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
                 nodeId = connection.connectionId;
             }
+            // create html template
             var card_header = document.createElement("div");
             card_header.className = "card-header p-1";
             card_header.setAttribute("id", "card-header-" + nodeId)
             card_header.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
             card_element.insertBefore(card_header, videoElement.parentNode);
             
+            // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting
             var button_list_desktop = document.createElement("div");
             button_list_desktop.className = "button_list_video for-desktop";
             button_list_desktop.setAttribute("id", "button-list-" + nodeId);
@@ -521,6 +647,7 @@
             var drop_call_desktop = document.createElement("button");
             drop_call_desktop.className = "btn btn-danger btn-circle btn-sm for-desktop drop-call-desktop";
             drop_call_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">call_end</i>';
+            // disable private chat if the card belongs to the user
             if (nodeId === "mine") {private_chat_desktop.disabled = true;}
             button_list_desktop.appendChild(private_chat_desktop);
             button_list_desktop.appendChild(video_toggle_desktop);
@@ -529,6 +656,7 @@
             videoElement.parentNode.appendChild(
                 button_list_desktop
             );
+            // show button group when user hovers on the video
             $(videoElement.parentNode).hover(function () {
                 $(videoElement).css("opacity", "0.3");
                 $(button_list_desktop).css("opacity", "1");
@@ -537,11 +665,16 @@
                 $(button_list_desktop).css("opacity", "0");
             })
             $(card_element).css("margin", "10px");
+            // intialize maon container
             setTimeout(initMainVids, 1000, videoElement, nodeId);
         }
         
+        // function ran in appendUserData()
         function initMainVids(videoElement, nodeId) {
+            // check if active user is lesser than 2
             if (Object.keys(active_users).length < 2) {
+                // active users is lesser than 2
+                // append user to main videos
                 active_users[nodeId] = 0;
                 if (Object.keys(active_users).length === 1) {
                     document.getElementById("video-main-1").srcObject = videoElement.srcObject;
@@ -553,11 +686,8 @@
             }
         }
 
+        // remove user data when any user discconects
         function removeUserData(connection) {}
-
-        function addClickListener(videoElement, clientData, serverData) {
-            videoElement.addEventListener('click', function() {});
-        }
     </script>
     <script src="/static/session/js/main.js"></script>
 </body>

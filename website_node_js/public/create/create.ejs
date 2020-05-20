@@ -61,7 +61,7 @@
             var photoURL = user.photoURL;
             var uid = user.uid;
             $("#joinUsLink").hide();
-            $("#navbar").append('<button onclick="logout()" class="btn" style="background-color:transparent;border: none"><i class="fas fa-sign-out-alt"></i></button><img src="' + photoURL + '" alt="Profile Photo" width="27" height="27" style="border-radius:100%;"></img>')
+            $("#navbar").append('<button onclick="logout()" class="btn" style="background-color:transparent;border: none"><i class="fas fa-sign-out-alt"></i></button><img src="' + photoURL + '" alt="profile" width="27" height="27" style="border-radius:100%;"></img>')
             $("#nameInput").val(displayName);
             $("#userLoggedIn").val(uid);
           } else {

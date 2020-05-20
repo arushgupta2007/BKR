@@ -7,6 +7,7 @@
     <script src="/static/head_imports.js"></script>
     <script src="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.js"></script>
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css" />
+    <link rel="stylesheet" href="/static/join_us/css/main.css" />
     <script type="text/javascript">
 
         firebase.auth().onAuthStateChanged(function (user) {
@@ -42,7 +43,14 @@
 </head>
 <body>
     <script src="/static/navbar.js"></script>
-    <div id="auth-container"></div>
+    <div class="container d-flex h-100">
+        <div class="card mx-auto align-self-center" style="opacity: 90%;">
+            <div class="card-header">
+                Join Us
+            </div>
+            <div id="auth-container"></div>  
+        </div>
+    </div>
     <script src="/static/scripts_end_of_body.js"></script>
 </body>
 </html>

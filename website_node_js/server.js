@@ -8,8 +8,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Other Imports
 var express = require("express");
 var fs = require("fs");
-var session = require("express-session");
-var https = require("https");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var cookieSession = require("cookie-session");
@@ -41,14 +39,6 @@ app.use(cookieSession({
     keys: [keys.cookie.encryptKey],
 }))
 
-// app.use(
-//     session({
-//         saveUninitialized: true,
-//         resave: false,
-//         secret: "MY_SECRET",
-//     })
-// );
-
 // unknown
 app.use(
     bodyParser.urlencoded({
@@ -73,11 +63,11 @@ var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 // Storing all session objects in mapSessions Object
 var mapSessions = {};
 
-// var mapSessionNamesTokens = {};
-// var name_codes = {};
-// var id_tracker = {};
+/* var mapSessionNamesTokens = {};
+ var name_codes = {};
+ var id_tracker = {}; */
 
-// setting all files of public to be hoted on /static
+// setting all files of public to be hosted on /static
 app.use("/static", express.static("public"));
 
 // GET request to / (home page)
