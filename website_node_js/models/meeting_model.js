@@ -9,6 +9,7 @@ const userSchema = new Schema({
     code: String,
     next_id: Number,
     usersPrev: [String],
+    chatMessages: [Schema.Types.Mixed]
 })
 
 const Meeting = mongoose.model("meeting", userSchema);

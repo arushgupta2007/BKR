@@ -22,6 +22,8 @@
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+    <script src="/static/head_imports.js"></script>
+
     <script src="/static/session/js/openvidu-browser-2.14.0.js"></script>
 </head>
 
@@ -209,6 +211,22 @@
         var userName = <%- JSON.stringify(userName) %> ;
         // get meeting name to display on navbar
         var meetingName = <%- JSON.stringify(meetingName) %> ;
+
+        // check if user is signed in
+        var signName = nickName;
+        var accountID = "";
+        var signphotoUrl = "";
+        firebase.auth().onAuthStateChanged(function(user) {
+          if (user) {
+            // User is signed in.
+            signName = user.displayName;
+            signphotoUrl = user.photoURL;
+            accountID = user.uid;
+          }
+        }, function(error) {
+          console.log(error);
+        });
+
         // keep track of video and audio status using booleans
         var audio = true;
         var video = true;
@@ -502,7 +520,22 @@
                         data: nickName + "," + userName + "," + message,
                         to: [],
                         type: "chat",
-                    }).then(() => {}).catch((error) => {})
+                    }).then(() => {
+                        var data = {
+                            sessionId: sessionName,
+                            from: nickName,
+                            from_account: accountID,
+                            to: "Everyone",
+                            message: message
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: "http://localhost:8000/session/saveMessage/",
+                            data: data,
+                            success: function () {},
+                            error: function(err) {console.log(err);}
+                        })
+                    }).catch((error) => {})
                 } else {
                     // send message to particular person
                     session.signal({

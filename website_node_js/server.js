@@ -32,6 +32,7 @@ var options = {
     cert: fs.readFileSync("openviducert.pem"),
 };
 var http = require("http").createServer(options, app);
+var https = require('https').createServer(options, app);
 
 // Using cookie-session as default cookie
 app.use(cookieSession({
@@ -202,6 +203,7 @@ app.post("/session/", (req, res) => {
                                 tokens:[token],
                                 code: session_code,
                                 next_id: 1,
+                                chatMessages: [],
                             }).save().then((newMeeting) => {
                                 console.log("MEETING SAVED TO DATABASE");
                                 // check if user was signed in, If yes save in it's meetings list
@@ -380,6 +382,30 @@ app.post("/session/", (req, res) => {
     }
 });
 
+
+// POST request to /session/saveMessage (save the message to database)
+app.post("/session/saveMessage", (req,res) => {
+    // get sessionId, from name, from account id, to, and message from req.body
+    var data = req.body;
+    // find meeting from data.sessionId
+    meetingsModel.findOne({meetingID: data.sessionId}, function(err, meeting) {
+        if (err) {
+            // log error if there
+            console.log(err);            
+        }
+        if (meeting) {
+            // meeting found
+            // remove unnecessary data 
+            delete data.sessionId;
+            // append to chat list of meeting
+            meeting.chatMessages.push(data);
+            // save changes done to meeting to MongoDB
+            meeting.save();
+        }
+    })
+    res.send("Bla");
+});
+
 // function to delete meeting
 function deleteMeeting(session_id, meeting) {
     //delete from mapSession
@@ -460,7 +486,7 @@ app.post("/leave-session", (req, res) => {
 });
 
 // start http server at port 8000
-http.listen(8000, () => {
+https.listen(8000, () => {
     // log after server has started
     console.log("Started Server at port 8000");
     console.log("Link: http://localhost:8000/");    
