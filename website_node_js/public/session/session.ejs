@@ -463,6 +463,7 @@
                 // start publishing audio
                 publisher.publishAudio(true);
             }
+            sendStreamStatusMessage(audio, video);
         }
 
         // function ran when toggle video button is pressed
@@ -482,6 +483,7 @@
                 // start publishing video
                 publisher.publishVideo(true);
             }
+            sendStreamStatusMessage(audio, video);
         }
 
         // function ran when sidepanel has open close
