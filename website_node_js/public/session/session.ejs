@@ -333,7 +333,6 @@
             var subscriber = session.subscribe(event.stream, undefined);
             // create html template to put in participant list
             var card_participant = document.createElement("div");
-            card_participant.setAttribute("id", "card-" + event.target.connection.connectionId);
             card_participant.className = "card p-0";
             var card_body = document.createElement("div");
             card_body.setAttribute("id", "card-body-" + event.target.connection.connectionId);
@@ -681,6 +680,7 @@
                 nodeId = connection.connectionId;
             }
             // create html template
+            card_element.setAttribute("id", "card-" + nodeId);
             var card_header = document.createElement("div");
             card_header.className = "card-header p-1";
             card_header.setAttribute("id", "card-header-" + nodeId)
