@@ -554,12 +554,13 @@
                         to: [],
                         type: "chat",
                     }).then(() => {
+                        console.log("Saving Message")
                         var data = {
                             sessionId: sessionName,
                             from: nickName,
                             from_account: accountID,
                             to: "Everyone",
-                            message: message
+                            message: message,
                         }
                         $.ajax({
                             type: "POST",
