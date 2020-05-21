@@ -325,6 +325,28 @@
             var message_body = document.getElementById("messages_body");
             // scroll to bottom when new message has been recv
             message_body.scrollTop = message_body.scrollHeight;
+        });
+
+        // function ran when somebody changed their stream status
+        session.on('signal:streamStatus', (event) => {
+            var connectionId = event.from;
+            if (connection_list[connectionId]) {
+                var data = JSON.parse(event.data);
+                connection_list[connectionId][audio] = data[audio];
+                connection_list[connectionId][video] = data[video];
+                var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
+                var video_of_other_user = document.getElementById("video-toggle-button-" + connectionId);
+                if (data[audio]) {
+                    audio.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
+                } else {
+                    audio.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic</i>';
+                }
+                if (data[video]) {
+                    video_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
+                } else {
+                    video_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam</i>';
+                }
+            }
         })
 
         // function ran when new user connects
@@ -360,7 +382,7 @@
         // function ran when new connection is created
         session.on('connectionCreated', (event) => {
             // append to connection list
-            connection_list[event.connection.connectionId] = event.connection;
+            connection_list[event.connection.connectionId] = {connection: event.connection, audio: true, video: true};
         });
 
         // function ran when some user exits meeting
@@ -540,7 +562,7 @@
                         }
                         $.ajax({
                             type: "POST",
-                            url: "http://localhost:8000/session/saveMessage/",
+                            url: "https://" + window.location.hostname + "/session/saveMessage/",
                             data: data,
                             success: function () {},
                             error: function(err) {console.log(err);}
@@ -550,14 +572,14 @@
                     // send message to particular person
                     session.signal({
                         data: nickName + "," + userName + "," + message,
-                        to: [connection_list[to]],
+                        to: [connection_list[to][connection]],
                         type: "private-chat",
                     }).then(() => {}).catch((error) => {})
                     // reset value of recvier
                     $("#to_message_send").val("");
                     // create html template to render in the users page
                     $("#message_to_send").attr("placeholder", "Chat With Everybody!");
-                    to_send = JSON.parse(connection_list[to].data.split('%/%')[0]).clientData;
+                    to_send = JSON.parse(connection_list[to][connection].data.split('%/%')[0]).clientData;
                     var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
                     // append html template with message to DOM
                     $("#messages_body").append(html_string);
@@ -568,6 +590,19 @@
             }
             // reset message value
             $("#message_to_send").val("");
+        }
+
+        // send streamStatus message
+        function sendStreamStatusMessage(audio, video) {
+            // send stream status to everybody
+            session.signal({
+                data: JSON.stringify({audio: audio, video:video}),
+                to: [],
+                type: "streamStatus"
+            }).then(() => {}).catch(err => {
+                // log error if there
+                console.log(err);                
+            })
         }
 
         // function called when user presses share screen button
@@ -687,31 +722,36 @@
             card_header.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
             card_element.insertBefore(card_header, videoElement.parentNode);
             
-            // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting
-            var button_list_desktop = document.createElement("div");
-            button_list_desktop.className = "button_list_video for-desktop";
-            button_list_desktop.setAttribute("id", "button-list-" + nodeId);
-            var private_chat_desktop = document.createElement("button");
-            private_chat_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop private-chat-desktop";
-            private_chat_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">chat</i>';
-            var video_toggle_desktop = document.createElement("button");
-            video_toggle_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop video-toggle-dektop";
-            video_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
-            var voice_toggle_desktop = document.createElement("button");
-            voice_toggle_desktop.className = "btn btn-success btn-circle btn-sm for-desktop voice-toggle-dektop";
-            voice_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
-            var drop_call_desktop = document.createElement("button");
-            drop_call_desktop.className = "btn btn-danger btn-circle btn-sm for-desktop drop-call-desktop";
-            drop_call_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">call_end</i>';
-            // disable private chat if the card belongs to the user
-            if (nodeId === "mine") {private_chat_desktop.disabled = true;}
-            button_list_desktop.appendChild(private_chat_desktop);
-            button_list_desktop.appendChild(video_toggle_desktop);
-            button_list_desktop.appendChild(voice_toggle_desktop);
-            button_list_desktop.appendChild(drop_call_desktop);
-            videoElement.parentNode.appendChild(
-                button_list_desktop
-            );
+            // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting 
+            // if it is not the user itelf
+            if (nodeId !== 'mine') {
+                var button_list_desktop = document.createElement("div");
+                button_list_desktop.className = "button_list_video for-desktop";
+                button_list_desktop.setAttribute("id", "button-list-" + nodeId);
+                var private_chat_desktop = document.createElement("button");
+                private_chat_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop private-chat-desktop";
+                private_chat_desktop.setAttribute("id", "private-chat-button-" + nodeId);
+                private_chat_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">chat</i>';
+                var video_toggle_desktop = document.createElement("button");
+                video_toggle_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop video-toggle-dektop";
+                video_toggle_desktop.setAttribute("id", "video-toggle-button-" + nodeId);
+                video_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
+                var voice_toggle_desktop = document.createElement("button");
+                voice_toggle_desktop.className = "btn btn-success btn-circle btn-sm for-desktop voice-toggle-dektop";
+                voice_toggle_desktop.setAttribute("id", "audio-toggle-button-" + nodeId);
+                voice_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
+                var drop_call_desktop = document.createElement("button");
+                drop_call_desktop.className = "btn btn-danger btn-circle btn-sm for-desktop drop-call-desktop";
+                drop_call_desktop.setAttribute("id", "drop-call-button-" + nodeId);
+                drop_call_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">call_end</i>';
+                button_list_desktop.appendChild(private_chat_desktop);
+                button_list_desktop.appendChild(video_toggle_desktop);
+                button_list_desktop.appendChild(voice_toggle_desktop);
+                button_list_desktop.appendChild(drop_call_desktop);
+                videoElement.parentNode.appendChild(
+                    button_list_desktop
+                );
+            }
 
             // add db click listner to full screen video
             videoElement.parentNode.ondbclick = function () {
