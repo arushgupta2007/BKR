@@ -653,6 +653,18 @@
             })
         }
 
+        function openFullscreen(elem) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen();
+            }
+        }
+
         // function ran when user joins meeting or other user joins meeting
         function appendUserData(videoElement, connection, card_element) {
             // get important data
@@ -700,6 +712,12 @@
             videoElement.parentNode.appendChild(
                 button_list_desktop
             );
+
+            // add db click listner to full screen video
+            videoElement.parentNode.ondbclick = function () {
+                openFullscreen(videoElement);
+            }
+
             // show button group when user hovers on the video
             $(videoElement.parentNode).hover(function () {
                 $(videoElement).css("opacity", "0.3");
@@ -731,7 +749,12 @@
         }
 
         // remove user data when any user discconects
-        function removeUserData(connection) {}
+        function removeUserData(connection) {
+            var nodeId = connection.connectionId;
+            console.log("NodeId: " + nodeId);
+            
+            document.getElementById("card-" + nodeId).remove();
+        }
     </script>
     <script src="/static/session/js/main.js"></script>
 </body>
