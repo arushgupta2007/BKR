@@ -80,6 +80,7 @@
             <div class="modal-content" id="whiteboard-model-content">
                 <div class="modal-header">
                     <h3 class="modal-title" id="modalLabel">White Board</h3>
+                    <button class="btn btn-primary" id="clear-board">Clear board</button>
                 </div>
                 <div class="modal-body" id="canvas-container">
                     <!-- <canvas id="whiteboard"></canvas> -->
@@ -163,8 +164,18 @@
         // script to create whiteboard
         // keep track of where the mouse has been dragged on
         var array_of_mouse_loactions = [];
+        
         // sketch for p5 js
         let sketch = function(p) {
+            
+            document.getElementById("clear-board").addEventListener('click', function() {
+                clearWhiteBoard();
+            })
+
+            function clearWhiteBoard () {
+                p.background(0);
+            }
+
             // setup function
             p.setup = function(){
                 /* var width = window.document.getElementById("canvas-container").style.width;
