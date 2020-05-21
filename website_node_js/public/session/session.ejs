@@ -338,12 +338,12 @@
                 connection_list[connectionId][video] = data[1] === "1";
                 var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
                 var video_of_other_user = document.getElementById("video-toggle-button-" + connectionId);
-                if (data[audio] === "1") {
+                if (data[0] === "1") {
                     audio_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
                 } else {
                     audio_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic</i>'; 
                 }
-                if (data[video] === "1") {
+                if (data[1] === "1") {
                     video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
                 } else {
                     video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam</i>';
