@@ -9,7 +9,8 @@ const userSchema = new Schema({
     code: String,
     next_id: Number,
     usersPrev: [String],
-    chatMessages: [Schema.Types.Mixed]
+    chatMessages: [Schema.Types.Mixed],
+    isRecording: Boolean,
 })
 
 const Meeting = mongoose.model("meeting", userSchema);

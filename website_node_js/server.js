@@ -71,6 +71,39 @@ var mapSessions = {};
 // setting all files of public to be hosted on /static
 app.use("/static", express.static("public"));
 
+// helper functions
+// function to delete meeting
+function deleteMeeting(session_id, meeting) {
+    //delete from mapSession
+    delete mapSessions[session_id];
+    // get users in meeting's user list in MongoDB
+    usersArray = meeting.usersPrev;
+    // delete this meeting from user's meeting list
+    for (userId of usersArray) {
+        /* userModel.deleteOne({_id: user}, function(err){}); */
+        // find user in database with meeting in it's meeting list
+        userModel.findOne({commonId: userId}, function (err, user) {
+            if (err) {
+                // log error if there
+                console.log(err);                
+            }
+            // check if user exixts
+            if (user) {
+                // user exists
+                // find index of current meeting in meeting's list
+                var index_of_meeting = user.meetings.indexOf(session_id);
+                // remove current meeting from meeting's list
+                user.meetings.splice(index_of_meeting, 1);
+                // save user to MongoDB database
+                user.save();
+            }
+        })
+    }
+    // delete meeting from MongoDB database
+    meetingsModel.deleteOne({meetingID: session_id}).catch((err, b, c) => {})
+    console.log("DELETED MEETING");
+}
+
 // GET request to / (home page)
 app.get("/", function (req, res) {
     console.log("RENDERING HOME PAGE");
@@ -203,6 +236,7 @@ app.post("/session/", (req, res) => {
                                 tokens:[token],
                                 code: session_code,
                                 next_id: 1,
+                                isRecording: false,
                                 chatMessages: [],
                             }).save().then((newMeeting) => {
                                 console.log("MEETING SAVED TO DATABASE");
@@ -405,38 +439,6 @@ app.post("/session/saveMessage", (req,res) => {
     })
     res.send("Bla");
 });
-
-// function to delete meeting
-function deleteMeeting(session_id, meeting) {
-    //delete from mapSession
-    delete mapSessions[session_id];
-    // get users in meeting's user list in MongoDB
-    usersArray = meeting.usersPrev;
-    // delete this meeting from user's meeting list
-    for (userId of usersArray) {
-        /* userModel.deleteOne({_id: user}, function(err){}); */
-        // find user in database with meeting in it's meeting list
-        userModel.findOne({commonId: userId}, function (err, user) {
-            if (err) {
-                // log error if there
-                console.log(err);                
-            }
-            // check if user exixts
-            if (user) {
-                // user exists
-                // find index of current meeting in meeting's list
-                var index_of_meeting = user.meetings.indexOf(session_id);
-                // remove current meeting from meeting's list
-                user.meetings.splice(index_of_meeting, 1);
-                // save user to MongoDB database
-                user.save();
-            }
-        })
-    }
-    // delete meeting from MongoDB database
-    meetingsModel.deleteOne({meetingID: session_id}).catch((err, b, c) => {})
-    console.log("DELETED MEETING");
-}
 
 // POST request to /leave-session (leave the current session)
 app.post("/leave-session", (req, res) => {
