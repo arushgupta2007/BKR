@@ -492,7 +492,15 @@
                 // start publishing video
                 publisher.publishVideo(true);
             }
-            sendStreamStatusMessage(audio, video);
+            var audio_return = "0"
+            if (audio) {
+                audio_return = "1";
+            }
+            var video_return= "0";
+            if (video) {
+                video_return = "1";
+            }
+            sendStreamStatusMessage(audio_return + "," + video_return);
         }
 
         // function ran when sidepanel has open close
