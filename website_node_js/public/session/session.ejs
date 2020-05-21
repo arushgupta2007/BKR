@@ -554,7 +554,6 @@
                         to: [],
                         type: "chat",
                     }).then(() => {
-                        console.log("Saving Message")
                         var data = {
                             sessionId: sessionName,
                             from: nickName,
@@ -564,7 +563,7 @@
                         }
                         $.ajax({
                             type: "POST",
-                            url: "https://" + window.location.hostname + "/session/saveMessage/",
+                            url: "https://" + window.location.hostname + ":8000/session/saveMessage/",
                             data: data,
                             success: function () {},
                             error: function(err) {console.log(err);}
