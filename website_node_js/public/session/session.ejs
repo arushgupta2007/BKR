@@ -332,18 +332,18 @@
             var connectionId = event.from.connectionId;      
             
             if (connection_list[connectionId]) {
-                var data = JSON.parse(event.data);
+                var data = event.data.split(",");
                 console.log("Data: " + data);
-                connection_list[connectionId][audio] = data[audio];
-                connection_list[connectionId][video] = data[video];
+                connection_list[connectionId][audio] = data[0] === "1";
+                connection_list[connectionId][video] = data[1] === "1";
                 var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
                 var video_of_other_user = document.getElementById("video-toggle-button-" + connectionId);
-                if (data[audio]) {
-                    audio.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
+                if (data[audio] === "1") {
+                    audio_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
                 } else {
-                    audio.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic</i>'; 
+                    audio_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic</i>'; 
                 }
-                if (data[video]) {
+                if (data[video] === "1") {
                     video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
                 } else {
                     video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam</i>';
@@ -464,7 +464,15 @@
                 // start publishing audio
                 publisher.publishAudio(true);
             }
-            sendStreamStatusMessage(audio, video);
+            var audio_return = "0"
+            if (audio) {
+                audio_return = "1";
+            }
+            var video_return= "0";
+            if (video) {
+                video_return = "1";
+            }
+            sendStreamStatusMessage(audio_return + "," + video_return);
         }
 
         // function ran when toggle video button is pressed
@@ -597,10 +605,10 @@
         }
 
         // send streamStatus message
-        function sendStreamStatusMessage(audio, video) {
+        function sendStreamStatusMessage(streamStatus) {
             // send stream status to everybody
             session.signal({
-                data: JSON.stringify({audio: audio, video:video}),
+                data: streamStatus,
                 to: [],
                 type: "streamStatus"
             }).then(() => {}).catch(err => {
