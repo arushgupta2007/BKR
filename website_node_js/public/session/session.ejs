@@ -209,7 +209,6 @@
     </script>
 
     <script>
-        console.log("https://" + window.location.hostname + "/session/saveMessage/");        
         // script for main stuff
         // define publisher as global var
         var publisher;
@@ -331,6 +330,9 @@
         // function ran when somebody changed their stream status
         session.on('signal:streamStatus', (event) => {
             var connectionId = event.from;
+            console.log(connectionId);
+            console.log(connection_list);          
+            
             if (connection_list[connectionId]) {
                 var data = JSON.parse(event.data);
                 connection_list[connectionId][audio] = data[audio];
