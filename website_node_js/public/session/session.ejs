@@ -333,6 +333,7 @@
             
             if (connection_list[connectionId]) {
                 var data = JSON.parse(event.data);
+                console.log("Data: " + data);
                 connection_list[connectionId][audio] = data[audio];
                 connection_list[connectionId][video] = data[video];
                 var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
