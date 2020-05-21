@@ -418,7 +418,8 @@ app.post("/session/", (req, res) => {
 
 
 // POST request to /session/saveMessage (save the message to database)
-app.post("/session/saveMessage", (req,res) => {
+app.post("/session/saveMessage/", (req,res) => {
+    console.log("SAVING MESSAGE WITH DATA:" + req.body);    
     // get sessionId, from name, from account id, to, and message from req.body
     var data = req.body;
     // find meeting from data.sessionId
