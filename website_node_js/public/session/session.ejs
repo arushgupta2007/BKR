@@ -734,6 +734,8 @@
                 serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
                 nodeId = connection.connectionId;
             }
+            console.log(serverData);
+            
             // create html template
             card_element.setAttribute("id", "card-" + nodeId);
             var card_header = document.createElement("div");
