@@ -658,7 +658,7 @@
             // send User control message to the person
             session.signal({
                 data: controlType + "," + status,
-                to: [connection_list[connectionId][connection]],
+                to: [connection_list[connectionId].connection],
                 type: "userControlMessage",
             }).then(() => {}).catch(err => {
                 // log error if there
