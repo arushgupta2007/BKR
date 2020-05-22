@@ -384,6 +384,7 @@
         // function ran when new connection is created
         session.on('connectionCreated', (event) => {
             // append to connection list
+            console.log(event.connection.connectionId);
             connection_list[event.connection.connectionId] = {connection: event.connection, audio: true, video: true};
         });
 
@@ -625,6 +626,19 @@
             })
         }
 
+        // send User Control Message
+        function sendUserControlMessage(connectionId, controlType, status) {
+            // send User control message to the person
+            session.signal({
+                data: controlType + "," + status,
+                to: [connection_list[connectionId][connection]],
+                type: "userControlMessage",
+            }).then(() => {}).catch(err => {
+                // log error if there
+                console.log(err);                
+            })
+        }
+
         // function called when user presses share screen button
         function screenShare() {
             // get screen media stream
@@ -734,7 +748,7 @@
                 serverData = JSON.parse(connection.data.split('%/%')[1]).serverData;
                 nodeId = connection.connectionId;
             }
-            console.log(serverData);
+            console.log(nodeId);            
             
             // create html template
             card_element.setAttribute("id", "card-" + nodeId);
@@ -773,6 +787,14 @@
                 videoElement.parentNode.appendChild(
                     button_list_desktop
                 );
+                // show button group when user hovers on the video
+                $(videoElement.parentNode).hover(function () {
+                    $(videoElement).css("opacity", "0.3");
+                    $(button_list_desktop).css("opacity", "1");
+                }, function () {
+                    $(videoElement).css("opacity", "1");
+                    $(button_list_desktop).css("opacity", "0");
+                })
             }
 
             // add db click listner to full screen video
@@ -780,14 +802,6 @@
                 openFullscreen(videoElement);
             }
 
-            // show button group when user hovers on the video
-            $(videoElement.parentNode).hover(function () {
-                $(videoElement).css("opacity", "0.3");
-                $(button_list_desktop).css("opacity", "1");
-            }, function () {
-                $(videoElement).css("opacity", "1");
-                $(button_list_desktop).css("opacity", "0");
-            })
             $(card_element).css("margin", "10px");
             // intialize maon container
             setTimeout(initMainVids, 1000, videoElement, nodeId);
