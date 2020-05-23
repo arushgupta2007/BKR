@@ -354,29 +354,33 @@
         // function ran when somebody forces change to our streams
         session.on('signal:userControlMessage', (event) => {
             var data_split = event.data.split(",");
-            if (data_split[0] === "audio") {
-                if (data_split[1] === "0") {
-                    if (audio) {
-                        toggleAudio()
-                    }
-                } else {
-                    if (!audio) {
-                        toggleAudio()
-                    }
-                }
-            } else if (data_split[0] === "video") {
-                if (data_split[1] === "0") {
-                    if (video) {
-                        toggleVideo();
-                    }
-                } else {
-                    if (!video) {
-                        toggleVideo();
-                    }
-                }
-            } else {
-                $("#buttonLeaveSession").click()
-            }
+            console.log(data_split);
+            console.log(data_split[0], typeof data_split[0]);
+            console.log(data_split[1], typeof data_split[1]);           
+            
+            // if (data_split[0] === "audio") {
+            //     if (data_split[1] === "0") {
+            //         if (audio) {
+            //             toggleAudio()
+            //         }
+            //     } else {
+            //         if (!audio) {
+            //             toggleAudio()
+            //         }
+            //     }
+            // } else if (data_split[0] === "video") {
+            //     if (data_split[1] === "0") {
+            //         if (video) {
+            //             toggleVideo();
+            //         }
+            //     } else {
+            //         if (!video) {
+            //             toggleVideo();
+            //         }
+            //     }
+            // } else {
+            //     $("#buttonLeaveSession").click()
+            // }
         })
 
         // function ran when new user connects
