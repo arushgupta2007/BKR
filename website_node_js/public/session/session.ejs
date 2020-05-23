@@ -800,9 +800,9 @@
                 video_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
                 video_toggle_desktop.addEventListener('click', function () {
                     if (connection_list[nodeId][video]) {
-                        sendUserControlMessage(nodeId, "video", "0");
-                    } else {
                         sendUserControlMessage(nodeId, "video", "1");
+                    } else {
+                        sendUserControlMessage(nodeId, "video", "0");
                     }
                 })
                 var voice_toggle_desktop = document.createElement("button");
@@ -811,9 +811,9 @@
                 voice_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
                 voice_toggle_desktop.addEventListener('click', function () {
                     if (connection_list[nodeId][audio]) {
-                        sendUserControlMessage(nodeId, "audio", "0");
-                    } else {
                         sendUserControlMessage(nodeId, "audio", "1");
+                    } else {
+                        sendUserControlMessage(nodeId, "audio", "0");
                     }
                 })
                 var drop_call_desktop = document.createElement("button");
