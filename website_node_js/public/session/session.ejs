@@ -812,7 +812,7 @@
                 voice_toggle_desktop.setAttribute("id", "audio-toggle-button-" + nodeId);
                 voice_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
                 voice_toggle_desktop.addEventListener('click', function () {
-                    if (video_toggle_desktop.innerHTML.includes("mic_off")) {
+                    if (voice_toggle_desktop.innerHTML.includes("mic_off")) {
                         sendUserControlMessage(nodeId, "audio", "0");
                     } else {
                         sendUserControlMessage(nodeId, "audio", "1");
