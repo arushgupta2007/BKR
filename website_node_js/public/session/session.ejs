@@ -464,6 +464,13 @@
                     appendUserData(video, userData, card_participant);
                     $(video).prop('muted', true);
                     session.publish(publisher);
+                    publisher.stream.applyFilter("GStreamerFilter", { command: "videoflip method=vertical-flip" })
+                        .then(() => {
+                            console.log("Video rotated!");
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
                 }, 5000);
             })
             .catch(error => {

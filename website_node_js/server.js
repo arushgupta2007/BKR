@@ -186,6 +186,9 @@ app.post("/session/", (req, res) => {
     var tokenOptions = {
         data: serverData,
         role: role,
+        kurentoOptions: {
+            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter"]
+        },
     };
     // check objective of user
     if (objective === "create") {
