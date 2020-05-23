@@ -35,6 +35,11 @@
         <span class="navbar-text mr-0 mr-md-2 mx-auto"><%= meetingName %></span>
         <ul class="navbar-nav ml-md-auto">
             <li class="nav-item session-header-inner">
+                <buton class="btn btn-primary btn-circle btn-sm" onclick="filterTest()" style="background-color:#7D7C46;border-color:#7D7C46">
+                    <i class="material-icons" style="color:white;font-size:100%;">chat</i>
+                </buton>
+            </li>
+            <li class="nav-item session-header-inner">
                 <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46;border-color:#7D7C46">
                     <i class="material-icons" style="color:white;font-size:100%;">chat</i>
                 </buton>
@@ -464,13 +469,6 @@
                     appendUserData(video, userData, card_participant);
                     $(video).prop('muted', true);
                     session.publish(publisher);
-                    publisher.stream.applyFilter("GStreamerFilter", { command: "videoflip method=vertical-flip" })
-                        .then(() => {
-                            console.log("Video rotated!");
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
                 }, 5000);
             })
             .catch(error => {
@@ -592,6 +590,16 @@
         // function ran when user clicks on share button
         function shareMeeting() {
             $("#share_meeting_modal").modal()
+        }
+
+        function filterTest() {
+            publisher.stream.applyFilter("GStreamerFilter", { command: "videoflip method=vertical-flip" })
+                .then(() => {
+                    console.log("Video rotated!");
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
 
         // function ran when user clicks on send message button
