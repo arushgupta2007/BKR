@@ -593,16 +593,16 @@
         }
 
         function filterTest() {
-            publisher.stream.applyFilter("FaceOverlayFilter")
-                .then(filter => {
-                    filter.execMethod( "setOverlayedImage", {
-                    "uri":"https://cdn.pixabay.com/photo/2013/07/12/14/14/derby-148046_960_720.png",
-                    "offsetXPercent":"-0.2F",
-                    "offsetYPercent":"-0.8F",
-                    "widthPercent":"1.3F",
-                    "heightPercent":"1.0F"
+            publisher.stream.applyFilter("GStreamerFilter", {"command": "gdkpixbufoverlay location=/home/ubuntu/images/thumbsUp.jpg offset-x=10 offset-y=10 overlay-height=200 overlay-width=200"})
+            setTimeout(function () {
+                publisher.stream.removeFilter()
+                    .then(() => {
+                        console.log("Filter removed");
+                    })
+                    .catch(error => {
+                        console.error(error);
                     });
-                });
+            }, 3000)
         }
 
         // function ran when user clicks on send message button
