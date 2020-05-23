@@ -187,7 +187,7 @@ app.post("/session/", (req, res) => {
         data: serverData,
         role: role,
         kurentoOptions: {
-            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter"]
+            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter", "ChromaFilter"]
         },
     };
     // check objective of user
