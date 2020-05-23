@@ -593,7 +593,7 @@
         }
 
         function filterTest() {
-            publisher.stream.applyFilter("GStreamerFilter", {"command": "gdkpixbufoverlay location=/home/ubuntu/images/thumbsUp.jpg offset-x=10 offset-y=10 overlay-height=200 overlay-width=200"})
+            publisher.stream.applyFilter("GStreamerFilter", {"command": "gdkpixbufoverlay location=https://18.222.131.54:8000/static/home/images/BKR.PNG offset-x=10 offset-y=10 overlay-height=200 overlay-width=200"})
             setTimeout(function () {
                 publisher.stream.removeFilter()
                     .then(() => {
