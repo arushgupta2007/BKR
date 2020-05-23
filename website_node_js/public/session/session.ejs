@@ -336,6 +336,7 @@
                 console.log("Data: " + data);
                 connection_list[connectionId][audio] = data[0] === "1";
                 connection_list[connectionId][video] = data[1] === "1";
+                console.log(connection_list[connectionId]);
                 try {
                     var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
                     var video_of_other_user = document.getElementById("video-toggle-button-" + connectionId);
@@ -355,6 +356,7 @@
 
         // function ran when somebody forces change to our streams
         session.on('signal:userControlMessage', (event) => {
+            console.log(connection_list[event.from.connectionId]);
             var data_split = event.data.split(",");            
             if (data_split[0] === "audio") {
                 if (data_split[1] === "0") {
