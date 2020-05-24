@@ -1,7 +1,7 @@
 document.write('\
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark py-1" id="navbar">\
   <a class="navbar-brand" href="#">\
-    <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;"/>\
+    <img src="/static/home/images/BKR.PNG" alt="Logo" width="52" height="28"/>\
   </a>\
   <button\
     class="navbar-toggler"\

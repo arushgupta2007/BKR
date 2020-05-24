@@ -30,7 +30,7 @@
 <body>
     <header class="navbar navbar-expand navbar-dark flex-column flex-md-row bg-dark py-1" id="navbar_session">
         <a href="/" class="navbar-brand mr-0 mr-md-2" aria-label="BKR">
-            <img src="/static/home/images/BKR.PNG" alt="Logo" width="67" height="27" style="border-radius:50%;" />
+            <img src="/static/home/images/BKR.PNG" alt="Logo" width="52" height="28"/>
         </a>
         <span class="navbar-text mr-0 mr-md-2 mx-auto"><%= meetingName %></span>
         <ul class="navbar-nav ml-md-auto">
@@ -351,8 +351,10 @@
                     }
                     if (data[1] === "1") {
                         video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
+                        removeThumbnail(connectionId);
                     } else {
                         video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam</i>';
+                        addThumbnail(connectionId, data[2]);
                     }
                 } catch(err) {}
             }
@@ -507,7 +509,7 @@
             if (video) {
                 video_return = "1";
             }
-            sendStreamStatusMessage(audio_return + "," + video_return);
+            sendStreamStatusMessage(audio_return + "," + video_return + "," + signphotoUrl);
         }
 
         // function ran when toggle video button is pressed
@@ -535,7 +537,7 @@
             if (video) {
                 video_return = "1";
             }
-            sendStreamStatusMessage(audio_return + "," + video_return);
+            sendStreamStatusMessage(audio_return + "," + video_return + "," + signphotoUrl);
         }
 
         // function ran when sidepanel has open close
@@ -593,7 +595,7 @@
         }
 
         function filterTest() {
-            publisher.stream.applyFilter("GStreamerFilter", {"command": "gdkpixbufoverlay location=https://18.222.131.54:8000/static/home/images/BKR.PNG offset-x=10 offset-y=10 overlay-height=200 overlay-width=200"})
+            publisher.stream.applyFilter("GStreamerFilter", {"command": "gdkpixbufoverlay location=/static/home/images/BKR.PNG offset-x=10 offset-y=10 overlay-height=200 overlay-width=200"})
             setTimeout(function () {
                 publisher.stream.removeFilter()
                     .then(() => {
@@ -603,6 +605,23 @@
                         console.error(error);
                     });
             }, 3000)
+        }
+
+        function addThumbnail(connectionId, photoUrl) {
+            $("#vid-" + connectionId).css("display", "none");
+            $("#img-" + connectionId).css("display", "block");
+            if (photoUrl === "") {
+                var unknowUrl = "/static/home/images/unknown_user.png";
+                $("#img-" + connectionId).attr("src", unknowUrl);
+            } else {
+                $("#img-" + connectionId).attr("src", photoUrl);
+            }
+            $("#img-" + connectionId).css("margin", "10px")
+        }
+
+        function removeThumbnail(connectionId) {
+            $("#vid-" + connectionId).css("display", "block");
+            $("#img-" + connectionId).css("display", "none");
         }
 
         // function ran when user clicks on send message button
@@ -796,6 +815,9 @@
                 nodeId = connection.connectionId;
             }
 
+            videoElement.id = "vid-" + nodeId;
+            videoElement.parentNode.id = "card-body-" + nodeId;
+
             // create html template
             card_element.setAttribute("id", "card-" + nodeId);
             var card_header = document.createElement("div");
@@ -803,6 +825,11 @@
             card_header.setAttribute("id", "card-header-" + nodeId)
             card_header.innerHTML = '<p class="nickName">' + clientData + '</p><p class="userName">' + serverData + '</p>';
             card_element.insertBefore(card_header, videoElement.parentNode);
+
+            var img_represent_user = document.createElement("img");
+            img_represent_user.setAttribute("id", "img-" + nodeId);
+            videoElement.parentNode.appendChild(img_represent_user);
+
             
             // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting 
             // if it is not the user itelf
@@ -872,19 +899,7 @@
         
         // function ran in appendUserData()
         function initMainVids(videoElement, nodeId) {
-            // check if active user is lesser than 2
-            if (Object.keys(active_users).length < 2) {
-                // active users is lesser than 2
-                // append user to main videos
-                active_users[nodeId] = 0;
-                if (Object.keys(active_users).length === 1) {
-                    document.getElementById("video-main-1").srcObject = videoElement.srcObject;
-                    $("#video-1-container").css("width", $("#video-main-1").width().toString() + "px")
-                } else {
-                    document.getElementById("video-main-2").srcObject = videoElement.srcObject;
-                    $("#video-2-container").css("width", $("#video-main-2").width().toString() + "px")
-                }
-            }
+            
         }
 
         // remove user data when any user discconects
