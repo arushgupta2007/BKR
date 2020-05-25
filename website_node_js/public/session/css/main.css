@@ -231,7 +231,19 @@ canvas {
     white-space: nowrap;
     vertical-align: middle;
     width: 0;
+    position:absolute;
+    margin-left: 50px;
+    max-width: 100%;
+}
+
+#prevMeetingList_sideBar {
+    background-color: #696969;
     display: inline-block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: nowrap;
+    vertical-align: middle;
+    width: 0;
     position:absolute;
     margin-left: 50px;
     max-width: 100%;

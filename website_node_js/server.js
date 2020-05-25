@@ -348,9 +348,9 @@ app.post("/session/", (req, res) => {
                                             // save chages done to user in MongoDB
                                             user.save();
                                             // push user to meeting'suser list
-                                            newMeeting.usersPrev.push(req.body.userId);
+                                            meeting.usersPrev.push(req.body.userId);
                                             // save changes done to meeting in MongoDB
-                                            newMeeting.save();
+                                            meeting.save();
                                             console.log("ADDED MEETING IN USER'S MEETING LIST AND USER IN MEETING'S USER LIST");
                                         }
                                     } else {
