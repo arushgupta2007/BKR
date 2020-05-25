@@ -12,12 +12,12 @@
 
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                window.location.replace("http://localhost:8000/join_us/success/");
+                window.location.replace("https://" + window.location.hostname + ":8000/join_us/success/");
             }
         })
         // FirebaseUI config.
         var uiConfig = {
-        signInSuccessUrl: 'http://localhost:8000/join_us/success/',
+        signInSuccessUrl: 'https://' + window.location.hostname + ':8000/join_us/success/',
         signInOptions: [
             // Leave the lines as is for the providers you want to offer your users.
             firebase.auth.GoogleAuthProvider.PROVIDER_ID,
