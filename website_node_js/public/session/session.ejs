@@ -4,15 +4,19 @@
     <title>BKR Meeting</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" ? />
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
 
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
 
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
 
@@ -34,11 +38,6 @@
         </a>
         <span class="navbar-text mr-0 mr-md-2 mx-auto"><%= meetingName %></span>
         <ul class="navbar-nav ml-md-auto">
-            <li class="nav-item session-header-inner">
-                <buton class="btn btn-primary btn-circle btn-sm" onclick="filterTest()" style="background-color:#7D7C46;border-color:#7D7C46">
-                    <i class="material-icons" style="color:white;font-size:100%;">chat</i>
-                </buton>
-            </li>
             <li class="nav-item session-header-inner">
                 <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46;border-color:#7D7C46">
                     <i class="material-icons" style="color:white;font-size:100%;">chat</i>
@@ -155,12 +154,21 @@
         <div id="participantList_sideBar"></div>
         
         <div class="inline-block" id="video_container">
-            <div class="card p-0" style="display:inline-block;" id="video-1-container">
-                <div class="card-body p-0"><video id="video-main-1" autoplay></video></div>
-            </div>
-            <br>
-            <div class="card p-0" style="display:inline-block;" id="video-2-container">
-                <div class="card-body p-0"><video id="video-main-2" autoplay></video></div>
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item p-0">
+                    <a class="nav-link active" data-toggle="tab" href="#gridParticipants"><i class="fas fa-border-all"></i> Grid View</a>
+                </li>
+                <li class="nav-item p-0">
+                    <a class="nav-link" data-toggle="tab" href="#pinnedVid"><i class="fas fa-thumbtack"></i> Pinned</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="gridParticipants" class="container-fluid tab-pane active"><br>
+                    <div class="row" id="gridViewVideoContainer"></div>                    
+                </div>
+                <div id="pinnedVid" class="container-fluid tab-pane fade"><br>
+                    <div class="row" id="pinnedVideoContainer"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -185,8 +193,8 @@
             p.setup = function(){
                 /* var width = window.document.getElementById("canvas-container").style.width;
                 // var height = $(window).width - 100; */
-                // create canvas with size 500, 500
-                p.createCanvas(500, 500);
+                // create canvas with size 640, 480
+                p.createCanvas(640, 480);
                 // background of black color
                 p.background(0);
             }
@@ -460,7 +468,6 @@
                 card_body.appendChild(video);
                 card_participant.appendChild(card_body);
                 document.getElementById("participantList_sideBar").appendChild(card_participant);
-                console.log("Added Element");
                 // set timeout of 5000 to connect video to OpenVidu and append user data and publish user's stream
                 setTimeout(function () {
                     publisher.addVideoElement(video);
@@ -592,19 +599,6 @@
         // function ran when user clicks on share button
         function shareMeeting() {
             $("#share_meeting_modal").modal()
-        }
-
-        function filterTest() {
-            publisher.stream.applyFilter("GStreamerFilter", {"command": "gdkpixbufoverlay location=/static/home/images/BKR.PNG offset-x=10 offset-y=10 overlay-height=200 overlay-width=200"})
-            setTimeout(function () {
-                publisher.stream.removeFilter()
-                    .then(() => {
-                        console.log("Filter removed");
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            }, 3000)
         }
 
         function addThumbnail(connectionId, photoUrl) {
@@ -893,21 +887,114 @@
             }
 
             $(card_element).css("margin", "10px");
-            // intialize maon container
-            setTimeout(initMainVids, 1000, videoElement, nodeId);
+            // intialize main container
+            // setTimeout(initMainVids, 1000, videoElement, nodeId);
+            initMainVidsActivator(videoElement, nodeId);
+        }
+
+        function initMainVidsActivator(videoElement, nodeId) {
+            if (videoElement.srcObject) {
+                initMainVids(videoElement, nodeId);
+            } else {
+                setTimeout(initMainVidsActivator, 1000, videoElement, nodeId);
+            }
         }
         
         // function ran in appendUserData()
         function initMainVids(videoElement, nodeId) {
-            
+            var gridId = "gridViewVideoContainer";
+            var col = document.createElement("div");
+            col.className = "col-md mx-auto fullSpaceGrid";
+            var videoGrid = document.createElement("video");
+            videoGrid.setAttribute("id", "vid-grid-" + nodeId);
+            videoGrid.className = "vid-grid-view";
+            videoGrid.style.margin = "10px";
+            videoGrid.srcObject = videoElement.srcObject;
+            if (nodeId === "mine") {
+                videoGrid.muted = true;
+            }
+            videoGrid.play();
+            col.appendChild(videoGrid)
+            document.getElementById(gridId).appendChild(col);
+            takeCareGridViewActivator(videoGrid);
+            // document.getElementById(gridId).appendChild(videoGrid);
+            // setTimeout(takeCareOfGridView, 5000);
+            // takeCareOfGridView();
         }
 
-        // remove user data when any user discconects
+        function takeCareGridViewActivator(videoElement) {
+            if (videoElement.srcObject) {
+                takeCareOfGridView();
+            } else {
+                setTimeout(takeCareOfGridView, 1000, videoElement);
+            }
+        }
+
+        function takeCareOfGridView() {
+            var height_of_grid = $(window).height() - $("#navbar_session").height() - 150;
+            var gridId = "gridViewVideoContainer";
+            var noParticipants = document.getElementById(gridId).childElementCount;
+            if (noParticipants === 1) {
+                $(".vid-grid-view").css("height", "100%");
+                $(".vid-grid-view").css("width", "100%");
+                $("#" + gridId).removeClass("row-cols-2");
+                $("#" + gridId).addClass("text-center");
+                $("#" + gridId).addClass("row-cols-1");
+                $(".vid-grid-view").css("max-height", height_of_grid.toString() + "px");
+                $(".vid-grid-view").parent().css("max-height", height_of_grid.toString() + "px");
+            } else if (noParticipants === 2) {
+                $(".vid-grid-view").css("height", "100%");
+                $(".vid-grid-view").css("width", "100%");
+                $("#" + gridId).removeClass("row-cols-1");
+                $("#" + gridId).removeClass("row-cols-3");
+                $("#" + gridId).addClass("text-center");
+                $("#" + gridId).addClass("row-cols-2");
+                $(".vid-grid-view").css("max-height", height_of_grid.toString() + "px");
+                $(".vid-grid-view").parent().css("max-height", height_of_grid.toString() + "px");
+                var max_width_video = ($(window).width() - 75 ) / 2;
+                $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
+            } else if (noParticipants === 3) {
+                $(".vid-grid-view").css("height", "100%");
+                $(".vid-grid-view").css("width", "100%");
+                $("#" + gridId).removeClass("row-cols-2");
+                $("#" + gridId).addClass("text-center");
+                $("#" + gridId).addClass("row-cols-3");
+                var max_height_video = height_of_grid / 2
+                $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
+                $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
+                var max_width_video = ($(window).width() - 75 ) / 2;
+                $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
+            } else if (noParticipants === 4) {
+                $(".vid-grid-view").css("height", "100%");
+                $(".vid-grid-view").css("width", "100%");
+                $("#" + gridId).removeClass("row-cols-3");
+                $("#" + gridId).addClass("row-cols-2");
+                $("#" + gridId).addClass("text-center");
+                var max_height_video = height_of_grid / 2
+                $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
+                $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
+                var max_width_video = ($(window).width() - 75 ) / 2;
+                $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
+            } else if (noParticipants > 4) {
+                $(".vid-grid-view").css("height", "100%");
+                $(".vid-grid-view").css("width", "100%");
+                $("#" + gridId).removeClass("row-col-2");
+                $("#" + gridId).addClass("text-center");
+                $("#" + gridId).addClass("row-col-3");
+                var max_height_video = height_of_grid / 2
+                $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
+                $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
+                var max_width_video = ($(window).width() - 75 ) / 3;
+                $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
+            }
+            $("#" + gridId).height(height_of_grid + 50);
+        }
+
+        // remove user data when any user disconnects
         function removeUserData(connection) {
-            var nodeId = connection.connectionId;
-            console.log("NodeId: " + nodeId);
-            
+            var nodeId = connection.connectionId;          
             document.getElementById("card-" + nodeId).remove();
+            document.getElementById("vid-grid-" + nodeId).remove();
         }
     </script>
     <script src="/static/session/js/main.js"></script>
