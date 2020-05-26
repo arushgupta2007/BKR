@@ -82,7 +82,7 @@ function deleteMeeting(session_id, meeting) {
     for (userId of usersArray) {
         /* userModel.deleteOne({_id: user}, function(err){}); */
         // find user in database with meeting in it's meeting list
-        userModel.findOne({commonId: userId}, function (err, user) {
+        userModel.findOne({_id: userId._id}, function (err, user) {
             if (err) {
                 // log error if there
                 console.log(err);                
@@ -91,7 +91,7 @@ function deleteMeeting(session_id, meeting) {
             if (user) {
                 // user exists
                 // find index of current meeting in meeting's list
-                var index_of_meeting = user.meetings.indexOf(session_id);
+                var index_of_meeting = user.meetings.indexOf(meeting._id);
                 // remove current meeting from meeting's list
                 user.meetings.splice(index_of_meeting, 1);
                 // save user to MongoDB database
@@ -153,11 +153,12 @@ app.post("/join_us/addUser/", function (req, res) {
             // no user found with same user id
             // saving user to database
             userModel({
+                _id: new mongoose.Types.ObjectId(),
                 name: req.body.name,
                 profilePhoto: req.body.photoUrl,
                 phoneNo: req.body.phone_no,
                 commonId: req.body.id_to_keep,
-                meetings: []
+                meetings: [],
             }).save().then(user => {
                 console.log("USER HAS BEEN SUCCESSFULLY ADDED TO DATABASE");
             })
@@ -234,11 +235,13 @@ app.post("/session/", (req, res) => {
                             // save meeting to MongoDB 
                             console.log("SAVING MEETING TO DATABASE");
                             meetingsModel({
+                                _id: new mongoose.Types.ObjectId(),
                                 meetingID:session_id,
                                 meetingName:name_meeting,
                                 tokens:[token],
                                 code: session_code,
                                 next_id: 1,
+                                usersPrev: [],
                                 isRecording: false,
                                 chatMessages: [],
                             }).save().then((newMeeting) => {
@@ -259,11 +262,11 @@ app.post("/session/", (req, res) => {
                                                 console.log("MEETING NOT IN MEETING LIST OF USER");
                                                 // meeting does not exixt in user's meeting list
                                                 // push meeting in user's meeting list
-                                                user.meetings.push(session_id);
+                                                user.meetings.push(newMeeting._id);
                                                 // save user to MongoDB
                                                 user.save();
                                                 // store users in meeting's user list
-                                                newMeeting.usersPrev.push(req.body.userId);
+                                                newMeeting.usersPrev.push(user._id);
                                                 // save meeting to MongoDB
                                                 newMeeting.save();
                                                 console.log("ADDED MEETING TO USER'S MEETING LIST AND USER TO MEETING'S USER LIST");
@@ -340,15 +343,15 @@ app.post("/session/", (req, res) => {
                                         console.log("FOUND LOGGED IN USER IN DATABASE");
                                         // user exists
                                         // check if user's meeting list contains current meeting
-                                        if (!user.meetings.includes(sessionID)) {
+                                        if (!user.meetings.includes(meeting._id)) {
                                             console.log("MEETING NOT IN USER'S MEETING LIST");
                                             // user's meeting list does not have the current meeting
                                             // add current meeting to user's meeting list
-                                            user.meetings.push(sessionID);
+                                            user.meetings.push(meeting._id);
                                             // save chages done to user in MongoDB
                                             user.save();
                                             // push user to meeting'suser list
-                                            meeting.usersPrev.push(req.body.userId);
+                                            meeting.usersPrev.push(user._id);
                                             // save changes done to meeting in MongoDB
                                             meeting.save();
                                             console.log("ADDED MEETING IN USER'S MEETING LIST AND USER IN MEETING'S USER LIST");
@@ -490,6 +493,32 @@ app.post("/leave-session", (req, res) => {
         res.redirect("/");
     }
 });
+
+app.post("/api/user/prevMeetings/", function (req, res) {
+    console.log("USER RQUESTED IT'S PREV MEETINGS");
+    var userUid = req.body.userUID;
+    var array_to_return = [];
+    userModel.findOne({commonId: userUid}).populate("meetings").then(user => {
+        if (user) {
+            console.log("FOUND USER");            
+            for (var i = 0; i < user.meetings.length; i++) {
+                console.log("MEETING FOUND: " + user.meetings[i]);
+                console.log("NAME: " + user.meetings[i].meetingName);
+                console.log("MEETINGID: " + user.meetings[i].meetingID);
+                var data_meeting = {
+                    meeting_id_mongo: user.meetings[i]._id,
+                    meeting_name: user.meetings[i].meetingName,
+                    meeting_id: user.meetings[i].meetingID,
+                }
+                array_to_return.push(data_meeting);
+            }
+            console.log("SENDING DATA BACK TO USER");
+            res.send(array_to_return);
+        } else {
+            res.send("bla");
+        }
+    });
+})
 
 // start http server at port 8000
 https.listen(8000, () => {

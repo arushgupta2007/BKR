@@ -6,7 +6,7 @@ const userSchema = new Schema({
     profilePhoto: String,
     phoneNo: String,
     commonId:String,
-    meetings: [Number],
+    meetings: [{ type: Schema.Types.ObjectId, ref: 'meeting' }],
 })
 
 const User = mongoose.model("user", userSchema);

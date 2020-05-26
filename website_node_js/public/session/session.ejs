@@ -152,7 +152,7 @@
         </div>
         
         <div id="participantList_sideBar"></div>
-        <div id="prevMeetingList_sideBar"></div>
+        <div id="prevMeetingList_sideBar" class="d-flex justify-content-center"></div>
         
         <div class="inline-block" id="video_container">
             <ul class="nav nav-tabs" role="tablist">
@@ -248,11 +248,69 @@
             signphotoUrl = user.photoURL;
             accountID = user.uid;
             $("#prevMeetingList_sideBar").empty();
+            $("#prevMeetingList_sideBar").addClass()
             var spinner = document.createElement("div");
             spinner.setAttribute("role", "status");
-            spinner.className = "spinner-border";
+            spinner.style.display = "inline-block";
+            spinner.className = "spinner-border text-light align-middle";
             spinner.innerHTML = '<span class="sr-only">Loading...</span>';
+            spinner.style.height = "4rem";
+            spinner.style.width = "4rem";
             document.getElementById("prevMeetingList_sideBar").appendChild(spinner);
+            var data_ajax = {
+                userUID: accountID,
+            }
+            $.ajax({
+                url: "https://" + window.location.hostname + ":8000/api/user/prevMeetings",
+                type: "POST",
+                data: data_ajax,
+                error: function (err) {
+                    console.log(err);                    
+                }
+            }).done(function(data) {
+                console.log(data);
+                $("#prevMeetingList_sideBar").empty();
+                var prev_meeting_container = document.createElement("div");
+                prev_meeting_container.setAttribute("id", "prev_meeting_container");
+                prev_meeting_container.style.marginTop = "20px";
+                prev_meeting_container.setAttribute("overflow-y", "auto")
+                data.forEach(function (item, index) {
+                    var card = document.createElement("div");
+                    card.className = "card";
+                    card.setAttribute("id", "card-" + item.meeting_id.toString());
+                    var card_body = document.createElement("div");
+                    card_body.className = "card-body p-2";
+                    card_body.setAttribute("id", "card-body-" + item.meeting_id.toString());
+                    var card_title = document.createElement("div");
+                    card_title.className = "card-title";
+                    card_title.innerHTML =  "<div style='display: inline-block'>" + item.meeting_name + "</div>"
+                    card_title.style.fontSize = "75%";
+                    card_title.style.marginBottom = "0";
+                    var button_group = document.createElement("div");
+                    button_group.style.display = "inline-block";
+                    button_group.style.float = "right";
+                    button_group.setAttribute("id", "button-group-prev-" + item.meeting_id.toString());
+                    var button_chat = document.createElement("button");
+                    button_chat.className = "btn btn-primary btn-sm";
+                    button_chat.setAttribute("id", "button-chat-prev-" + item.meeting_id.toString());
+                    button_chat.innerHTML = '<i class="material-icons" style="color:white;font-size:75%;">chat</i>';
+                    // background-color:#7D7C46;border-color:#7D7C46
+                    button_chat.style.backgroundColor = "#7D7C46";
+                    button_chat.style.borderColor = "#7D7C46";
+                    var button_delete = document.createElement("button");
+                    button_delete.className = "btn btn-danger btn-sm";
+                    button_delete.setAttribute("id", "button-delete-prev-" + item.meeting_id.toString());
+                    button_delete.style.marginLeft = "10px;"
+                    button_delete.innerHTML = '<i class="fa fa-close" style="color:white; font-size: 75%;"></i>'
+                    button_group.appendChild(button_chat);
+                    button_group.appendChild(button_delete);
+                    card_body.appendChild(card_title);
+                    card_title.appendChild(button_group);
+                    card.appendChild(card_body);
+                    prev_meeting_container.appendChild(card);
+                });
+                document.getElementById("prevMeetingList_sideBar").appendChild(prev_meeting_container);
+            });
           }
         }, function(error) {
           console.log(error);
@@ -618,40 +676,45 @@
             if ($("#prevMeetingList_sideBar").width() < 10 && $("#participantList_sideBar").width() < 10) {
                 // taget element is close
                 // check how much space should the participant list take
-                var width_of_part_list;
+                var width_of_prev_list;
                 if ($(window).width() <= 768) {
-                    var width_screen = $(window).width() - 50;
+                    var width_screen = $(window).width();
                     $("#prevMeetingList_sideBar").animate({width: width_screen.toString() + "px"});
-                    width_of_part_list = width_screen;
+                    width_of_prev_list = width_screen;
                 } else if ($(window).width() <= 992) {
                     $("#prevMeetingList_sideBar").animate({width: "25%"});
-                    width_of_part_list = $(window).width() * (1 / 4) + 50;
+                    width_of_prev_list = $(window).width() * (1 / 4) + 50;
                 } else {
                     $("#prevMeetingList_sideBar").animate({width: "15%"});
-                    width_of_part_list = $(window).width() * (15 / 100) + 50;
+                    width_of_prev_list = $(window).width() * (15 / 100) + 50;
                 }
-                $("#video_container").animate({marginLeft: width_of_part_list.toString()});
+                var width_of_accordtion = width_of_prev_list - 70;
+                $("#prev_meeting_container").animate({width: width_of_accordtion.toString() + "px"});
+                $("#video_container").animate({marginLeft: width_of_prev_list.toString()});
             } else if ($("#participantList_sideBar").width() > 10) {
                 $("#participantList_sideBar").width("0");
-                var width_of_part_list;
-                var width_screen = $(window).width() - 50;
+                var width_of_prev_list;
+                var width_screen = $(window).width();
                 if ($(window).width() <= 768) {
                     $("#prevMeetingList_sideBar").width(width_screen.toString() + "px");
-                    width_of_part_list = width_screen;
+                    width_of_prev_list = width_screen;
                 } else if ($(window).width() <= 992) {
                     var width_to_set = width_screen * 0.25
                     $("#prevMeetingList_sideBar").width(width_to_set.toString() + "px");
-                    width_of_part_list = $(window).width() * (1 / 4) + 50;
+                    width_of_prev_list = $(window).width() * (1 / 4) + 50;
                 } else {
                     var width_to_set = width_screen * 0.15;
-                    $("#prevMeetingList_sideBar").animate(width_to_set.toString() + "px");
-                    width_of_part_list = $(window).width() * (15 / 100) + 50;
+                    $("#prevMeetingList_sideBar").width(width_to_set.toString() + "px");
+                    width_of_prev_list = $(window).width() * (15 / 100) + 50;
                 }
-                $("#video_container").css("marginLeft", width_of_part_list.toString() + "px");
+                var width_of_accordtion = width_of_prev_list - 70;
+                $("#prev_meeting_container").width(width_of_accordtion.toString() + "px");
+                $("#video_container").css("marginLeft", width_of_prev_list.toString() + "px");
             } else {
                 // taget element is open
                 // close target element
                 $("#prevMeetingList_sideBar").animate({width: "0"});
+                $("#prev_meeting_container").animate({width: "0"});
                 var width_of_extraOptions = 50;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
             }

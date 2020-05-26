@@ -1,6 +1,6 @@
 document.write('\
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark py-1" id="navbar">\
-  <a class="navbar-brand" href="#">\
+  <a class="navbar-brand" href="/">\
     <img src="/static/home/images/BKR.PNG" alt="Logo" width="52" height="28"/>\
   </a>\
   <button\
@@ -23,7 +23,7 @@ document.write('\
       <a class="nav-item nav-link" href="#"\
         ><i class="fa fa-download" aria-hidden="true"></i> Download</a\
       >\
-      <a class="nav-item nav-link" id="joinUsLink" href="#"\
+      <a class="nav-item nav-link" id="joinUsLink" href="/join_us/"\
         ><i class="fa fa-sign-in" aria-hidden="true"></i> Join Us</a\
       >\
     </div>\

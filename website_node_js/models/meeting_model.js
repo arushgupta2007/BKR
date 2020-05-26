@@ -8,7 +8,7 @@ const userSchema = new Schema({
     tokens:[{type: String}],
     code: String,
     next_id: Number,
-    usersPrev: [String],
+    usersPrev: [{ type: Schema.Types.ObjectId, ref: 'user' }],
     chatMessages: [Schema.Types.Mixed],
     isRecording: Boolean,
 })
