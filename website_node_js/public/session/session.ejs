@@ -247,6 +247,12 @@
             signName = user.displayName;
             signphotoUrl = user.photoURL;
             accountID = user.uid;
+            $("#prevMeetingList_sideBar").empty();
+            var spinner = document.createElement("div");
+            spinner.setAttribute("role", "status");
+            spinner.className = "spinner-border";
+            spinner.innerHTML = '<span class="sr-only">Loading...</span>';
+            document.getElementById("prevMeetingList_sideBar").appendChild(spinner);
           }
         }, function(error) {
           console.log(error);
