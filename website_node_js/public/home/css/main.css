@@ -1,16 +1,272 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo&family=Open+Sans&display=swap");
+html, body {
+    width: 100%; 
+    height: 100%;
+    overflow-y: hidden;
+    font-family: 'B612';
+    cursor: url(awesomeface.png), auto;
+}
 
-body,
-html {
+canvas {
+    z-index: -1;
+    background-color: #192340ff;
+}
+
+#createNewTitle {
+    font-family: 'Questrial', sans-serif;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-control-placeholder {
+    position: absolute;
+    top: 0;
+    padding: 7px 0 0 13px;
+    transition: all 200ms;
+    opacity: 0.5;
+}
+
+.form-control:focus + .form-control-placeholder,
+.form-control:valid + .form-control-placeholder {
+  font-size: 75%;
+  transform: translate3d(0, -70%, 0);
+  opacity: 1;
+}
+
+.white-space {
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 50%;
+    background-color: white;
+}
+
+#create_new_meeting_description {
+    resize: none;
+}
+
+#main-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.snap-scroll {
+    scroll-snap-align: center;
+}
+
+.title-custom {
+    font-family: 'Archivo Black';
+}
+
+@keyframes jump_logo {
+    from {transform: translate3d(0, 0, 0);}
+    to {transform: translate3d(0, 30px, 0);}
+}
+
+#jumping-logo {
+    width: 40%;
+    height: auto;
+    animation: jump_logo 0.7s cubic-bezier(.5,0.05,1,.5);
+    animation-direction: alternate;
+    animation-iteration-count: infinite;
+}
+
+#intro-section-row {
+    height: calc(100vh - 48px);
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+#intro-card {
+    background-color: transparent;
+    border-color: transparent;
+    padding-top: 10px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+#intro-card-titile {
+    margin-top: 50px;
+    font-size: 40px;
+    font-family: 'Montserrat Alternates', sans-serif;
+}
+
+#intro-description {
+    margin-top: 30px;
+}
+
+#intro-description p {
+    font-size: 15px;
+    font-family: 'Questrial', sans-serif;
+}
+
+#features {
+    height: calc(100vh - 48px);
+    margin-left: 24px;
+    margin-right: 24px;
+}
+
+#features .card-deck {
     width: 100%;
     height: 100%;
 }
 
-body {
-    font-family: "Archivo", sans-serif;
-    background-image: url("/static/home/images/bkr_home_background.jpg");
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+#features .card {
+    border-radius: 20px;
+    transition: transform .2s;
+    z-index: 0;
+    /* opacity: 0; */
+    /* height: 0; */
+    overflow:auto;
+}
+
+#features .card.show {
+    opacity: 1;
+}
+
+#features .card:hover {
+    transform: scale(1.2);
+    z-index: 2;
+}
+
+#across-all-devices {
+    background-color: #ffe680ff;
+    color: white;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    height: calc(100vh - 48px);
+    /* margin-left: 24px;
+    margin-right: 24px; */
+}
+
+#device-support-img.big-device {
+    width: auto;
+    height: 100%;
+}
+
+#device-support-img.medium-device {
+    width:100%;
+    height: 100%;
+}
+
+#device-support-img.small-device {
+    width: 100%;
+    height: auto;
+}
+
+#footer {
+    height: calc(100vh - 48px);
+    background-image: linear-gradient(to right, #192340ff, rgb(18, 18, 90), #192340ff);
+    margin-top: 100px;
+    padding-top: 50px;
+}
+
+#img-top {
+    height: 50%;
+    width: 100%;
+    background-color: tomato;
+}
+
+#real-footer {
+    height: 50%;
+    width: 100%;
+    background-color: teal;
+}
+
+#img-footer {
+    background-color: violet;
+}
+
+#footer a {
+    text-decoration: none;
+    color: white;
+}
+
+.meeting-buttons {
+    border-radius: 0px !important;
+    font-family: 'Questrial', sans-serif;
+}
+
+@media only screen and (max-width: 992px) {
+    #main-container {
+        scroll-snap-type: none;
+        padding-top: 0 !important;
+    }
+
+    #jumping-logo {
+        width: 30%;
+        height: auto;
+    }
+
+    #intro-section-row {
+        height: calc(100vh - 100px);
+    }
+
+    #intro-card-titile {
+        font-size: 25px;
+    }
+
+    #intro-description {
+        margin-top: 10px;
+    }
+
+    #intro-description p {
+        font-size: 17px;
+    }
+
+    #features {
+        height: auto;
+        /* padding-top: 100px;
+        padding-bottom: 150px; */
+        scroll-snap-align: start;
+        min-height: calc(100vh - 48px);
+        margin-top: 75px;
+        margin-bottom: 75px;
+    }
+
+    #features .card:hover {
+        transform: 1;
+        z-index: 0;
+    }
+
+    #across-all-devices {
+        height: auto;
+        scroll-snap-align: start;
+            /* padding-top: 100px;
+            padding-bottom: 250px; */
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    #across-all-devices h4 {
+        font-size: 15px;
+    }
+
+    #links-container {
+        padding-top: 70px;
+    }
+
+    #footer {
+        margin-top: 0;
+    }
+
+    #footer a {
+        text-decoration: none;
+        color: white;
+        font-size: 15px;
+    }
+
+    #meetingOptions .btn {
+        font-size: 15px;
+        height: 60px !important;
+    }
+}
+
+@media only screen and (max-width:576px) {
+
 }

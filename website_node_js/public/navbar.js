@@ -24,7 +24,7 @@ document.write('\
         ><i class="fa fa-download" aria-hidden="true"></i> Download</a\
       >\
       <a class="nav-item nav-link" id="joinUsLink" href="/join_us/"\
-        ><i class="fa fa-sign-in" aria-hidden="true"></i> Join Us</a\
+        ><i class="fas fa-sign-in-alt"></i> Join Us</a\
       >\
     </div>\
   </div>\

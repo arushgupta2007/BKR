@@ -1,83 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>BKR Video Confrenicng Software</title>
-    <script src="/static/head_imports.js"></script>
-    <link rel="stylesheet" href="/static/home/css/main.css" />
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>BKR Video Chat</title>
+	<script src="/static/head_imports.js"></script>
+	<link rel="stylesheet" href="/static/fontawesome/css/all.min.css">
+	<link href='https://fonts.googleapis.com/css?family=Archivo Black' rel='stylesheet'>
+	<link href='https://fonts.googleapis.com/css?family=B612' rel='stylesheet'>
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@900&display=swap" rel="stylesheet"> 
+	<link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet"> 
+	<link rel="stylesheet" href="/static/home/css/main.css">
 </head>
-
 <body>
-    <script src="/static/navbar.js"></script>
-    <div class="container" style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 80vh;
-      ">
-        <div class="card p-3" style="
-          background: rgba(253, 253, 150, 0.8);
-          overflow: hidden;
-          border-width: 0ch;
-        ">
-            <div class="card-body">
-                <div class="card float-left border border-dark rounded-lg" style="background: rgba(255, 255, 255, 1);">
-                    <div class="card-body p-2 bd-highlight">
-                        <h5 style="font-size: 95%;">
-                            Connecting Friends and Family with the Internet<br />
-                        </h5>
-                        <h5 style="text-align: center;">
-                            #<strong>B</strong>aat<strong>K</strong>arte<strong>R</strong>aho
-                        </h5>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="fixed-bottom">
-            <div class="row">
-                <div class="col-4">
-                    <a href="create_new/" class="btn btn-danger" style="width: 100%;">
-                        <h5>New Meeting</h5>
-                    </a>
-                </div>
-                <div class="col-4">
-                    <a href="join/" class="btn btn-success" style="width: 100%;">
-                        <h5>Join Meeting</h5>
-                    </a>
-                </div>
-                <div class="col-4">
-                    <a href="schedule/" class="btn btn-primary" style="width: 100%;">
-                        <h5>Schedule Meeting</h5>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="/static/scripts_end_of_body.js"></script>
-    <script>
-        firebase.auth().onAuthStateChanged(function(user) {
-          if (user) {
-            // User is signed in.
-            var displayName = user.displayName;
-            var email = user.email;
-            var photoURL = user.photoURL;
-            var uid = user.uid;
-            $("#joinUsLink").hide();
-            $("#navbar").append('<button onclick="logout()" class="btn" style="background-color:transparent;border: none"><i class="fas fa-sign-out-alt"></i></button><img src="' + photoURL + '" alt="Profile Photo" width="27" height="27" style="border-radius:100%;"></img>')
-          } else {
-            
-          }
-        }, function(error) {
-          console.log(error);
-        });
+	<canvas id="canvas-background-animation"></canvas>
+	<div class="modal fade" id="createNew" tabindex="-1" role="dialog" 
+	aria-labelledby="Create New Call" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="createNewTitle">Create New Call</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-label="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form action="/session/" id="create-new-form" method="POST" onsubmit="return createFormValidation()">
+						<div class="form-group">
+							<input type="text" id="create_new_name" class="form-control create-new-input" name="name" required>
+							<label class="form-control-placeholder" for="create_new_name"><div class="white-space">Your Name</div></label>
+							<div class="invalid-feedback">
+								Please enter a valid name! >.<
+							</div>
+						</div>
+						<div class="form-group">
+							<input type="text" id="create_new_meeting_name" class="form-control create-new-input" name="meetingName" required>
+							<label class="form-control-placeholder" for="create_new_meeting_name"><div class="white-space">Meeting Name</div></label>
+							<div class="invalid-feedback">
+								Is your meeting that boring?! o.O
+							</div>
+						</div>						
+						<div class="form-group">
+							<input type="password" id="create_new_meeting_code" class="form-control create-new-input" name="meetingCode" aria-describedby="create_new_meeting_code_help" required>
+							<label class="form-control-placeholder" for="create_new_meeting_code"><div class="white-space">Meeting Code</div></label>
+							<small id="create_new_meeting_code_help" class="form-text text-muted">Atleast 8 characters alphanumeric</small>
+						</div>
+						<div class="form-group">
+							<textarea type="text" id="create_new_meeting_description" class="form-control create-new-input" name="meetingDesc"></textarea>
+							<label class="form-control-placeholder" for="create_new_meeting_description"><div class="white-space text-muted">Meeting Description (optional)</div></label>
+							<div class="valid-feedback">
+								Ok!
+							</div>
+						</div>
+						<input type="hidden" name="obj" value="create">
+						<div class="form-group text-center">
+							<button type="submit" class="btn btn-success">Create!</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 
-        function logout() {
-            firebase.auth().signOut();
-            location.reload();
-        }
-    </script>
+	<div class="modal fade" id="joinCall" tabindex="-1" role="dialog" 
+	aria-labelledby="Join Call" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="joinNewTitle">Join Call</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-label="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<form action="/session/" id="join-form" method="POST" onsubmit="return joinFormValidation()">
+						<div class="form-group">
+							<input type="text" id="join_name" class="form-control join-input" name="name" required>
+							<label class="form-control-placeholder" for="join_name"><div class="white-space">Your Name</div></label>
+							<div class="invalid-feedback">
+								Please enter a valid name! >.<
+							</div>
+						</div>
+						<div class="form-group">
+							<input type="number" id="join_meeting_name" class="form-control join-input" name="meetingId" required>
+							<label class="form-control-placeholder" for="join_meeting_name"><div class="white-space">Meeting ID</div></label>
+							<div class="invalid-feedback">
+								Looks like a wrong meeting ID or code! :(
+							</div>
+						</div>						
+						<div class="form-group">
+							<input type="password" id="join_meeting_code" class="form-control join-input" name="meetingCode" aria-describedby="join_meeting_code_help" required>
+							<label class="form-control-placeholder" for="join_meeting_code"><div class="white-space">Meeting Code</div></label>
+							<small id="join_meeting_code_help" class="form-text text-muted">Code created by host</small>
+						</div>		
+						<input type="hidden" name="obj" value="join">
+						<div class="form-group text-center">
+							<button type="submit" class="btn btn-success">Join!</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/static/navbar.js"></script>
+	<div class="container-fluid p-4" id="main-container">
+		<div class="row align-items-center snap-scroll" id="intro-section-row">
+			<div id="bkr_details" class="col-md-6">
+				<div class="card" id="intro-card">
+					<div class="card-body text-center">
+						<img src="/static/home/images/BKR.PNG" alt="LOGO" id="jumping-logo">
+						<h5 class="card-title title-custom" id="intro-card-titile"><strong>B</strong>aat<strong>K</strong>arte<strong>R</strong>aho</h5>
+						<div id="intro-description" class="text-left mx-auto">
+							<p class="card-text">
+								A video chatting application to connect YOUR friends and family so YOU can talk to them with ease!
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="represent_bkr_image" class="col-md-6">
+			</div>
+		</div>
+		<div id="features" class="snap-scroll">
+			<div class="card-deck align-items-center mx-auto" data-aos="fade-up">
+				<div class="card text-center col" id="feature1">
+					<img src="/static/home/images/BKR.PNG" alt="Feature" class="card-img-top">
+					<div class="card-body">
+						<div class="card-title title-custom">Feature 1</div>
+						<p class="card-text text-left">Bla This Feature is awesome Bla Bla Bla</p>
+					</div>
+				</div>
+				<div class="card text-center col" id="feature2">
+					<img src="/static/home/images/BKR.PNG" alt="Feature" class="card-img-top">
+					<div class="card-body">
+						<div class="card-title title-custom">Feature 1</div>
+						<p class="card-text text-left">Bla This Feature is awesome Bla Bla Bla</p>
+					</div>
+				</div>
+				<div class="card text-center col" id="feature3">
+					<img src="/static/home/images/BKR.PNG" alt="Feature" class="card-img-top">
+					<div class="card-body">
+						<div class="card-title title-custom">Feature 1</div>
+						<p class="card-text text-left">Bla This Feature is awesome Bla Bla Bla</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="across-all-devices" class="snap-scroll text-center">
+			<!-- <h4 class="title-custom">Supported on various devices!</h4> -->
+			<img alt="Devices" id="device-support-img">
+		</div>
+		<div id="footer" class="snap-scroll text-center">
+			<div id="img-top"></div>
+			<div id="real-footer" class="row row-cols-2 mx-auto">
+				<div id="img-footer" class="col-4"></div>
+				<div id="links-container" class="row row-cols-2 col-8">
+					<div class="col-6">
+						<h5><a href="#intro-section-row">Scroll Up</a></h5>
+					</div>
+					<div class="col-6">
+						<h5><a href="#features">Features</a></h5>
+					</div>
+					<div class="col-6">
+						<h5><a href="#across-all-devices">Devices</a></h5>
+					</div>
+					<div class="col-6">
+						<h5><a href="/contact">Contact</a></h5>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="meetingOptions" class="fixed-bottom">
+		<div class="row row-cols-3" id="meetingButtons">
+			<button class="btn btn-primary btn-lg col meeting-buttons text-center" id="newMeeting" data-toggle="modal" data-target="#createNew">New Call</button>
+			<button class="btn btn-danger btn-lg col meeting-buttons text-center" id="joinMeeting" data-toggle="modal" data-target="#joinCall">Join Call</button>
+			<button class="btn btn-success btn-lg col meeting-buttons text-center" id="scheduleMeeting" data-toggle="modal" data-target="#scheduleNew">Schedule Call</button>
+		</div>
+	</div>
+	<script src="/static/scripts_end_of_body.js"></script>
+	<script src="/static/home/js/main.js"></script>
 </body>
-
 </html>

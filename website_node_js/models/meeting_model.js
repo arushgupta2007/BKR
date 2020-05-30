@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     meetingID:Number,
     meetingName:String,
+    meetingDesc: String,
     meetingSession: Schema.Types.Mixed,
     tokens:[{type: String}],
     code: String,
