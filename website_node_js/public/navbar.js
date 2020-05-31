@@ -15,7 +15,7 @@ document.write('\
     <span class="navbar-toggler-icon"></span>\
   </button>\
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">\
-    <div class="navbar-nav">\
+    <div class="navbar-nav" style="width:100%;">\
       <a class="nav-item nav-link active" href="/"\
         ><i class="fa fa-home"></i> Home\
         <span class="sr-only">(current)</span></a\
@@ -26,6 +26,12 @@ document.write('\
       <a class="nav-item nav-link" id="joinUsLink" href="/join_us/"\
         ><i class="fas fa-sign-in-alt"></i> Join Us</a\
       >\
+      <div class="dropdown pull-right" id="user-sign">\
+        <a href="#" class="dropdown-toggle nav-link" id="user-extra" data-toggle="dropdown"><img alt="You" style="border-radius: 50%;"></a>\
+        <div class="dropdown-menu">\
+          <button class="dropdown-item">Sign Out</button>\
+        </div>\
+      </div>\
     </div>\
   </div>\
 </nav>\

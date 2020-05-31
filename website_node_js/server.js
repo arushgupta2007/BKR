@@ -111,20 +111,6 @@ app.get("/", function (req, res) {
     res.render(__dirname + "/public/home/home.ejs");
 });
 
-// GET request to /create_new (create new meeting page)
-app.get("/create_new/", function (req, res) {
-    console.log("RENDERING CREATE MEETING PAGE");
-    // render create_new ejs file
-    res.render(__dirname + "/public/create/create.ejs");
-});
-
-// GET request to /join (join ongoing meeting page)
-app.get("/join/", function (req, res) {
-    console.log("RENDERING JOIN MEETING PAGE");
-    // render join ongoing meeting ejs file
-    res.render(__dirname + "/public/join/join.ejs");
-});
-
 // GET request to /join_us (sign in / sign up / log in)
 app.get("/join_us/", function (req, res) {
     console.log("RENDERING JOIN US PAGE");
@@ -370,13 +356,13 @@ app.post("/session/", (req, res) => {
                     // the meeting id or meeting code was incorrect
                     // redirect user to fill right values
                     console.log("WRONG MEETING ID OR MEETING CODE");
-                    res.redirect("/join/?wrong=meeting&name=" + name_client);
+                    res.redirect("/?wrong=meeting&name=" + name_client);
                 }
             } else {
                 // meeting does not exist in MongoDB database, meetingId was incorrect
                 // redirect user to fill right values
                 console.log("WRONG MEETING ID");
-                res.redirect("/join/?wrong=meeting&name=" + name_client);
+                res.redirect("/?wrong=meeting&name=" + name_client);
             }
         })
 
@@ -487,9 +473,11 @@ app.post("/api/check-id-code/", function (req, res) {
     meetingsModel.findOne({meetingID: meeting_id}).then(meeting => {
         if (meeting) {
             console.log("MEETING FOUND");               
-            if (meeting_code === meeting.code) {            
+            if (meeting_code === meeting.code) {
+                console.log("MEETING CODE IS RIGHT");                            
                 res.send("1");
             } else {
+                console.log("MEETING CODE IS WRONG");
                 res.send("0");
             }
         } else {

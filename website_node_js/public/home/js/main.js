@@ -411,4 +411,21 @@ $(document).ready( function () {
         $("#features .card").css("opacity", "0.8");
         $(this).css("opacity", "1");
     })
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var photoURL = user.photoURL;
+            var uid = user.uid;
+            var providerData = user.providerData;
+        } else {
+        // User is signed out.
+            document.getElementById('sign-in-status').textContent = 'Signed out';
+            document.getElementById('sign-in').textContent = 'Sign in';
+            document.getElementById('account-details').textContent = 'null';
+        }
+    }, function(error) {
+        console.log(error);
+    });
 })
