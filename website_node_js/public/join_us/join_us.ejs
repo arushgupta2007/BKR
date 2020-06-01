@@ -9,12 +9,10 @@
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css" />
     <link rel="stylesheet" href="/static/join_us/css/main.css" />
     <script type="text/javascript">
-
+        // $("#user-sign").css("display", "none");
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 window.location.replace("https://" + window.location.hostname + ":8000/join_us/success/");
-            } else {
-                $("#user-sign").css("display", "none");
             }
         })
         // FirebaseUI config.
@@ -46,7 +44,7 @@
 <body>
     <script src="/static/navbar.js"></script>
     <div class="container d-flex h-100">
-        <div class="card mx-auto align-self-center" style="opacity: 90%;">
+        <div class="card mx-auto align-self-center">
             <div class="card-header">
                 Join Us
             </div>

@@ -81,6 +81,7 @@ function joinFormValidation () {
         data: data,
         async: false,
     }).done(function (data_filled_right) {
+        console.log(data_filled_right);
         if (data_filled_right === "0") {
             $("#join_meeting_name").removeClass("is-valid");
             $("#join_meeting_code").removeClass("is-valid");
@@ -88,10 +89,10 @@ function joinFormValidation () {
             $("#join_meeting_code").addClass("is-invalid");
             ok = false;
         } else {
-            $("#join_meeting_name").removeClass("is-valid");
-            $("#join_meeting_code").removeClass("is-valid");
-            $("#join_meeting_name").addClass("is-invalid");
-            $("#join_meeting_code").addClass("is-invalid");
+            $("#join_meeting_name").removeClass("is-invalid");
+            $("#join_meeting_code").removeClass("is-invalid");
+            $("#join_meeting_name").addClass("is-valid");
+            $("#join_meeting_code").addClass("is-valid");
         }
     })
     $(".join-input").change(function () {

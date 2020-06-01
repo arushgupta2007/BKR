@@ -40,32 +40,32 @@
         <ul class="navbar-nav ml-md-auto">
             <li class="nav-item session-header-inner">
                 <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46;border-color:#7D7C46">
-                    <i class="material-icons" style="color:white;font-size:100%;">chat</i>
+                    <i class="far fa-comment-alt"></i>
                 </buton>
             </li>
             <li class="nav-item session-header-inner">
                 <button class="btn btn-primary btn-circle btn-sm" onclick="screenShare()" style="background-color:#5E90E7">
-                    <i class="material-icons" style="color:white;font-size:100%;">screen_share</i>
+                    <i class="fas fa-share-square"></i>
                 </button>
             </li>
             <li class="nav-item session-header-inner">
                 <button class="btn btn-warning btn-circle btn-sm" onclick="whiteboard_open()">
-                    <i class='fas fa-chalkboard' style="color:white;font-size:100%;"></i>
+                    <i class="fas fa-pencil-alt"></i>
                 </button>
             </li>
             <li class="nav-item session-header-inner">
                 <button class="btn btn-info btn-circle btn-sm" onclick="shareMeeting()">
-                    <i class="material-icons" style="color:white;font-size:100%;">share</i>
+                    <i class="fas fa-user-plus"></i>
                 </button>
             </li>
             <li class="nav-item session-header-inner">
                 <button id="toggleVideo" class="btn btn-primary btn-circle btn-sm" onclick="toggleVideo()">
-                    <i class="material-icons" id="toggleVideoIcon" style="color:white;font-size:100%;">videocam_off</i>
+                    <i class="fas fa-video" id="toggleVideoIcon"></i>
                 </button>
             </li>
             <li class="nav-item session-header-inner">
                 <button id="toggleAudio" class="btn btn-success btn-circle btn-sm" onclick="toggleAudio()">
-                    <i class="material-icons" id="toggleAudioIcon" style="color:white;font-size:100%;">mic_off</i>
+                    <i class="fas fa-microphone" id="toggleAudioIcon"></i>
                 </button>
             </li>
             <li class="nav-item session-header-inner">
@@ -73,7 +73,7 @@
                     <input type="hidden" name="sessionname" value="<%= sessionName %>" />
                     <input type="hidden" name="token" value="<%= token %>" />
                     <button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-sm" type="submit" onclick="leaveSession()">
-                        <i class="material-icons" style="color:white;font-size:100%;">call_end</i>
+                        <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
                     </button>
                 </form>
             </li>
@@ -120,7 +120,7 @@
             <div class="card-header p-0" id="message_header">
                 <button class="closebtn btn btn-light" type="button" onclick="closeSidePanel()">&times;</button>
                 <h6 id="to_whom_message_side_panel">Broadcast</h6>
-                <i class="material-icons" id="chat_icon_side_panel">chat</i>
+                <i class="far fa-comment-alt" id="chat_icon_side_panel"></i>
             </div>
             <div class="card-body p-1 m-1" id="messages_body" style="margin-top:30px;margin-bottom:30px;"></div>
             <div class="card-footer p-1" id="message_footer">
@@ -128,7 +128,7 @@
                     <input class="form-control" id="to_message_send" type="hidden" />
                     <div class="send_button_sidebar_container">
                         <button type="submit" class="btn btn-primary btn-sm" onclick="sendMessage()">
-                            <i class="material-icons" style="color:white;font-size:100%;">send</i>
+                            <i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i>
                         </button>
                     </div>
                     <div class="form-group">
@@ -143,10 +143,10 @@
         <div class="meetingOptionsExtra">
             <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
                 <button type="button" class="btn btn-secondary" onclick="toggleParticipantList()">
-                    <i class="material-icons" style="color:white;">group</i>
+                    <i class="fas fa-user-friends"></i>
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="togglePrevMeetings()">
-                    <i class="material-icons" style="color:white;">perm_contact_calendar</i>
+                    <i class="fas fa-history"></i>
                 </button>
             </div>
         </div>
@@ -221,7 +221,6 @@
         // create new canvas with prev defined sketch in div of id canvas-container
         new p5(sketch, 'canvas-container');
     </script>
-
     <script>
         // script for main stuff
         // define publisher as global var
@@ -293,8 +292,7 @@
                     var button_chat = document.createElement("button");
                     button_chat.className = "btn btn-primary btn-sm";
                     button_chat.setAttribute("id", "button-chat-prev-" + item.meeting_id.toString());
-                    button_chat.innerHTML = '<i class="material-icons" style="color:white;font-size:75%;">chat</i>';
-                    // background-color:#7D7C46;border-color:#7D7C46
+                    button_chat.innerHTML = '<i class="far fa-comment-alt"></i>';
                     button_chat.style.backgroundColor = "#7D7C46";
                     button_chat.style.borderColor = "#7D7C46";
                     var button_delete = document.createElement("button");
@@ -354,11 +352,11 @@
             $("#participantList_sideBar").css("height", height_of_meetingExtraOptions.toString() + "px");
             $("#prevMeetingList_sideBar").css("height", height_of_meetingExtraOptions.toString() + "px");
             $("#video_container").css("height", height_of_meetingExtraOptions.toString() + "px")
-            
+
             // set width of main container
             var max_width_video_container = $(window).width() - 50;
             $("#video_container").css("width", max_width_video_container.toString() + "px");
-            
+
             // toggle participant list if open
             if ($("#participantList_sideBar").width() > 10) {
                 toggleParticipantList();
@@ -416,7 +414,7 @@
         // function ran when somebody changed their stream status
         session.on('signal:streamStatus', (event) => {
             var connectionId = event.from.connectionId;      
-            
+
             if (connection_list[connectionId]) {
                 var data = event.data.split(",");
                 console.log("Data: " + data);
@@ -426,14 +424,15 @@
                     var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
                     var video_of_other_user = document.getElementById("video-toggle-button-" + connectionId);
                     if (data[0] === "1") {
-                        audio_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
+                        audio_of_other_user.innerHTML = '<i class="fas fa-microphone"></i>';
                     } else {
-                        audio_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic</i>'; 
+                        audio_of_other_user.innerHTML = '<i class="fas fa-microphone-slash"></i>'; 
                     }
                     if (data[1] === "1") {
-                        video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
+                        video_of_other_user.innerHTML = '<i class="fas fa-video"></i>';
                     } else {
-                        video_of_other_user.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam</i>';                    }
+                        video_of_other_user.innerHTML = '<i class="fas fa-video-slash"></i>';
+                    }
                 } catch(err) {}
             }
         });
@@ -567,14 +566,14 @@
                 // change boolean
                 audio = false;
                 // change icon
-                $("#toggleAudioIcon").html("mic")
+                document.getElementById("toggleAudioIcon").innerHTML = '<i class="fas fa-microphone-slash"></i>';
                 // stop publishing stream
                 publisher.publishAudio(false);
             } else {
                 // change boolean
                 audio = true;
                 // change icon
-                $("#toggleAudioIcon").html("mic_off");
+                document.getElementById("toggleAudioIcon").innerHTML = '<i class="fas fa-microphone"></i>';
                 // start publishing audio
                 publisher.publishAudio(true);
             }
@@ -595,14 +594,14 @@
                 // change boolean
                 video = false;
                 // change icon
-                $("#toggleVideoIcon").html("videocam")
+                document.getElementById("toggleVideoIcon").innerHTML = '<i class="fas fa-video-slash"></i>';
                 // stop publishing audio
                 publisher.publishVideo(false);
             } else {
                 // change boolean
                 video = true;
                 // change icon
-                $("#toggleVideoIcon").html("videocam_off")
+                document.getElementById("toggleVideoIcon").innerHTML = '<i class="fas fa-video"></i>';
                 // start publishing video
                 publisher.publishVideo(true);
             }
@@ -626,7 +625,7 @@
         function openSidePanel() {
             document.getElementById("sidePanel").style.width = "350px";
         }
-        
+
         // toggle participant list function ran when user click participant list button
         function toggleParticipantList() {
             // check if taget element is open
@@ -940,7 +939,7 @@
             img_represent_user.setAttribute("id", "img-" + nodeId);
             videoElement.parentNode.appendChild(img_represent_user);
 
-            
+
             // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting 
             // if it is not the user itelf
             if (nodeId !== 'mine') {
@@ -950,33 +949,33 @@
                 var private_chat_desktop = document.createElement("button");
                 private_chat_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop private-chat-desktop";
                 private_chat_desktop.setAttribute("id", "private-chat-button-" + nodeId);
-                private_chat_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">chat</i>';
+                private_chat_desktop.innerHTML = '<i class="far fa-comment-alt"></i>';
                 var video_toggle_desktop = document.createElement("button");
                 video_toggle_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop video-toggle-dektop";
                 video_toggle_desktop.setAttribute("id", "video-toggle-button-" + nodeId);
-                video_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">videocam_off</i>';
+                video_toggle_desktop.innerHTML = '<i class="fas fa-video"></i>';
                 video_toggle_desktop.addEventListener('click', function () {
-                    if (video_toggle_desktop.innerHTML.includes("videocam_off")) {
-                        sendUserControlMessage(nodeId, "video", "0");
-                    } else {
+                    if (video_toggle_desktop.innerHTML.includes('<i class="fas fa-video-slash"></i>')) {
                         sendUserControlMessage(nodeId, "video", "1");
+                    } else {
+                        sendUserControlMessage(nodeId, "video", "0");
                     }
                 })
                 var voice_toggle_desktop = document.createElement("button");
                 voice_toggle_desktop.className = "btn btn-success btn-circle btn-sm for-desktop voice-toggle-dektop";
                 voice_toggle_desktop.setAttribute("id", "audio-toggle-button-" + nodeId);
-                voice_toggle_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">mic_off</i>';
+                voice_toggle_desktop.innerHTML = '<i class="fas fa-microphone"></i>';
                 voice_toggle_desktop.addEventListener('click', function () {
-                    if (voice_toggle_desktop.innerHTML.includes("mic_off")) {
-                        sendUserControlMessage(nodeId, "audio", "0");
-                    } else {
+                    if (voice_toggle_desktop.innerHTML.includes('<i class="fas fa-microphone-slash"></i>')) {
                         sendUserControlMessage(nodeId, "audio", "1");
+                    } else {
+                        sendUserControlMessage(nodeId, "audio", "0");
                     }
                 })
                 var drop_call_desktop = document.createElement("button");
                 drop_call_desktop.className = "btn btn-danger btn-circle btn-sm for-desktop drop-call-desktop";
                 drop_call_desktop.setAttribute("id", "drop-call-button-" + nodeId);
-                drop_call_desktop.innerHTML = '<i class="material-icons" style="color: white; font-size: 100%;">call_end</i>';
+                drop_call_desktop.innerHTML = '<i class="fas fa-phone" style="transform: rotate(-135deg);"></i>';
                 drop_call_desktop.addEventListener('click', function () {
                     sendUserControlMessage(nodeId, "drop", "force");
                 })                
@@ -1015,7 +1014,7 @@
                 setTimeout(initMainVidsActivator, 1000, videoElement, nodeId);
             }
         }
-        
+
         // function ran in appendUserData()
         function initMainVids(videoElement, nodeId) {
             var gridId = "gridViewVideoContainer";
@@ -1174,6 +1173,7 @@
                 takeCareOfGridView();
             }
         }
+
     </script>
     <script src="/static/session/js/main.js"></script>
 </body>

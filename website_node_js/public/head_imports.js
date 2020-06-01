@@ -5,11 +5,11 @@ document.write('\
   integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"\
   crossorigin="anonymous"\
 />\
-<link href="https://fonts.googleapis.com/css?family=Sofia" rel="stylesheet" />\
-<link\
-  rel="stylesheet"\
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"\
-/>\
+<link rel="stylesheet" href="/static/fontawesome/css/all.min.css">\
+<link href="https://fonts.googleapis.com/css?family=Archivo Black" rel="stylesheet">\
+<link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet">\
+<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@900&display=swap" rel="stylesheet"> \
+<link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>\
 <script>\

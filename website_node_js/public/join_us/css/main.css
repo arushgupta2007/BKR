@@ -5,7 +5,6 @@ html {
 }
 
 body {
-    font-family: "Archivo", sans-serif;
     background-image: url("/static/home/images/bkr_home_background.jpg");
     background-size: cover;
     background-position: center center;
@@ -13,7 +12,14 @@ body {
     background-attachment: fixed;
 }
 
+#navbar {
+    font-family: 'B612';
+}
+
 #joinUsLink {
     color: white;
 }
 
+#user-sign {
+    display: none;
+}

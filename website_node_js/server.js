@@ -106,6 +106,7 @@ function deleteMeeting(session_id, meeting) {
 
 // GET request to / (home page)
 app.get("/", function (req, res) {
+    console.log("--------------------------------------------------------")
     console.log("RENDERING HOME PAGE");
     // render home ejs file
     res.render(__dirname + "/public/home/home.ejs");
@@ -113,6 +114,7 @@ app.get("/", function (req, res) {
 
 // GET request to /join_us (sign in / sign up / log in)
 app.get("/join_us/", function (req, res) {
+    console.log("--------------------------------------------------------")
     console.log("RENDERING JOIN US PAGE");
     // render join_us ejs file
     res.render(__dirname + "/public/join_us/join_us.ejs");
@@ -120,6 +122,7 @@ app.get("/join_us/", function (req, res) {
 
 // GET request to /join_us/success (success of joining us above)
 app.get("/join_us/success/", function (req, res) {
+    console.log("--------------------------------------------------------")
     console.log("RENDERING JOIN US SUCCESS PAGE");
     // render success of joining us ejs file
     res.render(__dirname + "/public/join_us/success/success.ejs");
@@ -127,6 +130,7 @@ app.get("/join_us/success/", function (req, res) {
 
 // POST request to /join_us/addUser (adding user to MongoDB database)
 app.post("/join_us/addUser/", function (req, res) {
+    console.log("--------------------------------------------------------")
     console.log("ADD USER CALLED");
     // find if there is existing user with same user id
     userModel.findOne({commonId: req.body.id_to_keep}, function(err, user) {
@@ -156,6 +160,7 @@ app.post("/join_us/addUser/", function (req, res) {
 
 // POST request to /session (meeting)
 app.post("/session/", (req, res) => {
+    console.log("--------------------------------------------------------")
     console.log("ENTERED MEETING PAGE");
     // name of user
     var name_client = req.body.name;
@@ -179,6 +184,7 @@ app.post("/session/", (req, res) => {
     };
     // check objective of user
     if (objective === "create") {
+        console.log("--------------------------------------------------------")
         console.log("USER WANTS TO CREATE NEW MEETING");
         // what name should the meeting have
         var name_meeting = req.body.meetingName;
@@ -274,6 +280,7 @@ app.post("/session/", (req, res) => {
             })
             .catch((err) => console.log(err)); // log error if there
     } else {
+        console.log("--------------------------------------------------------")
         console.log("USER WANTS TO JOIN ONGOING MEETING");
         // user wants to join a ongoing meeting
         // get sessionId
@@ -398,6 +405,7 @@ app.post("/session/", (req, res) => {
 
 // POST request to /session/saveMessage (save the message to database)
 app.post("/session/saveMessage/", (req,res) => {
+    console.log("--------------------------------------------------------")
     console.log("SAVING MESSAGE WITH DATA:" + req.body);    
     // get sessionId, from name, from account id, to, and message from req.body
     var data = req.body;
@@ -422,6 +430,7 @@ app.post("/session/saveMessage/", (req,res) => {
 
 // POST request to /leave-session (leave the current session)
 app.post("/leave-session", (req, res) => {
+    console.log("--------------------------------------------------------")
     console.log("LEAVING SESSION");
     // get session name
     var sessionName = req.body.sessionname;
@@ -468,6 +477,8 @@ app.post("/leave-session", (req, res) => {
 });
 
 app.post("/api/check-id-code/", function (req, res) {
+    console.log("--------------------------------------------------------")
+    console.log("API CHECK ID AND CODE");
     var meeting_id = parseInt(req.body.meetingId);
     var meeting_code = req.body.meetingCode;
     meetingsModel.findOne({meetingID: meeting_id}).then(meeting => {
@@ -488,6 +499,7 @@ app.post("/api/check-id-code/", function (req, res) {
 })
 
 app.post("/api/user/prevMeetings/", function (req, res) {
+    console.log("--------------------------------------------------------")
     console.log("USER RQUESTED IT'S PREV MEETINGS");
     var userUid = req.body.userUID;
     var array_to_return = [];
@@ -516,6 +528,6 @@ app.post("/api/user/prevMeetings/", function (req, res) {
 // start http server at port 8000
 https.listen(8000, () => {
     // log after server has started
+    console.log("--------------------------------------------------------")
     console.log("Started Server at port 8000");
-    console.log("Link: http://localhost:8000/");    
 });
