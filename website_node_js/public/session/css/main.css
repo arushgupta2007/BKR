@@ -312,6 +312,24 @@ i {
     color: white;
 }
 
+.in-white-back {
+    color: black;
+}
+
+#chat-open-close {
+    background-color: #9eb5db;
+    width: 50px;    
+}
+
+#meetingOptionsButton_User button {
+    width: 50px;
+}
+
+#meetingOptionsButton_User {
+    padding: 20px;
+    background-color: rgba(0,0,0,0.5);
+}
+
 body {
     overflow: hidden;
 }

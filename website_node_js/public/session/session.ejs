@@ -38,45 +38,6 @@
         </a>
         <span class="navbar-text mr-0 mr-md-2 mx-auto"><%= meetingName %></span>
         <ul class="navbar-nav ml-md-auto">
-            <li class="nav-item session-header-inner">
-                <buton class="btn btn-primary btn-circle btn-sm" onclick="openSidePanel()" style="background-color:#7D7C46;border-color:#7D7C46">
-                    <i class="far fa-comment-alt"></i>
-                </buton>
-            </li>
-            <li class="nav-item session-header-inner">
-                <button class="btn btn-primary btn-circle btn-sm" onclick="screenShare()" style="background-color:#5E90E7">
-                    <i class="fas fa-share-square"></i>
-                </button>
-            </li>
-            <li class="nav-item session-header-inner">
-                <button class="btn btn-warning btn-circle btn-sm" onclick="whiteboard_open()">
-                    <i class="fas fa-pencil-alt"></i>
-                </button>
-            </li>
-            <li class="nav-item session-header-inner">
-                <button class="btn btn-info btn-circle btn-sm" onclick="shareMeeting()">
-                    <i class="fas fa-user-plus"></i>
-                </button>
-            </li>
-            <li class="nav-item session-header-inner">
-                <button id="toggleVideo" class="btn btn-primary btn-circle btn-sm" onclick="toggleVideo()">
-                    <i class="fas fa-video" id="toggleVideoIcon"></i>
-                </button>
-            </li>
-            <li class="nav-item session-header-inner">
-                <button id="toggleAudio" class="btn btn-success btn-circle btn-sm" onclick="toggleAudio()">
-                    <i class="fas fa-microphone" id="toggleAudioIcon"></i>
-                </button>
-            </li>
-            <li class="nav-item session-header-inner">
-                <form action="/leave-session" method="post">
-                    <input type="hidden" name="sessionname" value="<%= sessionName %>" />
-                    <input type="hidden" name="token" value="<%= token %>" />
-                    <button id="buttonLeaveSession" class="btn btn-danger btn-circle btn-sm" type="submit" onclick="leaveSession()">
-                        <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
-                    </button>
-                </form>
-            </li>
         </ul>
     </header>
     <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
@@ -157,10 +118,10 @@
         <div class="inline-block" id="video_container">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item p-0">
-                    <a class="nav-link active" data-toggle="tab" href="#gridParticipants"><i class="fas fa-border-all"></i> Grid View</a>
+                    <a class="nav-link active" data-toggle="tab" href="#gridParticipants"><i class="fas fa-border-all in-white-back"></i> Grid View</a>
                 </li>
                 <li class="nav-item p-0">
-                    <a class="nav-link" data-toggle="tab" href="#pinnedVid"><i class="fas fa-thumbtack"></i> Pinned</a>
+                    <a class="nav-link" data-toggle="tab" href="#pinnedVid"><i class="fas fa-thumbtack in-white-back"></i> Pinned</a>
                 </li>
             </ul>
             <div class="tab-content">
@@ -171,6 +132,35 @@
                     <div class="row" id="pinnedVideoContainer"></div>
                 </div>
             </div>
+        </div>
+        <div class="fixed-bottom text-center" id="meetingOptionsButton_User">
+            <button class="btn btn-warning pull-left" onclick="shareMeeting()" data-toggle="tooltip" data-placement="top" title="Add Person To Call">
+                <i class="fas fa-user-plus"></i>
+            </button>
+            <button id="toggleVideo" class="btn btn-primary" onclick="toggleVideo()" data-toggle="tooltip" data-placement="top" title="Video">
+                <i class="fas fa-video" id="toggleVideoIcon"></i>
+            </button>
+            <button id="toggleAudio" class="btn btn-success" onclick="toggleAudio()" data-toggle="tooltip" data-placement="top" title="Audio">
+                <i class="fas fa-microphone" id="toggleAudioIcon"></i>
+            </button>
+            <form action="/leave-session" method="post" style="display: inline-block; margin-bottom: 0;">
+                <input type="hidden" name="sessionname" value="<%= sessionName %>" />
+                <input type="hidden" name="token" value="<%= token %>" />
+                <button id="buttonLeaveSession" class="btn btn-danger" type="submit" onclick="leaveSession()" data-toggle="tooltip" data-placement="top" title="Leave Call">
+                    <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
+                </button>
+            </form>
+            <div class="btn-group dropup">
+                <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: transparent; color: white; font-size: 175%; height: 30px;">
+                </button>
+                <div class="dropdown-menu">
+                    <button class="btn dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
+                    <button class="btn dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
+                </div>
+            </div>
+            <buton class="btn pull-right" id="chat-open-close" onclick="openSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat">
+                <i class="fas fa-comment-alt"></i>
+            </buton>
         </div>
     </div>
 
@@ -292,7 +282,7 @@
                     var button_chat = document.createElement("button");
                     button_chat.className = "btn btn-primary btn-sm";
                     button_chat.setAttribute("id", "button-chat-prev-" + item.meeting_id.toString());
-                    button_chat.innerHTML = '<i class="far fa-comment-alt"></i>';
+                    button_chat.innerHTML = '<i class="fas fa-comment-alt"></i>';
                     button_chat.style.backgroundColor = "#7D7C46";
                     button_chat.style.borderColor = "#7D7C46";
                     var button_delete = document.createElement("button");
@@ -321,6 +311,8 @@
         var connection_list = {};
         // keep list for active user to be displayed on main container
         var active_users = {}
+        
+        var meetingOptionUserimout;
         // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
         // set url of #share_meeting_link
@@ -335,6 +327,13 @@
             // alert("orientaion changed");
             setTimeout(init_every_time, 200);
         });
+        
+        $("#video_container").mousemove(function (event) {
+            wakeMeetingOptions();
+        });
+        $("#video_container").on("tap", function () {
+            wakeMeetingOptions();
+        })
 
         // function init_every_time
         function init_every_time() {
@@ -364,6 +363,18 @@
             // set margin of main container as 50px
             $("#video_container").css("margin-left", "50px");
             takeCareOfGridView();
+            
+            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");
+        }
+            
+        function wakeMeetingOptions() {
+            if (meetingOptionUserimout) {
+                clearTimeout(meetingOptionUserimout);
+            }
+            $("#meetingOptionsButton_User").animate({marginBottom: "0px"});
+            meetingOptionUserimout = setTimeout(function () {
+                $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
+            }, 2000);
         }
 
         // initialize OpenVidu
@@ -645,6 +656,8 @@
                     width_of_part_list = $(window).width() * (15 / 100) + 50;
                 }
                 $("#video_container").animate({marginLeft: width_of_part_list.toString()});
+                var width_main_container = $(window).width() - width_of_part_list;
+                $("#video_container").animate({width: width_main_container});
             } else if ($("#prevMeetingList_sideBar").width() > 10) {
                 $("#prevMeetingList_sideBar").width("0");
                 var width_of_part_list;
@@ -662,12 +675,16 @@
                     width_of_part_list = $(window).width() * (15 / 100) + 50;
                 }
                 $("#video_container").css("marginLeft", width_of_part_list.toString() + "px");
+                var width_main_container = $(window).width() - width_of_part_list;
+                $("#video_container").width(width_main_container);
             } else {
                 // taget element is open
                 // close target element
                 $("#participantList_sideBar").animate({width: "0"});
                 var width_of_extraOptions = 50;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
+                var width_main_container = $(window).width() - width_of_extraOptions;
+                $("#video_container").animate({width: width_main_container});
             }
         }
 
@@ -690,6 +707,8 @@
                 var width_of_accordtion = width_of_prev_list - 70;
                 $("#prev_meeting_container").animate({width: width_of_accordtion.toString() + "px"});
                 $("#video_container").animate({marginLeft: width_of_prev_list.toString()});
+                var width_main_container = $(window).width() - width_of_prev_list;
+                $("#video_container").animate({width: width_main_container});
             } else if ($("#participantList_sideBar").width() > 10) {
                 $("#participantList_sideBar").width("0");
                 var width_of_prev_list;
@@ -709,6 +728,8 @@
                 var width_of_accordtion = width_of_prev_list - 70;
                 $("#prev_meeting_container").width(width_of_accordtion.toString() + "px");
                 $("#video_container").css("marginLeft", width_of_prev_list.toString() + "px");
+                var width_main_container = $(window).width() - width_of_prev_list;
+                $("#video_container").width(width_main_container);
             } else {
                 // taget element is open
                 // close target element
@@ -716,6 +737,8 @@
                 $("#prev_meeting_container").animate({width: "0"});
                 var width_of_extraOptions = 50;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
+                var width_main_container = $(window).width() - width_of_extraOptions;
+                $("#video_container").animate({width: width_main_container});
             }
         }
 
@@ -949,7 +972,7 @@
                 var private_chat_desktop = document.createElement("button");
                 private_chat_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop private-chat-desktop";
                 private_chat_desktop.setAttribute("id", "private-chat-button-" + nodeId);
-                private_chat_desktop.innerHTML = '<i class="far fa-comment-alt"></i>';
+                private_chat_desktop.innerHTML = '<i class="fas fa-comment-alt"></i>';
                 var video_toggle_desktop = document.createElement("button");
                 video_toggle_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop video-toggle-dektop";
                 video_toggle_desktop.setAttribute("id", "video-toggle-button-" + nodeId);
