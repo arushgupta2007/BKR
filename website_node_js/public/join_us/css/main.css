@@ -12,3 +12,8 @@ body {
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
+
+#joinUsLink {
+    color: white;
+}
+

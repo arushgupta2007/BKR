@@ -100,48 +100,61 @@ function joinFormValidation () {
     return ok;
 }
 
+$("#user-sign-out-navbar").click(function () {
+    firebase.auth().signOut();
+    location.reload();
+})
+
 $(document).ready( function () {
-    initEveryTime()
     $(window).resize(initEveryTime);
-    // document.body.appendChild(canvas_background)// = 'url(' + canvas_background.toDataURL() + ')';
+    $("#main-container").addClass("snap-scroll-parent");
 
     function initEveryTime() {
-        var main_container_height = $(window).outerHeight() - $("#navbar").outerHeight() - $("#meetingOptions").outerHeight() - 22;
+        var main_container_height;
         var is_on_phone = false;
-        $("#main-container").height(main_container_height.toString() + "px");
         if ($(window).width() > 992) {
             $("#device-support-img").attr("src", "/static/home/images/laptopscreen.png");
             $("#device-support-img").addClass("big-device");
+            $("#dropdown-user-data").addClass("dropdown-menu-right");
+            main_container_height = $(window).outerHeight() - $("#navbar").outerHeight() - $("#meetingOptions").outerHeight() - 48;
+            $("#main-container").height(main_container_height.toString() + "px");
         } else if ($(window).width() > 576) {
             $("#device-support-img").attr("src", "/static/home/images/laptopscreen.png");
             $("#device-support-img").addClass("medium-device");
+            $("#dropdown-user-data").addClass("dropdown-menu-right");
+            main_container_height = $(window).outerHeight() - $("#navbar").outerHeight() - $("#meetingOptions").outerHeight();
+            $("#main-container").height(main_container_height.toString() + "px");
             is_on_phone = true;
         } else {
             $("#device-support-img").attr("src", "/static/home/images/phonescreen.png");
             $("#device-support-img").addClass("small-device");
+            $("#dropdown-user-data").removeClass("dropdown-menu-right");
+            main_container_height = $(window).outerHeight() - $("#navbar").outerHeight() - $("#meetingOptions").outerHeight();
+            $("#main-container").height(main_container_height.toString() + "px");
             is_on_phone = true;
         }
-        canvas_background = document.getElementById("canvas-background-animation");
-        canvas_background.style.position = "absolute";
-        canvas_background.style.display = "inline";
-        var ctx = canvas_background.getContext('2d');
-        canvas_background.width = window.innerWidth;
-        canvas_background.height = window.innerHeight;
+        var max_height_intro_represent_image = main_container_height - 70;
+        $("#intro-img-represent").css("max-height", max_height_intro_represent_image.toString() + "px");
         var navabar_height = $("#navbar").outerHeight();
         var buttonGroup_height = $("#meetingOptions").outerHeight();
         var scrollbar_width = document.getElementById("intro-section-row").offsetWidth - document.getElementById("intro-section-row").clientWidth;
+        canvas_background = document.getElementById("canvas-background-animation");
+        var ctx = canvas_background.getContext('2d');
+        canvas_background.width = window.innerWidth;
+        canvas_background.height = window.innerHeight;
+        var common_velocity = 2;
         function random_x_y_dx_dy() {
             var x = Math.random() * (window.innerWidth - 50 - scrollbar_width);
             var y = Math.random() * (window.innerHeight - 30 - navabar_height - buttonGroup_height) + navabar_height;
             if (Math.random() > 0.5) {
-                var dx = 2;
+                var dx = common_velocity;
             } else {
-                var dx = -2;
+                var dx = -common_velocity;
             }
             if (Math.random() > 0.5) {
-                var dy = 2;
+                var dy = common_velocity;
             } else {
-                var dy = -2;
+                var dy = -common_velocity;
             }
             return {x: x, y: y, dx: dx, dy: dy};
         }
@@ -242,12 +255,6 @@ $(document).ready( function () {
                         }
                     }
                     ctx.drawImage(videoImg, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } else if (data.type === "person") {
                     if (!is_on_phone) {
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
@@ -267,12 +274,6 @@ $(document).ready( function () {
                         }
                     }
                     ctx.drawImage(person_img, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } else if (data.type === "chat") {
                     if (!is_on_phone) {                    
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
@@ -292,12 +293,6 @@ $(document).ready( function () {
                         }
                     }
                     ctx.drawImage(chat_img, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } else if (data.type === "mic") {
                     if (!is_on_phone) {
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
@@ -317,12 +312,6 @@ $(document).ready( function () {
                         }
                     }                    
                     ctx.drawImage(mic_img, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } else if (data.type === "share") {
                     if (!is_on_phone) {
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
@@ -342,12 +331,6 @@ $(document).ready( function () {
                         }
                     }                    
                     ctx.drawImage(share_img, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } else if (data.type === "call") {
                     if (!is_on_phone) {
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
@@ -367,12 +350,6 @@ $(document).ready( function () {
                         }
                     }
                     ctx.drawImage(call_img, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } else if (data.type === "headset") {
                     if (!is_on_phone) {
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
@@ -392,13 +369,22 @@ $(document).ready( function () {
                         }
                     }
                     ctx.drawImage(headset_img, data.x, data.y, data.size_width, data.size_height);
-                    if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
-                        data.dx *= -1;
-                    }
-                    if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
-                        data.dy *= -1
-                    }
                 } 
+
+                if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
+                    if (data.x < 0) {
+                        data.dx = common_velocity;
+                    } else {
+                        data.dx = -common_velocity;
+                    }
+                }
+                if (data.y < navabar_height || data.y + data.size_height > window.innerHeight - buttonGroup_height) {
+                    if (data.y < navabar_height) {
+                        data.dy = common_velocity;
+                    } else {
+                        data.dy = -common_velocity;
+                    }
+                }
                 
                 data.x += data.dx;
                 data.y += data.dy;
@@ -410,7 +396,11 @@ $(document).ready( function () {
     $("#features .card").hover(function () {
         $("#features .card").css("opacity", "0.8");
         $(this).css("opacity", "1");
+    }, function () {
+        $("#features .card").css("opacity", "1");
     })
+
+    $("#user-sign").css("display", "none");
     firebase.auth().onAuthStateChanged(function(user) {
         if (user) {
             // User is signed in.
@@ -419,11 +409,14 @@ $(document).ready( function () {
             var photoURL = user.photoURL;
             var uid = user.uid;
             var providerData = user.providerData;
+            $("#joinUsLink").css("display", "none");
+            $("#user-profile-photo-navbar").attr("src", photoURL);
+            $("#user-profile-photo-navbar").attr("alt", displayName);
+            $("#user-sign").css("display", "block");
+            initEveryTime();
         } else {
-        // User is signed out.
-            document.getElementById('sign-in-status').textContent = 'Signed out';
-            document.getElementById('sign-in').textContent = 'Sign in';
-            document.getElementById('account-details').textContent = 'null';
+            $("#user-sign").css("display", "none");
+            initEveryTime();
         }
     }, function(error) {
         console.log(error);
