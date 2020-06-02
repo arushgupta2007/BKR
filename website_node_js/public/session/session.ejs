@@ -80,13 +80,18 @@
         <div class="card" id="messages">
             <div class="card-header p-0" id="message_header">
                 <button class="closebtn btn btn-light" type="button" onclick="closeSidePanel()">&times;</button>
-                <h6 id="to_whom_message_side_panel">Broadcast</h6>
+                <h6 id="to_whom_message_side_panel">
+                    <select id="select-whom-chat">
+                        <option value="everyone">Everyone</option>
+                    </select>
+                </h6>
                 <i class="far fa-comment-alt" id="chat_icon_side_panel"></i>
             </div>
-            <div class="card-body p-1 m-1" id="messages_bodys" style="margin-top:30px;margin-bottom:30px;"></div>
+            <div class="card-body p-1 m-1" id="messages_body" style="margin-top:30px;margin-bottom:30px;">
+                <div id="everybody-chat" class="chat-group"></div>
+            </div>
             <div class="card-footer p-1" id="message_footer">
-                <form action="javascript:void(0)" autocomplete="off" style="text-align:center;">
-                    <input class="form-control" id="to_message_send" type="hidden" />
+                <form action="javascript:void(0)" autocomplete="off" style="text-align:center;"> 
                     <div class="form-group">
                         <textarea type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send" style="margin:3px;" rows="4"></textarea>
                     </div>
@@ -170,8 +175,7 @@
         var array_of_mouse_loactions = [];
         
         // sketch for p5 js
-        let sketch = function(p) {
-            
+        let sketch = function(p) {            
             document.getElementById("clear-board").addEventListener('click', function() {
                 clearWhiteBoard();
             })
@@ -318,6 +322,7 @@
         // set url of #share_meeting_link
         $("#share_meeting_link").html(" https://" + window.location.hostname + ":8000/join/?wrong=nothing&id=" + sessionName);
         $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":8000/join/?wrong=nothing&id=" + sessionName);
+        
         // initialize every thing
         init_every_time();
         // every time window resizes, initialize every thing
@@ -365,6 +370,18 @@
             takeCareOfGridView();
             
             $("#meetingOptionsButton_User").css("margin-bottom", "-70px");
+            
+            $("#select-whom-chat").on('change', function () {
+                var value = this.value;
+                $(".chat-group").hide();
+                if (value === 'everyone') {
+                    $("#everybody-chat").show();
+                    $("#message_to_send").attr("placeholder", "Chat with Everybody!");
+                } else {
+                    $("#chat-" + value).show();     
+                    $("#message_to_send").attr("placeholder", "Chat with " + $("#select-whom-chat option:selected").text() + "!")
+                }
+            })
         }
             
         function wakeMeetingOptions() {
@@ -399,10 +416,10 @@
                 html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
             }
             // append html template with message in DOM
-            $("#messages_body").append(html_string);
-            var message_body = document.getElementById("messages_body");
+            $("#messages_body #everybody-chat").append(html_string);
+            var everybody_chat = document.getElementById("everybody-chat");
             // scroll to bottom when new message recv
-            message_body.scrollTop = message_body.scrollHeight;
+            everybody_chat.scrollTop = everybody_chat.scrollHeight;
         })
 
         // function ran when private chat message has been recv
@@ -414,9 +431,9 @@
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
             // create html template
-            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>' + from_name + ' (Private): ' + message + ' </strong></div></div>'
+            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
             // append html template with message to DOM
-            $("#messages_body").append(html_string);
+            $("#messages_body #chat-" + event.from.connectionId).append(html_string);
             var message_body = document.getElementById("messages_body");
             // scroll to bottom when new message has been recv
             message_body.scrollTop = message_body.scrollHeight;
@@ -763,11 +780,13 @@
             // get message
             var message = $("#message_to_send").val();
             // check if message is empty
-            if (message !== "") {
+            if (message.trim() !== "") {
                 // get recver of message
-                var to = $("#to_message_send").val();
+                var to = $("#select-whom-chat").val();
                 // check if recver of message is empty
-                if (to === "") {
+                console.log(to);
+                
+                if (to === "everyone") {
                     // send message to every one
                     session.signal({
                         data: nickName + "," + userName + "," + message,
@@ -789,28 +808,30 @@
                             error: function(err) {console.log(err);}
                         })
                     }).catch((error) => {})
+                    var message_group = document.getElementById("#everybody-chat");
+                    // scroll to bottom
+                    message_group.scrollTop = message_group.scrollHeight;
                 } else {
+                    console.log(connection_list[to]);
                     // send message to particular person
                     session.signal({
                         data: nickName + "," + userName + "," + message,
-                        to: [connection_list[to][connection]],
+                        to: [connection_list[to].connection],
                         type: "private-chat",
-                    }).then(() => {}).catch((error) => {})
-                    // reset value of recvier
-                    $("#to_message_send").val("");
+                    }).then(() => {}).catch((error) => {
+                        console.log(error);
+                    })
                     // create html template to render in the users page
-                    $("#message_to_send").attr("placeholder", "Chat With Everybody!");
-                    to_send = JSON.parse(connection_list[to][connection].data.split('%/%')[0]).clientData;
-                    var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>You (To @' + to_send + ' Private): ' + $("#message_to_send").val() + ' </strong></div></div>'
+                    var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;background-color:#5cb3db;"><div class="card-body text-wrap p-1"><strong>You: ' + $("#message_to_send").val() + ' </strong></div></div>';
                     // append html template with message to DOM
-                    $("#messages_body").append(html_string);
-                    var message_body = document.getElementById("messages_body");
+                    $("#messages_body #chat-" + to).append(html_string);
+                    var message_group = document.getElementById("#chat-" + to);
                     // scroll to bottom
-                    message_body.scrollTop = message_body.scrollHeight;
+                    message_group.scrollTop = message_group.scrollHeight;
                 }
             }
             // reset message value
-            $("#message_to_send").val("");
+            $("#message_to_send").text("");
         }
 
         // send streamStatus message
@@ -1022,6 +1043,9 @@
                     $(videoElement).css("opacity", "1");
                     $(button_list_desktop).css("opacity", "0");
                 })
+                $("#messages_body").append('<div id="chat-' + nodeId + '" class="chat-group"></div>')
+                $("#chat-" + nodeId).hide();
+                $("#select-whom-chat").append('<option value="' + nodeId +'">' + clientData + '</option>');    
             }
 
             // add db click listner to full screen video
@@ -1030,9 +1054,7 @@
             }
 
             $(card_element).css("margin", "10px");
-            // intialize main container
-            // setTimeout(initMainVids, 1000, videoElement, nodeId);
-            initMainVidsActivator(videoElement, nodeId);
+            initMainVidsActivator(videoElement, nodeId);            
         }
 
         function initMainVidsActivator(videoElement, nodeId) {
@@ -1191,6 +1213,11 @@
             var nodeId = connection.connectionId;          
             document.getElementById("card-" + nodeId).remove();
             document.getElementById("col-grid-" + nodeId).remove();
+            $("#chat-" + nodeId).remove();
+            if ($("#select-whom-chat option:selected").val() === nodeId) {
+                $("#select-whom-chat").val("everyone");
+            }
+            $('#select-whom-chat option[value="' + nodeId + '"]').remove()
             takeCareGridViewActivatorElementRemoved("#col-grid-" + nodeId);
         }
 
