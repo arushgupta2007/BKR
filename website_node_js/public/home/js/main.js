@@ -414,6 +414,7 @@ $(document).ready( function () {
             $("#user-profile-photo-navbar").attr("src", photoURL);
             $("#user-profile-photo-navbar").attr("alt", displayName);
             $("#user-sign").css("display", "block");
+            $(".userId").val(uid);
             initEveryTime();
         } else {
             $("#user-sign").css("display", "none");

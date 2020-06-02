@@ -194,6 +194,10 @@ canvas {
     background-color: #6c757d;
 }
 
+.send_button_sidebar_container button {
+    width: 100%;
+}
+
 .message_sent {
     font-size: 10px;
     margin: 5px;

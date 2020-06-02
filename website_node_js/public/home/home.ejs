@@ -21,6 +21,7 @@
 				</div>
 				<div class="modal-body">
 					<form action="/session/" id="create-new-form" method="POST" onsubmit="return createFormValidation()">
+					    <input type="hidden" class="userId" value="" name="userId">
 						<div class="form-group">
 							<input type="text" id="create_new_name" class="form-control create-new-input" name="name" required>
 							<label class="form-control-placeholder" for="create_new_name"><div class="white-space">Your Name</div></label>
@@ -69,6 +70,7 @@
 				</div>
 				<div class="modal-body">
 					<form action="/session/" id="join-form" method="POST" onsubmit="return joinFormValidation()">
+					    <input type="hidden" class="userId" value="" name="userId">
 						<div class="form-group">
 							<input type="text" id="join_name" class="form-control join-input" name="name" required>
 							<label class="form-control-placeholder" for="join_name"><div class="white-space">Your Name</div></label>

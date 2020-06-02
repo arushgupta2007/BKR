@@ -83,17 +83,17 @@
                 <h6 id="to_whom_message_side_panel">Broadcast</h6>
                 <i class="far fa-comment-alt" id="chat_icon_side_panel"></i>
             </div>
-            <div class="card-body p-1 m-1" id="messages_body" style="margin-top:30px;margin-bottom:30px;"></div>
+            <div class="card-body p-1 m-1" id="messages_bodys" style="margin-top:30px;margin-bottom:30px;"></div>
             <div class="card-footer p-1" id="message_footer">
                 <form action="javascript:void(0)" autocomplete="off" style="text-align:center;">
                     <input class="form-control" id="to_message_send" type="hidden" />
+                    <div class="form-group">
+                        <textarea type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send" style="margin:3px;" rows="4"></textarea>
+                    </div>
                     <div class="send_button_sidebar_container">
-                        <button type="submit" class="btn btn-primary btn-sm" onclick="sendMessage()">
+                        <button type="submit" class="btn btn-primary btn-lg" onclick="sendMessage()">
                             <i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i>
                         </button>
-                    </div>
-                    <div class="form-group">
-                        <textarea type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send" style="margin:3px;" rows="6"></textarea>
                     </div>
                 </form>
             </div>
@@ -103,10 +103,10 @@
     <div id="main-container" class="container-fluid p-0">
         <div class="meetingOptionsExtra">
             <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
-                <button type="button" class="btn btn-secondary" onclick="toggleParticipantList()">
+                <button type="button" class="btn btn-secondary btn-lg" onclick="toggleParticipantList()">
                     <i class="fas fa-user-friends"></i>
                 </button>
-                <button type="button" class="btn btn-secondary" onclick="togglePrevMeetings()">
+                <button type="button" class="btn btn-secondary btn-lg" onclick="togglePrevMeetings()">
                     <i class="fas fa-history"></i>
                 </button>
             </div>
@@ -450,7 +450,8 @@
 
         // function ran when somebody forces change to our streams
         session.on('signal:userControlMessage', (event) => {
-            var data_split = event.data.split(",");            
+            var data_split = event.data.split(",");
+            console.log(data_split);
             if (data_split[0] === "audio") {
                 if (data_split[1] === "0") {
                     if (audio) {
@@ -577,14 +578,14 @@
                 // change boolean
                 audio = false;
                 // change icon
-                document.getElementById("toggleAudioIcon").innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                document.getElementById("toggleAudio").innerHTML = '<i class="fas fa-microphone-slash"></i>';
                 // stop publishing stream
                 publisher.publishAudio(false);
             } else {
                 // change boolean
                 audio = true;
                 // change icon
-                document.getElementById("toggleAudioIcon").innerHTML = '<i class="fas fa-microphone"></i>';
+                document.getElementById("toggleAudio").innerHTML = '<i class="fas fa-microphone"></i>';
                 // start publishing audio
                 publisher.publishAudio(true);
             }
@@ -605,14 +606,14 @@
                 // change boolean
                 video = false;
                 // change icon
-                document.getElementById("toggleVideoIcon").innerHTML = '<i class="fas fa-video-slash"></i>';
+                document.getElementById("toggleVideo").innerHTML = '<i class="fas fa-video-slash"></i>';
                 // stop publishing audio
                 publisher.publishVideo(false);
             } else {
                 // change boolean
                 video = true;
                 // change icon
-                document.getElementById("toggleVideoIcon").innerHTML = '<i class="fas fa-video"></i>';
+                document.getElementById("toggleVideo").innerHTML = '<i class="fas fa-video"></i>';
                 // start publishing video
                 publisher.publishVideo(true);
             }
@@ -634,6 +635,7 @@
 
         // function ran when sidepanel has to open
         function openSidePanel() {
+            $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
             document.getElementById("sidePanel").style.width = "350px";
         }
 
@@ -902,8 +904,8 @@
             OV.getUserMedia({
                 audioSource: undefined,
                 videoSource: undefined,
-                publishAudio: true,
-                publishVideo: true,
+                publishAudio: audio,
+                publishVideo: video ,
                 resolution: '640x480',
                 frameRate: 30,
                 insertMode: 'APPEND',
@@ -933,6 +935,7 @@
 
         // function ran when user joins meeting or other user joins meeting
         function appendUserData(videoElement, connection, card_element) {
+            videoElement.muted = true;
             // get important data
             var clientData; // nickname
             var serverData; // user name
@@ -978,9 +981,11 @@
                 video_toggle_desktop.setAttribute("id", "video-toggle-button-" + nodeId);
                 video_toggle_desktop.innerHTML = '<i class="fas fa-video"></i>';
                 video_toggle_desktop.addEventListener('click', function () {
-                    if (video_toggle_desktop.innerHTML.includes('<i class="fas fa-video-slash"></i>')) {
+                    if (video_toggle_desktop.innerHTML.includes('fa-video-slash')) {
+                        console.log("Turning Video On")
                         sendUserControlMessage(nodeId, "video", "1");
                     } else {
+                        console.log("Turning Video Off")
                         sendUserControlMessage(nodeId, "video", "0");
                     }
                 })
@@ -989,7 +994,7 @@
                 voice_toggle_desktop.setAttribute("id", "audio-toggle-button-" + nodeId);
                 voice_toggle_desktop.innerHTML = '<i class="fas fa-microphone"></i>';
                 voice_toggle_desktop.addEventListener('click', function () {
-                    if (voice_toggle_desktop.innerHTML.includes('<i class="fas fa-microphone-slash"></i>')) {
+                    if (voice_toggle_desktop.innerHTML.includes('fa-microphone-slash')) {
                         sendUserControlMessage(nodeId, "audio", "1");
                     } else {
                         sendUserControlMessage(nodeId, "audio", "0");
