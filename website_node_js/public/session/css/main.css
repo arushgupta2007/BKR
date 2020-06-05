@@ -48,6 +48,11 @@ input.btn {
     #video_container .card {
         width: 450px;
     }   
+    .editor-toolbar a {
+        height: 15px;
+        width: 20px;
+        border: none;
+    }
 }
 
 @media (min-width:600px) and (min-height:600px) {
@@ -127,7 +132,6 @@ p.userName {
     top: 0;
     right: 0;
     background-color: #dddddd;
-    opacity: 90%;
     overflow: hidden;
     transition: 0.5s;
 }
@@ -199,14 +203,176 @@ canvas {
     width: 100%;
 }
 
+#tabs-chat {
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 25%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#tabs-chat button {
+    display: block;
+    color: black;
+    padding: 10px 10px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 15px;
+    max-height: 50px;
+}
+
+#tabs-chat button:hover {
+    background-color: #ddd;
+}
+
+#tabs-chat button.active {
+    background-color: #0661b1;
+    color: white;
+}
+
+#chat-content {
+    float: left;
+    border: 1px solid black;
+    width: 75%;
+    border-left: none;
+    height: 100%;
+}
+
+#chat-content .card-header {
+    font-weight: bold;
+}
+
+#chat-everybody {
+    background-color: #023d31;
+}
+
+.private-chat {
+    background-color: aliceblue;
+}
+
+.chat-messages {
+    display: none;
+}
+
+#message-to-send {
+    width: 100%;
+    padding: 7px;
+}
+
+#sumbit-new-message {
+    width: 100%;
+}
+
+.chat-messages {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .message_sent {
-    font-size: 10px;
+    font-size: 12px;
     margin: 5px;
     max-width: 100%;
 }
 
-#message_to_send {
+.message_sent * {
+    margin-bottom: 0;
+}
+
+.message_sent .user-name-chat-message {
     font-size: 10px;
+}
+
+#snackbar-info-container {
+    width: 250px;
+    background-color: transparent;
+    color: #fff;
+    position: fixed;
+    z-index: 10;
+    right: 30px;
+    top: 30px;
+}
+
+.snackbar-info {
+    visibility: hidden;
+    width: 250px;
+    background-color: #333;
+    text-align: center;
+    border-radius: 5px;
+    padding: 16px;
+}
+
+.snackbar-info.show {
+    visibility: visible;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 1.5s;
+    animation: fadein 0.5s, fadeout 0.5s 1.5s;
+    animation-fill-mode: forwards;
+}
+
+@-webkit-keyframes fadein {
+  from {opacity: 0;} 
+  to {opacity: 1;}
+}
+
+@keyframes fadein {
+  from {opacity: 0;} 
+  to {opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {opacity: 1;} 
+  to {opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {opacity: 1;} 
+  to {opacity: 0;}
+}
+
+.red-chat {
+    color: #dc3545 !important;
+}
+
+.CodeMirror,
+.CodeMirror-scroll {
+    height: 100px;
+    min-height: auto;
+}
+
+.CodeMirror-fullscreen.CodeMirror {
+    max-height: none;
+}
+
+.CodeMirror-fullscreen .CodeMirror-scroll {
+    max-height: none;
+}
+
+.editor-toolbar {
+    font-size: 10px;
+}
+
+.editor-toolbar a {
+    height: 15px;
+    width: 15px;
+    border: none;
+}
+
+.editor-toolbar .separator {
+    display: none;
+}
+
+.editor-statusbar {
+    display: none;
+}
+
+.new-message-came {
+    background-color: #fcba03; !important;
 }
 
 .sidebar {
@@ -311,6 +477,10 @@ video {
     display: grid;
     grid-template-columns: repeat(3, 0.5fr);
     overflow-x: auto;
+}
+
+#gridViewVideoContainer .col {
+    margin-bottom: 20px !important; 
 }
 
 i {

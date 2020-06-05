@@ -22,13 +22,14 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
-    <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <script src="/static/head_imports.js"></script>
 
     <script src="/static/session/js/openvidu-browser-2.14.0.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
 </head>
 
 <body>
@@ -77,30 +78,23 @@
     </div>
 
     <div class="sidePanel" id="sidePanel">
-        <div class="card" id="messages">
-            <div class="card-header p-0" id="message_header">
-                <button class="closebtn btn btn-light" type="button" onclick="closeSidePanel()">&times;</button>
-                <h6 id="to_whom_message_side_panel">
-                    <select id="select-whom-chat">
-                        <option value="everyone">Everyone</option>
-                    </select>
-                </h6>
-                <i class="far fa-comment-alt" id="chat_icon_side_panel"></i>
-            </div>
-            <div class="card-body p-1 m-1" id="messages_body" style="margin-top:30px;margin-bottom:30px;">
-                <div id="everybody-chat" class="chat-group"></div>
-            </div>
-            <div class="card-footer p-1" id="message_footer">
-                <form action="javascript:void(0)" autocomplete="off" style="text-align:center;"> 
+        <div class="pull-left" id="tabs-chat">
+            <button class="chat-person active text-truncate" id="everybody">Everybody</button>
+        </div>
+        <div class="chat-content">
+            <div class="card h-100">
+                <div class="card-header text-center text-truncate" id="card-header-chat">
+                    Everybody
+                </div>
+                <div class="card-body p-0" id="all-chats">
+                    <div class="chat-messages" id="chat-everybody"></div>
+                </div>
+                <div class="card-footer">
                     <div class="form-group">
-                        <textarea type="text" placeholder="Chat With Everybody!" class="form-control" id="message_to_send" style="margin:3px;" rows="4"></textarea>
+                        <textarea id="message-to-send" rows="4" class="mb-3 form-control" placeholder="Talk to Everybody"></textarea>
                     </div>
-                    <div class="send_button_sidebar_container">
-                        <button type="submit" class="btn btn-primary btn-lg" onclick="sendMessage()">
-                            <i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i>
-                        </button>
-                    </div>
-                </form>
+                    <button class="btn btn-primary btn-lg" id="sumbit-new-message" onclick="sendMessage()"><i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -131,44 +125,49 @@
             </ul>
             <div class="tab-content">
                 <div id="gridParticipants" class="container-fluid tab-pane active"><br>
-                    <div class="row" id="gridViewVideoContainer"></div>                    
+                    <div class="row justify-content-center" id="gridViewVideoContainer"></div>                    
                 </div>
                 <div id="pinnedVid" class="container-fluid tab-pane fade"><br>
                     <div class="row" id="pinnedVideoContainer"></div>
                 </div>
             </div>
         </div>
-        <div class="fixed-bottom text-center" id="meetingOptionsButton_User">
-            <button class="btn btn-warning pull-left" onclick="shareMeeting()" data-toggle="tooltip" data-placement="top" title="Add Person To Call">
-                <i class="fas fa-user-plus"></i>
-            </button>
-            <button id="toggleVideo" class="btn btn-primary" onclick="toggleVideo()" data-toggle="tooltip" data-placement="top" title="Video">
-                <i class="fas fa-video" id="toggleVideoIcon"></i>
-            </button>
-            <button id="toggleAudio" class="btn btn-success" onclick="toggleAudio()" data-toggle="tooltip" data-placement="top" title="Audio">
-                <i class="fas fa-microphone" id="toggleAudioIcon"></i>
-            </button>
-            <form action="/leave-session" method="post" style="display: inline-block; margin-bottom: 0;">
-                <input type="hidden" name="sessionname" value="<%= sessionName %>" />
-                <input type="hidden" name="token" value="<%= token %>" />
-                <button id="buttonLeaveSession" class="btn btn-danger" type="submit" onclick="leaveSession()" data-toggle="tooltip" data-placement="top" title="Leave Call">
-                    <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
-                </button>
-            </form>
-            <div class="btn-group dropup">
-                <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: transparent; color: white; font-size: 175%; height: 30px;">
-                </button>
-                <div class="dropdown-menu">
-                    <button class="btn dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
-                    <button class="btn dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
-                </div>
-            </div>
-            <buton class="btn pull-right" id="chat-open-close" onclick="openSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat">
-                <i class="fas fa-comment-alt"></i>
-            </buton>
-        </div>
     </div>
-
+    <div class="fixed-bottom text-center" id="meetingOptionsButton_User">
+        <button class="btn btn-warning pull-left" onclick="shareMeeting()" data-toggle="tooltip" data-placement="top" title="Add Person To Call">
+            <i class="fas fa-user-plus"></i>
+        </button>
+        <button id="toggleVideo" class="btn btn-primary" onclick="toggleVideo()" data-toggle="tooltip" data-placement="top" title="Video">
+            <i class="fas fa-video" id="toggleVideoIcon"></i>
+        </button>
+        <button id="toggleAudio" class="btn btn-success" onclick="toggleAudio()" data-toggle="tooltip" data-placement="top" title="Audio">
+            <i class="fas fa-microphone" id="toggleAudioIcon"></i>
+        </button>
+        <form action="/leave-session" method="post" style="display: inline-block; margin-bottom: 0;">
+            <input type="hidden" name="sessionname" value="<%= sessionName %>" />
+            <input type="hidden" name="token" value="<%= token %>" />
+            <button id="buttonLeaveSession" class="btn btn-danger" type="submit" onclick="leaveSession()" data-toggle="tooltip" data-placement="top" title="Leave Call">
+                <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
+            </button>
+        </form>
+        <div class="btn-group dropup">
+            <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: transparent; color: white; font-size: 175%; height: 30px;">
+            </button>
+            <div class="dropdown-menu">
+                <button class="btn dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
+                <button class="btn dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
+            </div>
+        </div>
+        <buton class="btn pull-right" id="chat-open-close" onclick="toggleSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat">
+            <i class="fas fa-comment-alt"></i>
+        </buton>
+    </div>
+    <div id="snackbar-info-container">
+        <div class="snackbar-info text-truncate" id="notification"></div>
+    </div>
+    <audio src="/static/session/audio/unconvinced.mp3" id="chat-audio"></audio>
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
     <script>
         // script to create whiteboard
         // keep track of where the mouse has been dragged on
@@ -314,9 +313,16 @@
         // keep connection list for private chat and others
         var connection_list = {};
         // keep list for active user to be displayed on main container
-        var active_users = {}
+        var active_users = {};
+        
+        var markdown_to_html_con = new showdown.Converter();
+        
+        var chat_audio_notification = document.getElementById("chat-audio");
+        
+        var mouse_on_meetingOptions = false;
         
         var meetingOptionUserimout;
+        var notification_timeout;
         // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
         // set url of #share_meeting_link
@@ -339,17 +345,39 @@
         $("#video_container").on("tap", function () {
             wakeMeetingOptions();
         })
+        
+        $("#chat-everybody").show();
+        
+        $("#everybody").click(function () {
+            $(".chat-person").removeClass("active");
+            $(this).addClass("active");
+            $(".chat-messages").hide();
+            $("#chat-everybody").show();
+            //$("#message-to-send").attr("placeholder", "Talk to Everybody");
+            $("#card-header-chat").text("Everybody");
+            $("#everybody").removeClass("new-message-came");
+        })
+        
+        var message_textarea = new SimpleMDE({ element: $("#message-to-send")[0] });
+        
+        $("#main-container").click( function () {
+            closeSidePanel();
+            if ($("#prevMeetingList_sideBar").width() > 10) {
+                togglePrevMeetings();
+            }
+            if ($("#participantList_sideBar").width() > 10) {
+                toggleParticipantList();
+            }            
+        })
+        
+        $("#meetingOptionsButton_User").hover(function () {
+            mouse_on_meetingOptions = true;
+        }, function () {
+            mouse_on_meetingOptions = false;
+        })
 
         // function init_every_time
-        function init_every_time() {
-            // set margin of side panel as navbar's height + offset
-            $(".sidePanel").css("margin-top", $("#navbar_session").height() + 7);
-            // set messages side panel's height dynamically
-            if ($("#navbar_session").height() > 100) {
-                $("#messages").css("height", "78%");
-            } else {
-                $("#messages").css("height", "90%");
-            }
+        function init_every_time() {            
             // set height of meeting extra options
             var height_of_meetingExtraOptions = $(window).height() - $("#navbar_session").height() - 8;
             $(".meetingOptionsExtra").css("height", height_of_meetingExtraOptions.toString() + "px");
@@ -369,29 +397,25 @@
             $("#video_container").css("margin-left", "50px");
             takeCareOfGridView();
             
-            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");
-            
-            $("#select-whom-chat").on('change', function () {
-                var value = this.value;
-                $(".chat-group").hide();
-                if (value === 'everyone') {
-                    $("#everybody-chat").show();
-                    $("#message_to_send").attr("placeholder", "Chat with Everybody!");
-                } else {
-                    $("#chat-" + value).show();     
-                    $("#message_to_send").attr("placeholder", "Chat with " + $("#select-whom-chat option:selected").text() + "!")
-                }
-            })
+            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");            
         }
             
         function wakeMeetingOptions() {
-            if (meetingOptionUserimout) {
-                clearTimeout(meetingOptionUserimout);
+            clearTimeout(meetingOptionUserimout);
+//            $("#meetingOptionsButton_User").animate({marginBottom: "0px"});
+//            meetingOptionUserimout = setTimeout(function () {
+//                $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
+//            }, 100);
+            if (parseInt($("#meetingOptionsButton_User").css('margin-bottom').replace("px", "")) < -69) {
+                $("#meetingOptionsButton_User").animate({marginBottom: "0px"});   
             }
-            $("#meetingOptionsButton_User").animate({marginBottom: "0px"});
             meetingOptionUserimout = setTimeout(function () {
-                $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
-            }, 2000);
+                if (parseInt($("#meetingOptionsButton_User").css('margin-bottom').replace("px", "")) > -1) {
+                    if (!mouse_on_meetingOptions || $(window).width() < 576) {
+                        $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});  
+                    }
+                }
+            }, 1000)
         }
 
         // initialize OpenVidu
@@ -411,15 +435,46 @@
             // create html template of message
             var html_string;
             if (from_id === userName.toString()) {
-                html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><strong>You: ' + message + ' </strong></div></div>'
+                html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">You:</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
             } else {
-                html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
+                html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p>' + markdown_to_html_con.makeHtml(message) + '</div></div>'
             }
             // append html template with message in DOM
-            $("#messages_body #everybody-chat").append(html_string);
-            var everybody_chat = document.getElementById("everybody-chat");
+            $("#chat-everybody").append(html_string);
+            var everybody_chat = document.getElementById("chat-everybody");
             // scroll to bottom when new message recv
             everybody_chat.scrollTop = everybody_chat.scrollHeight;
+            if ($("#sidePanel").width() < 10) {
+                if (!$("#everybody").hasClass("active")) {
+                    $("#everybody").addClass("new-message-came");
+                }
+                chat_audio_notification.pause();
+                chat_audio_notification.currentTime = 0;
+                chat_audio_notification.play();
+                // <div class="snackbar-info text-truncate" id="notification"></div>
+                var div = document.createElement("div");
+                if ($(".snackbar-info").hasClass("show")) {
+                    div.className = "snackbar-info text-truncate";
+                    div.sytle.visibility = "visible";
+                } else {
+                    div.className = "snackbar-info text-truncate show";
+                }
+                div.innerHTML = "<i class='fas fa-comment-alt red-chat'></i> New Group Message"
+                $(".snackbar-info").remove();
+                document.getElementById("snackbar-info-container").appendChild(div);
+                clearTimeout(notification_timeout);
+                notification_timeout = setTimeout(function () {
+                    $(".snackbar-info").remove();
+                }, 2500);
+                $("#chat-open-close").addClass("red-chat");
+            } else {
+                if (!$("#everybody").hasClass("active")) {
+                    $("#everybody").addClass("new-message-came");
+                    chat_audio_notification.pause();
+                    chat_audio_notification.currentTime = 0;
+                    chat_audio_notification.play();
+                }
+            }
         })
 
         // function ran when private chat message has been recv
@@ -431,12 +486,43 @@
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
             // create html template
-            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><strong>' + from_name + ': ' + message + ' </strong></div></div>'
+            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
             // append html template with message to DOM
-            $("#messages_body #chat-" + event.from.connectionId).append(html_string);
-            var message_body = document.getElementById("messages_body");
-            // scroll to bottom when new message has been recv
-            message_body.scrollTop = message_body.scrollHeight;
+            $("#chat-" + event.from.connectionId).append(html_string);
+            // scroll to bottom when new message has been recv            
+            var message_body = document.getElementById("chat-" + event.from.connectionId);
+            message_body.scrollTop = message_body.scrollHeight;              
+            if ($("#sidePanel").width() < 10) {
+                // <div id="snackbar-info" class="text-truncate"></div>
+                if (!$("#" + event.from.connectionId).hasClass("active")) {
+                    $("#" + event.from.connectionId).addClass("new-message-came");
+                }
+                chat_audio_notification.pause();
+                chat_audio_notification.currentTime = 0;
+                chat_audio_notification.play();
+                var div = document.createElement("div");
+                if ($(".snackbar-info").hasClass("show")) {
+                    div.className = "snackbar-info text-truncate";
+                    div.sytle.visibility = "visible";
+                } else {
+                    div.className = "snackbar-info text-truncate show";
+                }
+                div.innerHTML = "<i class='fas fa-comment-alt red-chat'></i> New Group Message"
+                $(".snackbar-info").remove();
+                document.getElementById("snackbar-info-container").appendChild(div);
+                clearTimeout(notification_timeout);
+                notification_timeout = setTimeout(function () {
+                    $(".snackbar-info").remove();
+                }, 2500);
+                $("#chat-open-close").addClass("red-chat");
+            } else {
+                if (!$("#" + event.from.connectionId).hasClass("active")) {
+                    $("#" + event.from.connectionId).addClass("new-message-came");
+                    chat_audio_notification.pause();
+                    chat_audio_notification.currentTime = 0;
+                    chat_audio_notification.play();
+                }
+            }
         });
 
         // function ran when somebody changed their stream status
@@ -644,6 +730,14 @@
             }
             sendStreamStatusMessage(audio_return + "," + video_return);
         }
+        
+        function toggleSidePanel () {
+            if ($("#sidePanel").width() > 10) {
+                closeSidePanel();
+            } else {
+                openSidePanel();
+            }
+        }
 
         // function ran when sidepanel has open close
         function closeSidePanel() {
@@ -652,8 +746,12 @@
 
         // function ran when sidepanel has to open
         function openSidePanel() {
-            $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
-            document.getElementById("sidePanel").style.width = "350px";
+            if ($(window).width() < 576) {
+                document.getElementById("sidePanel").style.width = $(window).width().toString() + "px";
+            } else {
+                document.getElementById("sidePanel").style.width = "400px";
+            }
+            $("#chat-open-close").removeClass("red-chat");
         }
 
         // toggle participant list function ran when user click participant list button
@@ -778,15 +876,14 @@
         // function ran when user clicks on send message button
         function sendMessage() {
             // get message
-            var message = $("#message_to_send").val();
+//            var message = $("#message-to-send").val();
+            var message = message_textarea.value();
             // check if message is empty
             if (message.trim() !== "") {
                 // get recver of message
-                var to = $("#select-whom-chat").val();
+                var to = $(".chat-person.active").attr("id");
                 // check if recver of message is empty
-                console.log(to);
-                
-                if (to === "everyone") {
+                if (to === "everybody") {
                     // send message to every one
                     session.signal({
                         data: nickName + "," + userName + "," + message,
@@ -808,11 +905,10 @@
                             error: function(err) {console.log(err);}
                         })
                     }).catch((error) => {})
-                    var message_group = document.getElementById("#everybody-chat");
-                    // scroll to bottom
-                    message_group.scrollTop = message_group.scrollHeight;
+//                    var message_group = document.getElementById("#everybody-chat");
+//                    // scroll to bottom
+//                    message_group.scrollTop = message_group.scrollHeight;
                 } else {
-                    console.log(connection_list[to]);
                     // send message to particular person
                     session.signal({
                         data: nickName + "," + userName + "," + message,
@@ -822,16 +918,17 @@
                         console.log(error);
                     })
                     // create html template to render in the users page
-                    var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;background-color:#5cb3db;"><div class="card-body text-wrap p-1"><strong>You: ' + $("#message_to_send").val() + ' </strong></div></div>';
+                    var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;background-color:#5cb3db;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">You:</p>' + markdown_to_html_con.makeHtml(message) + '</div></div>';
                     // append html template with message to DOM
-                    $("#messages_body #chat-" + to).append(html_string);
-                    var message_group = document.getElementById("#chat-" + to);
+                    $("#chat-" + to).append(html_string);
                     // scroll to bottom
+                    var message_group = document.getElementById("chat-" + to);
                     message_group.scrollTop = message_group.scrollHeight;
                 }
             }
             // reset message value
-            $("#message_to_send").text("");
+//            $("#message-to-send").val("");
+            message_textarea.value("");
         }
 
         // send streamStatus message
@@ -1043,9 +1140,18 @@
                     $(videoElement).css("opacity", "1");
                     $(button_list_desktop).css("opacity", "0");
                 })
-                $("#messages_body").append('<div id="chat-' + nodeId + '" class="chat-group"></div>')
-                $("#chat-" + nodeId).hide();
-                $("#select-whom-chat").append('<option value="' + nodeId +'">' + clientData + '</option>');    
+                // <button class="chat-person active" id="everybody">Everybody</button>
+                $("#tabs-chat").append('<button class="chat-person text-truncate" id="' + nodeId + '">' + clientData + '</button>');
+                $("#all-chats").append('<div class="chat-messages private-chat" id="chat-' + nodeId + '"></div>');
+                $('#' + nodeId).click(function () {
+                    $(".chat-person").removeClass("active");
+                    $(this).addClass("active");
+                    $(".chat-messages").hide();
+                    $("#chat-" + nodeId).show();
+                    //$("#message-to-send").attr("placeholder", "Talk with " + clientData);
+                    $("#card-header-chat").text(clientData);
+                    $("#" + nodeId).removeClass("new-message-came");
+                })
             }
 
             // add db click listner to full screen video
@@ -1069,7 +1175,7 @@
         function initMainVids(videoElement, nodeId) {
             var gridId = "gridViewVideoContainer";
             var col = document.createElement("div");
-            col.className = "col mx-auto fullSpaceGrid";
+            col.className = "col fullSpaceGrid";
             col.setAttribute("id", "col-grid-" + nodeId);
             var videoGrid = document.createElement("video");
             videoGrid.setAttribute("id", "vid-grid-" + nodeId);
@@ -1102,7 +1208,6 @@
             var noParticipants = document.getElementById(gridId).childElementCount;
             $(".vid-grid-view").css("height", "100%");
             $(".vid-grid-view").css("width", "100%");
-            $("#" + gridId).addClass("text-center");
             var margin_bottom_grid = $("#navbar_session").height() + 100;
             $("#" + gridId).css("margin-bottom", margin_bottom_grid.toString() + "px");
             if ($(window).width() > 575) {
@@ -1142,7 +1247,7 @@
                     $("#" + gridId).removeClass("row-cols-2");
                     if ($(window).width() > 575) {
                         $("#" + gridId).removeClass("row-cols-1");
-                        $("#" + gridId).addClass("row-cols-3");
+                        $("#" + gridId).addClass("row-cols-2");
                         var max_width_video = ($(window).width() - 75 ) / 2;
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     } else {
@@ -1151,7 +1256,7 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid / 2
+                    var max_height_video = height_of_grid * 0.75;
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 } else if (noParticipants === 4) {
@@ -1167,7 +1272,7 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid / 2
+                    var max_height_video = height_of_grid * 0.75;
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 } else if (4 < noParticipants < 7) {
@@ -1184,7 +1289,7 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid * 0.4
+                    var max_height_video = height_of_grid * 0.75
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 } else if (6 < noParticipants) {
@@ -1200,7 +1305,7 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid * 0.4
+                    var max_height_video = height_of_grid * 0.75
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 }
@@ -1214,10 +1319,10 @@
             document.getElementById("card-" + nodeId).remove();
             document.getElementById("col-grid-" + nodeId).remove();
             $("#chat-" + nodeId).remove();
-            if ($("#select-whom-chat option:selected").val() === nodeId) {
-                $("#select-whom-chat").val("everyone");
+            if ($("#" + nodeId).hasClass("active")) {
+                $("#everybody").click()
             }
-            $('#select-whom-chat option[value="' + nodeId + '"]').remove()
+            $("#" + nodeId).remove();
             takeCareGridViewActivatorElementRemoved("#col-grid-" + nodeId);
         }
 
