@@ -392,6 +392,13 @@ $(document).ready( function () {
             }
         }
         animate();
+        const urlParams = new URLSearchParams(window.location.search);
+        const todo = urlParams.get('todo');   
+        if (todo === "join") {
+            const meetingId = urlParams.get('id_');
+            $("#join_meeting_name").val(meetingId);
+            $("#joinMeeting").click();
+        }
     }
 
     $("#features .card").hover(function () {

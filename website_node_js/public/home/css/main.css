@@ -130,7 +130,8 @@ canvas {
 
 #intro-card-titile {
     margin-top: 50px;
-    font-size: 40px;
+/*    font-size: 40px;*/
+    font-size: 6vh;
     font-family: 'Montserrat Alternates', sans-serif;
 }
 
@@ -147,7 +148,7 @@ canvas {
     height: calc(100vh - 48px);
 }
 
-#features .card-deck {
+#features .row {
     width: 100%;
     height: 100%;
 }
@@ -159,14 +160,17 @@ canvas {
     /* opacity: 0; */
     /* height: 0; */
     overflow:auto;
+    margin: 10px;
+/*    max-height: 350px;*/
 }
 
-#features .card.show {
-    opacity: 1;
+#features img {
+    width: 100% !important;    
+    height: auto !important;
 }
 
 #features .card:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
     z-index: 3;
 }
 
@@ -240,12 +244,8 @@ canvas {
     }
 
     #intro-section-row {
-        /* height: calc(100vh - 100px); */
-        height:auto;
-    }
-
-    #intro-card-titile {
-        font-size: 25px;
+        height: calc(100vh - 100px); 
+/*        height:auto;*/
     }
 
     #intro-description {

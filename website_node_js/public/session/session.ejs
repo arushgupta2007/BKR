@@ -336,8 +336,8 @@
         // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
         // set url of #share_meeting_link
-        $("#share_meeting_link").html(" https://" + window.location.hostname + ":8000/join/?wrong=nothing&id=" + sessionName);
-        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":8000/join/?wrong=nothing&id=" + sessionName);
+        $("#share_meeting_link").html(" https://" + window.location.hostname + ":8000/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":8000/?todo=join&id_=" + sessionName);
         
         $("#refreshButton").attr("disabled", true);
         
