@@ -273,6 +273,7 @@ app.post("/session/", (req, res) => {
                                 nickName: name_client,
                                 userName: 0,
                                 meetingName: name_meeting,
+                                code: session_code,
                             });
                         })                           
                     })
@@ -353,6 +354,7 @@ app.post("/session/", (req, res) => {
                                 userName: client_id,
                                 sessionName: sessionID,
                                 meetingName: meeting.meetingName,
+                                code: session_code,
                             });
                         });
                     })
@@ -372,33 +374,6 @@ app.post("/session/", (req, res) => {
                 res.redirect("/?wrong=meeting&name=" + name_client);
             }
         })
-
-        /* if (name_codes[sessionID] !== undefined) {
-             if (session_code === name_codes[sessionID].code) {
-                 var client_id = id_tracker[sessionID.toString()];
-                 id_tracker[sessionID.toString()] = id_tracker[sessionID.toString()] + 1;
-                 mySession
-                     .generateToken(tokenOptions)
-                     .then((token) => {
-                         mapSessionNamesTokens[sessionID].push(token);
-                         res.render(__dirname + "/public/session/session.ejs", {
-                             token: token,
-                             nickName: name_client,
-                             userName: client_id,
-                             sessionName: sessionID,
-                             meetingName: name_codes[sessionID].name,
-                         });
-                     })
-                     .catch((error) => {
-                         console.error(error);
-                     });
-             } else {
-                 res.redirect("/join/?wrong=meeting&name=" + name_client);
-             }
-         } else {
-             res.redirect("/join/?wrong=meeting&name=" + name_client);
-         } */
-
     }
 });
 
@@ -428,6 +403,47 @@ app.post("/session/saveMessage/", (req,res) => {
     res.send("Bla");
 });
 
+app.post("/session/refresh", (req, res) => {
+    console.log("--------------------------------------------------------");
+    console.log("USER WANTS TO REFRESH IT'S CONNECTION");
+    var sessionName = req.body.sessionname;
+    var token = req.body.token;
+    if (mapSessions[sessionName]) {
+        // session object exists
+        // find meeting in MongoDB database
+        meetingsModel.findOne({meetingID: sessionName}).then((meeting) => {
+            // get all tokens
+            var tokens = meeting.tokens;
+            // get index of token of the user who wants to exit the meeting
+            var index = tokens.indexOf(token);
+            // check if token exists
+            if (index !== -1) {
+                // token exists
+                // remove token from token list
+                tokens.splice(index, 1);
+                // save meeting to MongoDB database
+                meeting.save().then((meeting_recv) => {
+                    // check if there are any more users in the meeting
+                    if (meeting_recv.tokens.length === 0) {
+                        // there are no more users in the meeting
+                        // delete entire meeting
+                        deleteMeeting(sessionName, meeting_recv);
+                    }
+                });
+            } else {
+                // token was not valid
+                // redirect user to home page
+                res.redirect("/");
+            }
+            // redirect users after process
+            res.redirect(307, "/session/");
+        })
+    } else {
+        // there was no session object in mapSession
+        res.redirect("/");
+    }
+})
+
 // POST request to /leave-session (leave the current session)
 app.post("/leave-session", (req, res) => {
     console.log("--------------------------------------------------------")
@@ -456,7 +472,7 @@ app.post("/leave-session", (req, res) => {
                 // save meeting to MongoDB database
                 meeting.save().then((meeting_recv) => {
                     // check if there are any more users in the meeting
-                    if (meeting_recv.tokens.length == 0) {
+                    if (meeting_recv.tokens.length === 0) {
                         // there are no more users in the meeting
                         // delete entire meeting
                         deleteMeeting(sessionName, meeting_recv);

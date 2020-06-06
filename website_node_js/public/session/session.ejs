@@ -85,13 +85,14 @@
             <div class="card h-100">
                 <div class="card-header text-center text-truncate" id="card-header-chat">
                     Everybody
+                    <button class="btn pull-right" onclick="closeSidePanel()"><i class="fas fa-times-circle" style="color: red;"></i></button>
                 </div>
                 <div class="card-body p-0" id="all-chats">
                     <div class="chat-messages" id="chat-everybody"></div>
                 </div>
                 <div class="card-footer">
                     <div class="form-group">
-                        <textarea id="message-to-send" rows="4" class="mb-3 form-control" placeholder="Talk to Everybody"></textarea>
+                        <textarea id="message-to-send" rows="4" class="mb-3 form-control" placeholder="Send a message..."></textarea>
                     </div>
                     <button class="btn btn-primary btn-lg" id="sumbit-new-message" onclick="sendMessage()"><i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i></button>
                 </div>
@@ -108,6 +109,14 @@
                 <button type="button" class="btn btn-secondary btn-lg" onclick="togglePrevMeetings()">
                     <i class="fas fa-history"></i>
                 </button>
+                <form action="/session/refresh" method="post" style="display: inline-block; margin-bottom: 0;">
+                    <input type="hidden" name="sessionname" value="<%= sessionName %>" />
+                    <input type="hidden" name="token" value="<%= token %>" />
+                    <input type="hidden" name="name" value="<%= nickName %>" />
+                    <input type="hidden" name="meetingId" value="<%= sessionName %>" />
+                    <input type="hidden" name="meetingCode" value="<%= code %>" />
+                    <button class="btn btn-secondary btn-lg" type="submit" onclick="leaveSession()" id="refreshButton"><i class="fas fa-sync"></i></button>
+                </form>
             </div>
         </div>
         
@@ -168,6 +177,7 @@
     <audio src="/static/session/audio/unconvinced.mp3" id="chat-audio"></audio>
     <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+    <script src="/static/session/js/main.js"></script>
     <script>
         // script to create whiteboard
         // keep track of where the mouse has been dragged on
@@ -329,6 +339,8 @@
         $("#share_meeting_link").html(" https://" + window.location.hostname + ":8000/join/?wrong=nothing&id=" + sessionName);
         $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":8000/join/?wrong=nothing&id=" + sessionName);
         
+        $("#refreshButton").attr("disabled", true);
+        
         // initialize every thing
         init_every_time();
         // every time window resizes, initialize every thing
@@ -361,13 +373,7 @@
         var message_textarea = new SimpleMDE({ element: $("#message-to-send")[0] });
         
         $("#main-container").click( function () {
-            closeSidePanel();
-            if ($("#prevMeetingList_sideBar").width() > 10) {
-                togglePrevMeetings();
-            }
-            if ($("#participantList_sideBar").width() > 10) {
-                toggleParticipantList();
-            }            
+            closeSidePanel();           
         })
         
         $("#meetingOptionsButton_User").hover(function () {
@@ -386,7 +392,7 @@
             $("#video_container").css("height", height_of_meetingExtraOptions.toString() + "px")
 
             // set width of main container
-            var max_width_video_container = $(window).width() - 50;
+            var max_width_video_container = $(window).width() - 60;
             $("#video_container").css("width", max_width_video_container.toString() + "px");
 
             // toggle participant list if open
@@ -394,10 +400,12 @@
                 toggleParticipantList();
             }
             // set margin of main container as 50px
-            $("#video_container").css("margin-left", "50px");
+            $("#video_container").css("margin-left", "60px");
             takeCareOfGridView();
             
-            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");            
+            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");  
+            // 60 - (16 x 2)
+            $("#refreshButton").width("28px")
         }
             
         function wakeMeetingOptions() {
@@ -535,19 +543,22 @@
                 connection_list[connectionId][audio] = data[0] === "1";
                 connection_list[connectionId][video] = data[1] === "1";
                 try {
-                    var audio_of_other_user = document.getElementById("audio-toggle-button-" + connectionId);
-                    var video_of_other_user = document.getElementById("video-toggle-button-" + connectionId);
+                    var audio_of_other_user = $(".voice-toggle-" + connectionId);
+                    var video_of_other_user = $(".video-toggle-" + connectionId);
                     if (data[0] === "1") {
-                        audio_of_other_user.innerHTML = '<i class="fas fa-microphone"></i>';
+                        audio_of_other_user.html('<i class="fas fa-microphone"></i>');
                     } else {
-                        audio_of_other_user.innerHTML = '<i class="fas fa-microphone-slash"></i>'; 
+                        audio_of_other_user.html('<i class="fas fa-microphone-slash"></i>'); 
                     }
                     if (data[1] === "1") {
-                        video_of_other_user.innerHTML = '<i class="fas fa-video"></i>';
+                        video_of_other_user.html('<i class="fas fa-video"></i>');
                     } else {
-                        video_of_other_user.innerHTML = '<i class="fas fa-video-slash"></i>';
+                        video_of_other_user.html('<i class="fas fa-video-slash"></i>');
                     }
-                } catch(err) {}
+                } catch(err) {
+                    console.log(err);
+                    console.log(connectionId);
+                }
             }
         });
 
@@ -589,7 +600,7 @@
             card_participant.className = "card p-0";
             var card_body = document.createElement("div");
             card_body.setAttribute("id", "card-body-" + event.target.connection.connectionId);
-            card_body.className = "card-body p-0";
+            card_body.className = "card-body p-0 text-center";
             var video = document.createElement("video");
             video.setAttribute("id", "vid-" + event.target.connection.connectionId);
             video.className = "video-user"; 
@@ -600,6 +611,7 @@
             subscriber.addVideoElement(video);
             // apend user data and buttons to the video
             appendUserData(video, subscriber.stream.connection, card_participant);
+            $("#refreshButton").attr("disabled", false);
         });
 
         // function ran when some user disconnect's stream the meeting
@@ -620,6 +632,12 @@
         session.on('connectionDestroyed', (event) => {
             // delete from connection list
             delete connection_list[event.connection.connectionId];
+        });
+        
+        session.on('sessionDisconnected', (event) => {
+            if (event.reason === 'networkDisconnect') {
+                $("#refreshButton").click();
+            }
         });
 
         // join meeting
@@ -739,7 +757,7 @@
             }
         }
 
-        // function ran when sidepanel has open close
+        // function ran when sidepanel has to close
         function closeSidePanel() {
             document.getElementById("sidePanel").style.width = "0px";
         }
@@ -762,15 +780,15 @@
                 // check how much space should the participant list take
                 var width_of_part_list;
                 if ($(window).width() <= 768) {
-                    var width_screen = $(window).width() - 50;
+                    var width_screen = $(window).width() - 60;
                     $("#participantList_sideBar").animate({width: width_screen.toString() + "px"});
                     width_of_part_list = width_screen;
                 } else if ($(window).width() <= 992) {
                     $("#participantList_sideBar").animate({width: "25%"});
-                    width_of_part_list = $(window).width() * (1 / 4) + 50;
+                    width_of_part_list = $(window).width() * (1 / 4) + 60;
                 } else {
                     $("#participantList_sideBar").animate({width: "15%"});
-                    width_of_part_list = $(window).width() * (15 / 100) + 50;
+                    width_of_part_list = $(window).width() * (15 / 100) + 60;
                 }
                 $("#video_container").animate({marginLeft: width_of_part_list.toString()});
                 var width_main_container = $(window).width() - width_of_part_list;
@@ -778,18 +796,18 @@
             } else if ($("#prevMeetingList_sideBar").width() > 10) {
                 $("#prevMeetingList_sideBar").width("0");
                 var width_of_part_list;
-                var width_screen = $(window).width() - 50;
+                var width_screen = $(window).width() - 60;
                 if ($(window).width() <= 768) {
                     $("#participantList_sideBar").width(width_screen.toString() + "px");
                     width_of_part_list = width_screen;
                 } else if ($(window).width() <= 992) {
                     var width_to_set = width_screen * 0.25
                     $("#participantList_sideBar").width(width_to_set.toString() + "px");
-                    width_of_part_list = $(window).width() * (1 / 4) + 50;
+                    width_of_part_list = $(window).width() * (1 / 4) + 60;
                 } else {
                     var width_to_set = width_screen * 0.15;
                     $("#participantList_sideBar").animate(width_to_set.toString() + "px");
-                    width_of_part_list = $(window).width() * (15 / 100) + 50;
+                    width_of_part_list = $(window).width() * (15 / 100) + 60;
                 }
                 $("#video_container").css("marginLeft", width_of_part_list.toString() + "px");
                 var width_main_container = $(window).width() - width_of_part_list;
@@ -798,8 +816,8 @@
                 // taget element is open
                 // close target element
                 $("#participantList_sideBar").animate({width: "0"});
-                var width_of_extraOptions = 50;
-                $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
+                var width_of_extraOptions = 60;
+                $("#video_container").animate({marginLeft: width_of_extraOptions.toString() + "px"});
                 var width_main_container = $(window).width() - width_of_extraOptions;
                 $("#video_container").animate({width: width_main_container});
             }
@@ -816,10 +834,10 @@
                     width_of_prev_list = width_screen;
                 } else if ($(window).width() <= 992) {
                     $("#prevMeetingList_sideBar").animate({width: "25%"});
-                    width_of_prev_list = $(window).width() * (1 / 4) + 50;
+                    width_of_prev_list = $(window).width() * (1 / 4) + 60;
                 } else {
                     $("#prevMeetingList_sideBar").animate({width: "15%"});
-                    width_of_prev_list = $(window).width() * (15 / 100) + 50;
+                    width_of_prev_list = $(window).width() * (15 / 100) + 60;
                 }
                 var width_of_accordtion = width_of_prev_list - 70;
                 $("#prev_meeting_container").animate({width: width_of_accordtion.toString() + "px"});
@@ -836,11 +854,11 @@
                 } else if ($(window).width() <= 992) {
                     var width_to_set = width_screen * 0.25
                     $("#prevMeetingList_sideBar").width(width_to_set.toString() + "px");
-                    width_of_prev_list = $(window).width() * (1 / 4) + 50;
+                    width_of_prev_list = $(window).width() * (1 / 4) + 60;
                 } else {
                     var width_to_set = width_screen * 0.15;
                     $("#prevMeetingList_sideBar").width(width_to_set.toString() + "px");
-                    width_of_prev_list = $(window).width() * (15 / 100) + 50;
+                    width_of_prev_list = $(window).width() * (15 / 100) + 60;
                 }
                 var width_of_accordtion = width_of_prev_list - 70;
                 $("#prev_meeting_container").width(width_of_accordtion.toString() + "px");
@@ -852,7 +870,7 @@
                 // close target element
                 $("#prevMeetingList_sideBar").animate({width: "0"});
                 $("#prev_meeting_container").animate({width: "0"});
-                var width_of_extraOptions = 50;
+                var width_of_extraOptions = 60;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
                 var width_main_container = $(window).width() - width_of_extraOptions;
                 $("#video_container").animate({width: width_main_container});
@@ -1086,59 +1104,41 @@
 
             // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting 
             // if it is not the user itelf
-            if (nodeId !== 'mine') {
-                var button_list_desktop = document.createElement("div");
-                button_list_desktop.className = "button_list_video for-desktop";
-                button_list_desktop.setAttribute("id", "button-list-" + nodeId);
-                var private_chat_desktop = document.createElement("button");
-                private_chat_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop private-chat-desktop";
-                private_chat_desktop.setAttribute("id", "private-chat-button-" + nodeId);
-                private_chat_desktop.innerHTML = '<i class="fas fa-comment-alt"></i>';
-                var video_toggle_desktop = document.createElement("button");
-                video_toggle_desktop.className = "btn btn-primary btn-circle btn-sm for-desktop video-toggle-dektop";
-                video_toggle_desktop.setAttribute("id", "video-toggle-button-" + nodeId);
-                video_toggle_desktop.innerHTML = '<i class="fas fa-video"></i>';
-                video_toggle_desktop.addEventListener('click', function () {
-                    if (video_toggle_desktop.innerHTML.includes('fa-video-slash')) {
-                        console.log("Turning Video On")
+            if (nodeId !== 'mine') {                
+                var buttonGroupInstance = new ButtonGroupControlUser(nodeId, "part");
+                buttonGroupInstance.addChatListner(function () {
+                    $("#"+ nodeId).click();
+                    setTimeout(function () {
+                        openSidePanel();
+                    }, 500);
+                });
+                buttonGroupInstance.addVideoListner(function () {
+                    if (buttonGroupInstance.video_toggle.innerHTML.includes('fa-video-slash')) {
                         sendUserControlMessage(nodeId, "video", "1");
                     } else {
-                        console.log("Turning Video Off")
                         sendUserControlMessage(nodeId, "video", "0");
                     }
-                })
-                var voice_toggle_desktop = document.createElement("button");
-                voice_toggle_desktop.className = "btn btn-success btn-circle btn-sm for-desktop voice-toggle-dektop";
-                voice_toggle_desktop.setAttribute("id", "audio-toggle-button-" + nodeId);
-                voice_toggle_desktop.innerHTML = '<i class="fas fa-microphone"></i>';
-                voice_toggle_desktop.addEventListener('click', function () {
-                    if (voice_toggle_desktop.innerHTML.includes('fa-microphone-slash')) {
+                });
+                buttonGroupInstance.addVoiceListner(function () {
+                    if (buttonGroupInstance.voice_toggle.innerHTML.includes('fa-microphone-slash')) {
                         sendUserControlMessage(nodeId, "audio", "1");
                     } else {
                         sendUserControlMessage(nodeId, "audio", "0");
                     }
-                })
-                var drop_call_desktop = document.createElement("button");
-                drop_call_desktop.className = "btn btn-danger btn-circle btn-sm for-desktop drop-call-desktop";
-                drop_call_desktop.setAttribute("id", "drop-call-button-" + nodeId);
-                drop_call_desktop.innerHTML = '<i class="fas fa-phone" style="transform: rotate(-135deg);"></i>';
-                drop_call_desktop.addEventListener('click', function () {
+                });
+                buttonGroupInstance.addDropListner(function () {
                     sendUserControlMessage(nodeId, "drop", "force");
-                })                
-                button_list_desktop.appendChild(private_chat_desktop);
-                button_list_desktop.appendChild(video_toggle_desktop);
-                button_list_desktop.appendChild(voice_toggle_desktop);
-                button_list_desktop.appendChild(drop_call_desktop);
-                videoElement.parentNode.appendChild(
-                    button_list_desktop
-                );
+                });
+                buttonGroupInstance.button_list.style.bottom = "10px"
+                videoElement.parentNode.appendChild(buttonGroupInstance.button_list);
+                
                 // show button group when user hovers on the video
                 $(videoElement.parentNode).hover(function () {
                     $(videoElement).css("opacity", "0.3");
-                    $(button_list_desktop).css("opacity", "1");
+                    $(buttonGroupInstance.button_list).css("display", "block");
                 }, function () {
                     $(videoElement).css("opacity", "1");
-                    $(button_list_desktop).css("opacity", "0");
+                    $(buttonGroupInstance.button_list).css("display", "none");
                 })
                 // <button class="chat-person active" id="everybody">Everybody</button>
                 $("#tabs-chat").append('<button class="chat-person text-truncate" id="' + nodeId + '">' + clientData + '</button>');
@@ -1160,33 +1160,74 @@
             }
 
             $(card_element).css("margin", "10px");
-            initMainVidsActivator(videoElement, nodeId);            
+            initMainVidsActivator(videoElement, nodeId, clientData);            
         }
 
-        function initMainVidsActivator(videoElement, nodeId) {
+        function initMainVidsActivator(videoElement, nodeId, clientData) {
             if (videoElement.srcObject) {
-                initMainVids(videoElement, nodeId);
+                initMainVids(videoElement, nodeId, clientData);
             } else {
-                setTimeout(initMainVidsActivator, 1000, videoElement, nodeId);
+                setTimeout(initMainVidsActivator, 1000, videoElement, nodeId, clientData);
             }
         }
 
         // function ran in appendUserData()
-        function initMainVids(videoElement, nodeId) {
+        function initMainVids(videoElement, nodeId, clientData) {
             var gridId = "gridViewVideoContainer";
             var col = document.createElement("div");
             col.className = "col fullSpaceGrid";
             col.setAttribute("id", "col-grid-" + nodeId);
             var videoGrid = document.createElement("video");
             videoGrid.setAttribute("id", "vid-grid-" + nodeId);
-            videoGrid.className = "vid-grid-view";
+            videoGrid.className = "vid-grid-view video-user";
             videoGrid.style.margin = "10px";
             videoGrid.srcObject = videoElement.srcObject;
             if (nodeId === "mine") {
                 videoGrid.muted = true;
             }
             videoGrid.play();
-            col.appendChild(videoGrid)
+            col.appendChild(videoGrid);            
+            if (nodeId !== "mine") {
+                var header = document.createElement("p");
+                header.className = "header-name";
+                header.innerHTML = clientData;
+                var buttonGroupInstance = new ButtonGroupControlUser(nodeId, "grid");
+                buttonGroupInstance.addChatListner(function () {
+                    $("#"+ nodeId).click();
+                    setTimeout(function () {
+                        openSidePanel();
+                    }, 500);
+                });
+                buttonGroupInstance.addVideoListner(function () {
+                    if (buttonGroupInstance.video_toggle.innerHTML.includes('fa-video-slash')) {
+                        sendUserControlMessage(nodeId, "video", "1");
+                    } else {
+                        sendUserControlMessage(nodeId, "video", "0");
+                    }
+                });
+                buttonGroupInstance.addVoiceListner(function () {
+                    if (buttonGroupInstance.voice_toggle.innerHTML.includes('fa-microphone-slash')) {
+                        sendUserControlMessage(nodeId, "audio", "1");
+                    } else {
+                        sendUserControlMessage(nodeId, "audio", "0");
+                    }
+                });
+                buttonGroupInstance.addDropListner(function () {
+                    sendUserControlMessage(nodeId, "drop", "force");
+                });
+                // show button group when user hovers on the video
+                $(videoGrid.parentNode).hover(function () {
+                    $(videoGrid).css("opacity", "0.3");
+                    $(buttonGroupInstance.button_list).css("display", "block");
+                    $(header).css("display", "block");
+                }, function () {
+                    $(videoGrid).css("opacity", "1");
+                    $(buttonGroupInstance.button_list).css("display", "none");
+                    $(header).css("display", "none");
+                })
+                col.appendChild(buttonGroupInstance.button_list);
+                col.appendChild(header);
+            }
             document.getElementById(gridId).appendChild(col);
             takeCareGridViewActivatorElementAdded(videoGrid);
             // document.getElementById(gridId).appendChild(videoGrid);
@@ -1324,6 +1365,13 @@
             }
             $("#" + nodeId).remove();
             takeCareGridViewActivatorElementRemoved("#col-grid-" + nodeId);
+            $("#refreshButton").attr("disabled", true);
+            setTimeout(function () {
+                if (Object.keys(connection_list).length > 1) {
+                    console.log("Removing");
+                    $("#refreshButton").attr("disabled", false);                
+                }                
+            }, 100);
         }
 
         function takeCareGridViewActivatorElementRemoved (elemId) {
@@ -1335,7 +1383,6 @@
         }
 
     </script>
-    <script src="/static/session/js/main.js"></script>
 </body>
 
 </html>
