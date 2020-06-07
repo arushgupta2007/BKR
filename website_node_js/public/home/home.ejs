@@ -121,28 +121,88 @@
 			</div>
 		</div>
 		<div id="features" class="snap-scroll">
-			<div class="row align-items-center mx-auto" data-aos="fade-up">
-				<div class="card text-center col-sm" id="feature1">
-					<img src="/static/home/images/noise.gif" alt="Feature" class="card-img-top">
-					<div class="card-body">
-						<div class="card-title title-custom">Noise Reduction</div>
-						<p class="card-text text-left">Bla This Feature is awesome Bla Bla Bla</p>
-					</div>
-				</div>
-				<div class="card text-center col-sm" id="feature2">
-					<img src="/static/home/images/privacytest.gif" alt="Privacy" class="card-img-top">
-					<div class="card-body">
-						<div class="card-title title-custom">Privacy</div>
-						<p class="card-text text-left">Bla This Feature is awesome Bla Bla Bla</p>
-					</div>
-				</div>
-				<div class="card text-center col-sm" id="feature3">
-					<img src="/static/home/images/usercontroltest.gif" alt="User Control" class="card-img-top">
-					<div class="card-body">
-						<div class="card-title title-custom">User Control</div>
-						<p class="card-text text-left">Control Annoying Participants</p>
-					</div>
-				</div>
+			<div class="row align-items-center mx-auto">
+			    <div class="col-sm-2">
+			        <ul class="nav nav-pill flex-column">
+			            <li class="nav-item">
+			                <a href="#" class="nav-link active btn side-button-features" onclick="featureOpen('noise-reduction', 'noise-reduction-button')" id="noise-reduction-button">Noise Reduction</a>
+			            </li>
+			            <li class="nav-item">
+			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('privacy', 'privacy-button')" id="privacy-button">Privacy</a>
+			            </li>
+			            <li class="nav-item">
+			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('user-control', 'user-control-button')" id="user-control-button">User Control</a>
+			            </li>
+			            <li class="nav-item">
+			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('collaboration', 'collaboration-button')" id="collaboration-button">Collaboration</a>
+			            </li>
+			            <li class="nav-item">
+			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('share-anything', 'share-anything-button')" id="share-anything-button">Share Anything</a>
+			            </li>
+			        </ul>
+			    </div>
+			    <div class="col-sm-10">
+                    <div id="noise-reduction" class="feature-more row">
+                        <img src="/static/home/images/noise.gif" alt="" class="col-sm-6 info-img">
+                        <div class="info-feature col-sm-6">
+                            <h3><strong>Noise Reduction</strong></h3>
+                            Crying baby? no problem, we've got your back!
+                            <ul>
+                                <li>Communicate in public places</li>
+                                <li>No machine noise</li>
+                                <li>AI/ML adapted noise reduction</li>
+                            </ul>
+                        </div>
+                    </div>
+			        <div id="privacy" class="feature-more row">
+			            <img src="/static/home/images/privacy.gif" alt="" class="col-sm-6 info-img">
+			            <div class="info-feature col-sm-6">
+                            <h3><strong>Privacy</strong></h3>
+                            Bla Bla This feature is awesome Bla Bla Bla Pivacy
+                            <ul>
+                                <li>End to End Encyption</li>
+                                <li>No intruders</li>
+                                <li>No personal information needed</li>
+                            </ul>
+			            </div>
+			        </div>
+			        <div id="user-control" class="feature-more row">
+			            <img src="/static/home/images/usercontrol.gif" alt="" class="col-sm-6 info-img">
+			            <div class="info-feature col-sm-6">
+                            <h3><strong>User Control</strong></h3>
+                            Bla Bla This feature is awesome Bla Bla Bla User Control
+                            <ul>
+                                <li>Mute/Stop Video/Remove participants</li>
+                                <li>Bleh</li>
+                                <li>Bleh</li>
+                            </ul>
+			            </div>
+			        </div>
+			        <div id="collaboration" class="feature-more row">
+			            <img src="/static/home/images/whiteboard.gif" alt="" class="col-sm-6 info-img">
+			            <div class="info-feature col-sm-6">
+                            <h3><strong>Collaboration</strong></h3>
+                            All hands on deck!
+                            <ul>
+                                <li>Edit documents and code</li>
+                                <li>Mindmap</li>
+                                <li>Whiteboard</li>
+                            </ul>
+			            </div>
+			        </div>
+			        <div id="share-anything" class="feature-more row">
+			            <img src="/static/home/images/share-animation.gif" alt="" class="col-sm-6 info-img">
+			            <div class="info-feature col-sm-6">
+                            <h3><strong>Share Anything</strong></h3>
+                            Share just about anything!
+                            <ul>
+                                <li>Share files, photos and fun</li>
+                                <li>Share screen</li>
+                                <li>Share ideas</li>
+                            </ul>
+			            </div>
+			        </div>
+			    </div>
 			</div>
 		</div>
 		<div id="across-all-devices" class="snap-scroll text-center">
@@ -150,9 +210,9 @@
 			<img alt="Devices" id="device-support-img">
 		</div>
 		<div id="footer" class="snap-scroll text-center">
-			<div id="img-top"></div>
 			<div id="real-footer" class="row row-cols-2 mx-auto">
-				<div id="img-footer" class="col-4"></div>
+				<div id="img-footer" class="col-4"><img src="/static/home/images/footer.png" id="img-footer-panda" alt=""></div>
+<!--				<div id="img-top"></div>-->
 				<div id="links-container" class="row row-cols-2 col-8">
 					<div class="col-6">
 						<h5><a href="#intro-section-row">Scroll Up</a></h5>
@@ -172,9 +232,9 @@
 	</div>
 	<div id="meetingOptions" class="fixed-bottom">
 		<div class="row row-cols-3" id="meetingButtons">
-			<button class="btn btn-primary btn-lg col meeting-buttons text-center" id="newMeeting" data-toggle="modal" data-target="#createNew">New Call</button>
-			<button class="btn btn-danger btn-lg col meeting-buttons text-center" id="joinMeeting" data-toggle="modal" data-target="#joinCall">Join Call</button>
-			<button class="btn btn-success btn-lg col meeting-buttons text-center" id="scheduleMeeting" data-toggle="modal" data-target="#scheduleNew">Schedule Call</button>
+			<button class="btn btn-lg col meeting-buttons text-center" id="newMeeting" data-toggle="modal" data-target="#createNew">New Call</button>
+			<button class="btn btn-success btn-lg col meeting-buttons text-center" id="joinMeeting" data-toggle="modal" data-target="#joinCall">Join Call</button>
+			<button class="btn btn-primary btn-lg col meeting-buttons text-center" id="scheduleMeeting" data-toggle="modal" data-target="#scheduleNew">Schedule Call</button>
 		</div>
 	</div>
 	<script src="/static/scripts_end_of_body.js"></script>

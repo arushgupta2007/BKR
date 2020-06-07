@@ -101,6 +101,13 @@ function joinFormValidation () {
     return ok;
 }
 
+function featureOpen(id_element, id_button) {
+    $(".feature-more").hide();
+    $("#" + id_element).show();
+    $(".side-button-features").removeClass("active");
+    $("#" + id_button).addClass("active");
+}
+
 $("#user-sign-out-navbar").click(function () {
     firebase.auth().signOut();
     location.reload();
@@ -109,6 +116,8 @@ $("#user-sign-out-navbar").click(function () {
 $(document).ready( function () {
     $(window).resize(initEveryTime);
     $("#main-container").addClass("snap-scroll-parent");
+    $(".feature-more").hide();
+    $("#noise-reduction").show();
 
     function initEveryTime() {
         var main_container_height;
@@ -119,6 +128,7 @@ $(document).ready( function () {
             $("#dropdown-user-data").addClass("dropdown-menu-right");
             main_container_height = $(window).outerHeight() - $("#navbar").outerHeight() - $("#meetingOptions").outerHeight() - 48;
             $("#main-container").height(main_container_height.toString() + "px");
+//            $("#intro-img-represent").css("max-height", max_height_intro_represent_image.toString() + "px");
         } else if ($(window).width() > 576) {
             $("#device-support-img").attr("src", "/static/home/images/laptopscreen.png");
             $("#device-support-img").addClass("medium-device");
@@ -134,8 +144,8 @@ $(document).ready( function () {
             $("#main-container").height(main_container_height.toString() + "px");
             is_on_phone = true;
         }
+        //$("#img-footer").height($("#links-container").height().toString() + "px");
         var max_height_intro_represent_image = main_container_height - 70;
-        $("#intro-img-represent").css("max-height", max_height_intro_represent_image.toString() + "px");
         var navabar_height = $("#navbar").outerHeight();
         var buttonGroup_height = $("#meetingOptions").outerHeight();
         var scrollbar_width = document.getElementById("intro-section-row").offsetWidth - document.getElementById("intro-section-row").clientWidth;
