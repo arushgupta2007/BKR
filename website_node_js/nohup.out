@@ -1,0 +1,171 @@
+2020-05-15T14:58:58.594+0000 I  CONTROL  [main] Automatically disabling TLS 1.0, to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'
+2020-05-15T14:58:58.595+0000 W  ASIO     [main] No TransportLayer configured during NetworkInterface startup
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] MongoDB starting : pid=1426 port=27017 dbpath=/data/db 64-bit host=ip-172-31-25-103
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] db version v4.2.6
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] git version: 20364840b8f1af16917e4c23c1b5f5efd8b352f8
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.1.1  11 Sep 2018
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] allocator: tcmalloc
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] modules: none
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] build environment:
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten]     distmod: ubuntu1804
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten]     distarch: x86_64
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten]     target_arch: x86_64
+2020-05-15T14:58:58.596+0000 I  CONTROL  [initandlisten] options: {}
+2020-05-15T14:58:58.596+0000 I  STORAGE  [initandlisten] Detected data files in /data/db created by the 'wiredTiger' storage engine, so setting the active storage engine to 'wiredTiger'.
+2020-05-15T14:58:58.596+0000 I  STORAGE  [initandlisten] 
+2020-05-15T14:58:58.596+0000 I  STORAGE  [initandlisten] ** WARNING: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine
+2020-05-15T14:58:58.596+0000 I  STORAGE  [initandlisten] **          See http://dochub.mongodb.org/core/prodnotes-filesystem
+2020-05-15T14:58:58.596+0000 I  STORAGE  [initandlisten] wiredtiger_open config: create,cache_size=256M,cache_overflow=(file_max=0M),session_max=33000,eviction=(threads_min=4,threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,archive=true,path=journal,compressor=snappy),file_manager=(close_idle_time=100000,close_scan_interval=10,close_handle_minimum=250),statistics_log=(wait=0),verbose=[recovery_progress,checkpoint_progress],
+2020-05-15T14:58:59.310+0000 I  STORAGE  [initandlisten] WiredTiger message [1589554739:310422][1426:0x7f2f88a32b00], txn-recover: Recovering log 5 through 6
+2020-05-15T14:58:59.355+0000 I  STORAGE  [initandlisten] WiredTiger message [1589554739:355618][1426:0x7f2f88a32b00], txn-recover: Recovering log 6 through 6
+2020-05-15T14:58:59.430+0000 I  STORAGE  [initandlisten] WiredTiger message [1589554739:430691][1426:0x7f2f88a32b00], txn-recover: Main recovery loop: starting at 5/4736 to 6/256
+2020-05-15T14:58:59.520+0000 I  STORAGE  [initandlisten] WiredTiger message [1589554739:520177][1426:0x7f2f88a32b00], txn-recover: Recovering log 5 through 6
+2020-05-15T14:58:59.572+0000 I  STORAGE  [initandlisten] WiredTiger message [1589554739:572932][1426:0x7f2f88a32b00], txn-recover: Recovering log 6 through 6
+2020-05-15T14:58:59.617+0000 I  STORAGE  [initandlisten] WiredTiger message [1589554739:617626][1426:0x7f2f88a32b00], txn-recover: Set global recovery timestamp: (0, 0)
+2020-05-15T14:58:59.649+0000 I  RECOVERY [initandlisten] WiredTiger recoveryTimestamp. Ts: Timestamp(0, 0)
+2020-05-15T14:58:59.653+0000 I  STORAGE  [initandlisten] Timestamp monitor starting
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] 
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] 
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] ** WARNING: This server is bound to localhost.
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] **          Remote systems will be unable to connect to this server. 
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] **          Start the server with --bind_ip <address> to specify which IP 
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] **          addresses it should serve responses from, or with --bind_ip_all to
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] **          bind to all interfaces. If this behavior is desired, start the
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] **          server with --bind_ip 127.0.0.1 to disable this warning.
+2020-05-15T14:58:59.656+0000 I  CONTROL  [initandlisten] 
+2020-05-15T14:58:59.659+0000 I  SHARDING [initandlisten] Marking collection local.system.replset as collection version: <unsharded>
+2020-05-15T14:58:59.660+0000 I  STORAGE  [initandlisten] Flow Control is enabled on this deployment.
+2020-05-15T14:58:59.660+0000 I  SHARDING [initandlisten] Marking collection admin.system.roles as collection version: <unsharded>
+2020-05-15T14:58:59.660+0000 I  SHARDING [initandlisten] Marking collection admin.system.version as collection version: <unsharded>
+2020-05-15T14:58:59.662+0000 I  SHARDING [initandlisten] Marking collection local.startup_log as collection version: <unsharded>
+2020-05-15T14:58:59.662+0000 I  FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/data/db/diagnostic.data'
+2020-05-15T14:58:59.664+0000 I  SHARDING [LogicalSessionCacheRefresh] Marking collection config.system.sessions as collection version: <unsharded>
+2020-05-15T14:58:59.664+0000 I  SHARDING [LogicalSessionCacheReap] Marking collection config.transactions as collection version: <unsharded>
+2020-05-15T14:58:59.665+0000 I  NETWORK  [listener] Listening on /tmp/mongodb-27017.sock
+2020-05-15T14:58:59.665+0000 I  NETWORK  [listener] Listening on 127.0.0.1
+2020-05-15T14:58:59.665+0000 I  NETWORK  [listener] waiting for connections on port 27017
+2020-05-15T14:59:00.000+0000 I  SHARDING [ftdc] Marking collection local.oplog.rs as collection version: <unsharded>
+2020-05-15T14:59:39.781+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:40820 #1 (1 connection now open)
+2020-05-15T14:59:39.816+0000 I  NETWORK  [conn1] received client metadata from 127.0.0.1:40820 conn1: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-15T15:00:21.730+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:40826 #2 (2 connections now open)
+2020-05-15T15:00:21.732+0000 I  NETWORK  [conn2] received client metadata from 127.0.0.1:40826 conn2: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-15T15:00:21.735+0000 I  SHARDING [conn2] Marking collection BKR.meetings as collection version: <unsharded>
+2020-05-15T15:06:21.740+0000 I  NETWORK  [conn2] end connection 127.0.0.1:40826 (1 connection now open)
+2020-05-15T17:11:45.191+0000 I  NETWORK  [conn1] end connection 127.0.0.1:40820 (0 connections now open)
+2020-05-16T04:29:53.522+0000 I  CONTROL  [signalProcessingThread] got signal 15 (Terminated), will terminate after current cmd ends
+2020-05-16T04:29:53.522+0000 I  NETWORK  [signalProcessingThread] shutdown: going to close listening sockets...
+2020-05-16T04:29:53.527+0000 I  NETWORK  [listener] removing socket file: /tmp/mongodb-27017.sock
+2020-05-16T04:29:53.527+0000 I  -        [signalProcessingThread] Stopping further Flow Control ticket acquisitions.
+2020-05-16T04:29:53.527+0000 I  CONTROL  [signalProcessingThread] Shutting down free monitoring
+2020-05-16T04:29:53.527+0000 I  FTDC     [signalProcessingThread] Shutting down full-time diagnostic data capture
+2020-05-16T04:29:53.531+0000 I  STORAGE  [signalProcessingThread] Deregistering all the collections
+2020-05-16T04:29:53.531+0000 I  STORAGE  [signalProcessingThread] Timestamp monitor shutting down
+2020-05-16T04:29:53.531+0000 I  STORAGE  [signalProcessingThread] WiredTigerKVEngine shutting down
+2020-05-16T04:29:53.531+0000 I  STORAGE  [signalProcessingThread] Shutting down session sweeper thread
+2020-05-16T04:29:53.531+0000 I  STORAGE  [signalProcessingThread] Finished shutting down session sweeper thread
+2020-05-16T04:29:53.531+0000 I  STORAGE  [signalProcessingThread] Shutting down journal flusher thread
+2020-05-16T04:29:53.547+0000 I  STORAGE  [signalProcessingThread] Finished shutting down journal flusher thread
+2020-05-16T04:29:53.547+0000 I  STORAGE  [signalProcessingThread] Shutting down checkpoint thread
+2020-05-16T04:29:53.547+0000 I  STORAGE  [signalProcessingThread] Finished shutting down checkpoint thread
+2020-05-16T04:29:53.572+0000 I  STORAGE  [signalProcessingThread] shutdown: removing fs lock...
+2020-05-16T04:29:53.572+0000 I  CONTROL  [signalProcessingThread] now exiting
+2020-05-16T04:29:53.572+0000 I  CONTROL  [signalProcessingThread] shutting down with code:0
+2020-05-18T16:57:54.246+0000 I  CONTROL  [main] Automatically disabling TLS 1.0, to force-enable TLS 1.0 specify --sslDisabledProtocols 'none'
+2020-05-18T16:57:54.251+0000 W  ASIO     [main] No TransportLayer configured during NetworkInterface startup
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] MongoDB starting : pid=12029 port=27017 dbpath=/data/db 64-bit host=ip-172-31-25-103
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] db version v4.2.6
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] git version: 20364840b8f1af16917e4c23c1b5f5efd8b352f8
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] OpenSSL version: OpenSSL 1.1.1  11 Sep 2018
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] allocator: tcmalloc
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] modules: none
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] build environment:
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten]     distmod: ubuntu1804
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten]     distarch: x86_64
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten]     target_arch: x86_64
+2020-05-18T16:57:54.252+0000 I  CONTROL  [initandlisten] options: {}
+2020-05-18T16:57:54.253+0000 I  STORAGE  [initandlisten] Detected data files in /data/db created by the 'wiredTiger' storage engine, so setting the active storage engine to 'wiredTiger'.
+2020-05-18T16:57:54.253+0000 I  STORAGE  [initandlisten] 
+2020-05-18T16:57:54.253+0000 I  STORAGE  [initandlisten] ** WARNING: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine
+2020-05-18T16:57:54.253+0000 I  STORAGE  [initandlisten] **          See http://dochub.mongodb.org/core/prodnotes-filesystem
+2020-05-18T16:57:54.253+0000 I  STORAGE  [initandlisten] wiredtiger_open config: create,cache_size=256M,cache_overflow=(file_max=0M),session_max=33000,eviction=(threads_min=4,threads_max=4),config_base=false,statistics=(fast),log=(enabled=true,archive=true,path=journal,compressor=snappy),file_manager=(close_idle_time=100000,close_scan_interval=10,close_handle_minimum=250),statistics_log=(wait=0),verbose=[recovery_progress,checkpoint_progress],
+2020-05-18T16:57:54.980+0000 I  STORAGE  [initandlisten] WiredTiger message [1589821074:980217][12029:0x7feee8407b00], txn-recover: Recovering log 13 through 14
+2020-05-18T16:57:55.040+0000 I  STORAGE  [initandlisten] WiredTiger message [1589821075:40594][12029:0x7feee8407b00], txn-recover: Recovering log 14 through 14
+2020-05-18T16:57:55.182+0000 I  STORAGE  [initandlisten] WiredTiger message [1589821075:182018][12029:0x7feee8407b00], txn-recover: Main recovery loop: starting at 13/72832 to 14/256
+2020-05-18T16:57:55.286+0000 I  STORAGE  [initandlisten] WiredTiger message [1589821075:286160][12029:0x7feee8407b00], txn-recover: Recovering log 13 through 14
+2020-05-18T16:57:55.346+0000 I  STORAGE  [initandlisten] WiredTiger message [1589821075:346585][12029:0x7feee8407b00], txn-recover: Recovering log 14 through 14
+2020-05-18T16:57:55.398+0000 I  STORAGE  [initandlisten] WiredTiger message [1589821075:398305][12029:0x7feee8407b00], txn-recover: Set global recovery timestamp: (0, 0)
+2020-05-18T16:57:55.429+0000 I  RECOVERY [initandlisten] WiredTiger recoveryTimestamp. Ts: Timestamp(0, 0)
+2020-05-18T16:57:55.438+0000 I  STORAGE  [initandlisten] Timestamp monitor starting
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] 
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] 
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] ** WARNING: This server is bound to localhost.
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] **          Remote systems will be unable to connect to this server. 
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] **          Start the server with --bind_ip <address> to specify which IP 
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] **          addresses it should serve responses from, or with --bind_ip_all to
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] **          bind to all interfaces. If this behavior is desired, start the
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] **          server with --bind_ip 127.0.0.1 to disable this warning.
+2020-05-18T16:57:55.439+0000 I  CONTROL  [initandlisten] 
+2020-05-18T16:57:55.465+0000 I  SHARDING [initandlisten] Marking collection local.system.replset as collection version: <unsharded>
+2020-05-18T16:57:55.475+0000 I  STORAGE  [initandlisten] Flow Control is enabled on this deployment.
+2020-05-18T16:57:55.484+0000 I  SHARDING [initandlisten] Marking collection admin.system.roles as collection version: <unsharded>
+2020-05-18T16:57:55.485+0000 I  SHARDING [initandlisten] Marking collection admin.system.version as collection version: <unsharded>
+2020-05-18T16:57:55.488+0000 I  SHARDING [initandlisten] Marking collection local.startup_log as collection version: <unsharded>
+2020-05-18T16:57:55.488+0000 I  FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/data/db/diagnostic.data'
+2020-05-18T16:57:55.491+0000 I  SHARDING [LogicalSessionCacheRefresh] Marking collection config.system.sessions as collection version: <unsharded>
+2020-05-18T16:57:55.491+0000 I  SHARDING [LogicalSessionCacheReap] Marking collection config.transactions as collection version: <unsharded>
+2020-05-18T16:57:55.491+0000 I  NETWORK  [listener] Listening on /tmp/mongodb-27017.sock
+2020-05-18T16:57:55.491+0000 I  NETWORK  [listener] Listening on 127.0.0.1
+2020-05-18T16:57:55.491+0000 I  NETWORK  [listener] waiting for connections on port 27017
+2020-05-18T16:57:56.000+0000 I  SHARDING [ftdc] Marking collection local.oplog.rs as collection version: <unsharded>
+2020-05-18T16:58:01.742+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59110 #1 (1 connection now open)
+2020-05-18T16:58:01.769+0000 I  NETWORK  [conn1] received client metadata from 127.0.0.1:59110 conn1: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-18T16:58:25.968+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59116 #2 (2 connections now open)
+2020-05-18T16:58:25.969+0000 I  NETWORK  [conn2] received client metadata from 127.0.0.1:59116 conn2: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-18T16:58:25.972+0000 I  SHARDING [conn2] Marking collection BKR.meetings as collection version: <unsharded>
+2020-05-18T17:07:28.324+0000 I  NETWORK  [conn2] end connection 127.0.0.1:59116 (1 connection now open)
+2020-05-18T17:13:59.175+0000 I  NETWORK  [conn1] end connection 127.0.0.1:59110 (0 connections now open)
+2020-05-20T14:29:29.190+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59256 #3 (1 connection now open)
+2020-05-20T14:29:29.212+0000 I  NETWORK  [conn3] received client metadata from 127.0.0.1:59256 conn3: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T14:30:16.468+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59262 #4 (2 connections now open)
+2020-05-20T14:30:16.469+0000 I  NETWORK  [conn4] received client metadata from 127.0.0.1:59262 conn4: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T14:36:16.495+0000 I  NETWORK  [conn4] end connection 127.0.0.1:59262 (1 connection now open)
+2020-05-20T14:36:43.516+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59264 #5 (2 connections now open)
+2020-05-20T14:36:43.518+0000 I  NETWORK  [conn5] received client metadata from 127.0.0.1:59264 conn5: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T14:42:43.545+0000 I  NETWORK  [conn5] end connection 127.0.0.1:59264 (1 connection now open)
+2020-05-20T14:59:53.181+0000 I  NETWORK  [conn3] end connection 127.0.0.1:59256 (0 connections now open)
+2020-05-20T15:00:27.275+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59270 #6 (1 connection now open)
+2020-05-20T15:00:27.285+0000 I  NETWORK  [conn6] received client metadata from 127.0.0.1:59270 conn6: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T15:01:38.093+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59276 #7 (2 connections now open)
+2020-05-20T15:01:38.095+0000 I  NETWORK  [conn7] received client metadata from 127.0.0.1:59276 conn7: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T15:10:44.077+0000 I  NETWORK  [conn7] end connection 127.0.0.1:59276 (1 connection now open)
+2020-05-20T15:13:30.319+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59282 #8 (2 connections now open)
+2020-05-20T15:13:30.321+0000 I  NETWORK  [conn8] received client metadata from 127.0.0.1:59282 conn8: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T15:20:44.750+0000 I  NETWORK  [conn8] end connection 127.0.0.1:59282 (1 connection now open)
+2020-05-20T15:23:55.064+0000 I  NETWORK  [listener] connection accepted from 127.0.0.1:59290 #9 (2 connections now open)
+2020-05-20T15:23:55.065+0000 I  NETWORK  [conn9] received client metadata from 127.0.0.1:59290 conn9: { driver: { name: "nodejs|Mongoose", version: "3.5.7" }, os: { type: "Linux", name: "linux", architecture: "x64", version: "5.3.0-1017-aws" }, platform: "'Node.js v14.2.0, LE (unified)", version: "3.5.7|5.9.13" }
+2020-05-20T15:35:11.388+0000 I  NETWORK  [conn9] end connection 127.0.0.1:59290 (1 connection now open)
+2020-05-20T17:42:35.896+0000 I  NETWORK  [conn6] end connection 127.0.0.1:59270 (0 connections now open)
+2020-05-21T04:18:53.309+0000 I  CONTROL  [signalProcessingThread] got signal 15 (Terminated), will terminate after current cmd ends
+2020-05-21T04:18:53.365+0000 I  NETWORK  [signalProcessingThread] shutdown: going to close listening sockets...
+2020-05-21T04:18:53.365+0000 I  NETWORK  [listener] removing socket file: /tmp/mongodb-27017.sock
+2020-05-21T04:18:53.365+0000 I  -        [signalProcessingThread] Stopping further Flow Control ticket acquisitions.
+2020-05-21T04:18:53.371+0000 I  CONTROL  [signalProcessingThread] Shutting down free monitoring
+2020-05-21T04:18:53.371+0000 I  FTDC     [signalProcessingThread] Shutting down full-time diagnostic data capture
+2020-05-21T04:18:53.373+0000 I  STORAGE  [signalProcessingThread] Deregistering all the collections
+2020-05-21T04:18:53.373+0000 I  STORAGE  [signalProcessingThread] Timestamp monitor shutting down
+2020-05-21T04:18:53.373+0000 I  STORAGE  [signalProcessingThread] WiredTigerKVEngine shutting down
+2020-05-21T04:18:53.373+0000 I  STORAGE  [signalProcessingThread] Shutting down session sweeper thread
+2020-05-21T04:18:53.374+0000 I  STORAGE  [signalProcessingThread] Finished shutting down session sweeper thread
+2020-05-21T04:18:53.374+0000 I  STORAGE  [signalProcessingThread] Shutting down journal flusher thread
+2020-05-21T04:18:53.435+0000 I  STORAGE  [signalProcessingThread] Finished shutting down journal flusher thread
+2020-05-21T04:18:53.435+0000 I  STORAGE  [signalProcessingThread] Shutting down checkpoint thread
+2020-05-21T04:18:53.435+0000 I  STORAGE  [signalProcessingThread] Finished shutting down checkpoint thread
+2020-05-21T04:18:53.504+0000 I  STORAGE  [signalProcessingThread] shutdown: removing fs lock...
+2020-05-21T04:18:53.507+0000 I  CONTROL  [signalProcessingThread] now exiting
+2020-05-21T04:18:53.508+0000 I  CONTROL  [signalProcessingThread] shutting down with code:0
