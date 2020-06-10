@@ -9,6 +9,7 @@ document.write('\
 <link href="https://fonts.googleapis.com/css?family=Archivo Black" rel="stylesheet">\
 <link href="https://fonts.googleapis.com/css?family=B612" rel="stylesheet">\
 <link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@900&display=swap" rel="stylesheet"> \
+<link href="https://fonts.googleapis.com/css2?family=Lexend+Tera&display=swap" rel="stylesheet">\
 <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>\
