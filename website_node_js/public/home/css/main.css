@@ -104,7 +104,7 @@ canvas {
 }
 
 #jumping-logo {
-    width: 40%;
+    width: 80%;
     height: auto;
     animation: jump_logo 0.7s cubic-bezier(.5,0.05,1,.5);
     animation-direction: alternate;
