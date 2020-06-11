@@ -3,7 +3,7 @@ var OpenVidu = require("openvidu-node-client").OpenVidu;
 var OpenViduRole = require("openvidu-node-client").OpenViduRole;
 
 // Workaround to a problem
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 // Other Imports
 var express = require("express");
@@ -17,7 +17,7 @@ var userModel = require("./models/user_model")
 var meetingsModel = require("./models/meeting_model");
 
 // Connecting to local MongoDB
-var mongoDB = 'mongodb://127.0.0.1/BKR';
+var mongoDB = 'mongodb://mongodb:27017/BKR';
 mongoose.connect(mongoDB, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -27,12 +27,7 @@ mongoose.connect(mongoDB, {
 var app = express();
 
 // Starting http server with openvidu requirements
-var options = {
-    key: fs.readFileSync("openvidukey.pem"),
-    cert: fs.readFileSync("openviducert.pem"),
-};
-var http = require("http").createServer(options, app);
-var https = require('https').createServer(options, app);
+var http = require("http").createServer(app);
 
 // Using cookie-session as default cookie
 app.use(cookieSession({
@@ -57,8 +52,8 @@ app.use(
 app.set("view engine", "ejs");
 
 // Connecting to Openvidu Server
-var OPENVIDU_URL = keys.openvidu.url;
-var OPENVIDU_SECRET = keys.openvidu.secret;
+var OPENVIDU_URL = process.env.OPENVIDU_URL;
+var OPENVIDU_SECRET = process.env.OPENVIDU_SECRET;
 var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 
 // Storing all session objects in mapSessions Object
@@ -542,7 +537,8 @@ app.post("/api/user/prevMeetings/", function (req, res) {
 })
 
 // start http server at port 8000
-https.listen(8000, () => {
+console.log("PORT: " + process.env.SERVER_PORT);
+http.listen(process.env.SERVER_PORT, () => {
     // log after server has started
     console.log("--------------------------------------------------------")
     console.log("Started Server at port 8000");

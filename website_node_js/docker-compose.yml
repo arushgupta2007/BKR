@@ -1,0 +1,13 @@
+version: "3"
+services: 
+    mongodb: 
+        image: "mongo"
+
+    bkr_website:
+        build: .
+        ports: 
+            - "5442:5442"
+        environment: 
+            - SERVER_PORT=5442
+            - OPENVIDU_URL=https://ec2-3-17-189-175.us-east-2.compute.amazonaws.com
+            - OPENVIDU_SECRET=BaatKarteRaho
