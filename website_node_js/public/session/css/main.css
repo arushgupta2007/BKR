@@ -90,6 +90,37 @@ video {
     height: auto;
 }
 
+.firepad {
+    width: 100%;
+    height: calc(100vh - 150px);
+    background-color: #f62;
+}
+
+.firepad-toolbar {
+    height: auto !important;
+}
+
+#firepad .CodeMirror-scroll {
+    height: 100%;
+}
+
+#firepad .CodeMirror {
+    top: 40px;
+}
+
+#firepad .firepad-toolbar {
+    height: 40px;
+}
+
+.unknown_user {
+    position: absolute;
+    bottom: 20px;
+    display: none;
+    width: 100%;
+    max-width: 150px;
+    height: auto;
+}
+
 p.userName {
     position: absolute;
     right: 0;
@@ -372,7 +403,7 @@ canvas {
 }
 
 .new-message-came {
-    background-color: #fcba03; !important;
+    background-color: #fcba03 !important;
 }
 
 .sidebar {

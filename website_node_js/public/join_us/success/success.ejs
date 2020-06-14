@@ -26,18 +26,18 @@
                     id_to_keep: id_to_keep,
                 }
                 $.ajax({
-                    url: "https://" + window.location.hostname + ":8000/join_us/addUser/",
+                    url: "https://" + window.location.hostname + "/join_us/addUser/",
                     type: "POST",
                     data: data,
                     success: function() {
-                        window.location.replace("https://" + window.location.hostname + ":8000/");              
+                        window.location.replace("https://" + window.location.hostname + "/");              
                     },
                     error: function (error) {
                         console.log("Error: " + error);
                     }
                 })
             } else {
-                window.location.replace("https://" + window.location.hostname + ":8000/join_us/");
+                window.location.replace("https://" + window.location.hostname + "/join_us/");
             }
         })
     </script>

@@ -3,30 +3,25 @@
 <head>
     <title>BKR Meeting</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8" ? />
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+    <!-- <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" /> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
-
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
-
-    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
-    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-
-
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
     <script src="/static/head_imports.js"></script>
 
+    <!-- CodeMirror -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.css" />
+
+    <!-- Firepad -->
+    <link rel="stylesheet" href="https://firepad.io/releases/v1.5.10/firepad.css" />
+    <script src="https://firepad.io/releases/v1.5.10/firepad.min.js"></script>
+    
     <script src="/static/session/js/openvidu-browser-2.14.0.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
     <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
@@ -74,6 +69,20 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <div class="modal fade" id="collab" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">collaboration</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="firepad"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -165,6 +174,7 @@
             <div class="dropdown-menu">
                 <button class="btn dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
                 <button class="btn dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
+                <button class="btn dropdown-item" onclick="collabOpen()"><i class="fas fa-handshake" style="color:black;"></i> Collab</button>
             </div>
         </div>
         <buton class="btn pull-right" id="chat-open-close" onclick="toggleSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat">
@@ -263,7 +273,7 @@
                 userUID: accountID,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + ":8000/api/user/prevMeetings",
+                url: "https://" + window.location.hostname + "/api/user/prevMeetings",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -333,11 +343,19 @@
         
         var meetingOptionUserimout;
         var notification_timeout;
+
+        $(document).ready(function () {
+            var firepadRef = firebase.database().ref().child("firepad").child(sessionName);
+            var codeMirror = CodeMirror(document.getElementById('firepad'), { lineWrapping: true });
+            var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror,
+                { richTextShortcuts: true, richTextToolbar: true, defaultText: '' });
+        });
+
         // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
         // set url of #share_meeting_link
-        $("#share_meeting_link").html(" https://" + window.location.hostname + ":8000/?todo=join&id_=" + sessionName);
-        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":8000/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").html(" https://" + window.location.hostname + "/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + "/?todo=join&id_=" + sessionName);
         
         $("#refreshButton").attr("disabled", true);
         
@@ -886,6 +904,13 @@
             whiteboard_share();
         }
 
+        // function ran when user clicks on collab
+        function collabOpen() {
+            $("#collab").modal({
+                keyboard: false
+            })
+        }
+
         // function ran when user clicks on share button
         function shareMeeting() {
             $("#share_meeting_modal").modal()
@@ -917,7 +942,7 @@
                         }
                         $.ajax({
                             type: "POST",
-                            url: "https://" + window.location.hostname + ":8000/session/saveMessage/",
+                            url: "https://" + window.location.hostname + "/session/saveMessage/",
                             data: data,
                             success: function () {},
                             error: function(err) {console.log(err);}
@@ -1228,6 +1253,11 @@
                 col.appendChild(buttonGroupInstance.button_list);
                 col.appendChild(header);
             }
+            var unknown_photo = document.createElement("img");
+            unknown_photo.src = "/static/home/images/person.png";
+            unknown_photo.className = "unknown_user";
+            unknown_photo.setAttribute("id", "unknown_photo-" + nodeId);
+            col.appendChild(unknown_photo);
             document.getElementById(gridId).appendChild(col);
             takeCareGridViewActivatorElementAdded(videoGrid);
             // document.getElementById(gridId).appendChild(videoGrid);
@@ -1297,7 +1327,8 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid * 0.75;
+                    // var max_height_video = height_of_grid * 0.75;
+                    var max_height_video = height_of_grid * 0.4;
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 } else if (noParticipants === 4) {
@@ -1313,7 +1344,8 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid * 0.75;
+                    // var max_height_video = height_of_grid * 0.75;
+                    var max_height_video = height_of_grid * 0.4;
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 } else if (4 < noParticipants < 7) {
@@ -1330,7 +1362,8 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid * 0.75
+                    // var max_height_video = height_of_grid * 0.75;
+                    var max_height_video = height_of_grid * 0.4;
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 } else if (6 < noParticipants) {
@@ -1346,7 +1379,8 @@
                         var max_width_video = ($(window).width() - 75 );
                         $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
                     }
-                    var max_height_video = height_of_grid * 0.75
+                    // var max_height_video = height_of_grid * 0.75
+                    var max_height_video = height_of_grid * 0.4;
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 }

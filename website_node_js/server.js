@@ -11,13 +11,14 @@ var fs = require("fs");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var cookieSession = require("cookie-session");
+
 var keys = require("./config/keys");
 // MongoDB models
 var userModel = require("./models/user_model")
 var meetingsModel = require("./models/meeting_model");
 
 // Connecting to local MongoDB
-var mongoDB = 'mongodb://mongodb:27017/BKR';
+var mongoDB = 'mongodb://localhost:27017/BKR';
 mongoose.connect(mongoDB, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -51,6 +52,8 @@ app.use(
 // setting view engine as ejs
 app.set("view engine", "ejs");
 
+// setting favicon
+app.use('/favicon.ico', express.static('public/home/images/favicon.ico'));
 // Connecting to Openvidu Server
 var OPENVIDU_URL = process.env.OPENVIDU_URL;
 var OPENVIDU_SECRET = process.env.OPENVIDU_SECRET;
@@ -540,6 +543,7 @@ app.post("/api/user/prevMeetings/", function (req, res) {
 console.log("PORT: " + process.env.SERVER_PORT);
 http.listen(process.env.SERVER_PORT, () => {
     // log after server has started
-    console.log("--------------------------------------------------------")
-    console.log("Started Server at port 8000");
+    console.log("+--------------------------------------------------+");
+    console.log("|          Started Server at port 5542             |");
+    console.log("+--------------------------------------------------+");
 });

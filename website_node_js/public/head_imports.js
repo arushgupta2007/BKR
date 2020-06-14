@@ -13,6 +13,7 @@ document.write('\
 <link href="https://fonts.googleapis.com/css2?family=Questrial&display=swap" rel="stylesheet">\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>\
+<script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-database.js"></script>\
 <script>\
     var firebaseConfig = {\
         apiKey: "AIzaSyAAHNLr2B40uA5E_2VOFvpF7VxCs_jDjmI",\

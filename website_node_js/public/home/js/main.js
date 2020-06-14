@@ -115,7 +115,9 @@ $("#user-sign-out-navbar").click(function () {
 
 $(document).ready( function () {
     $(window).resize(initEveryTime);
-    $("#main-container").addClass("snap-scroll-parent");
+    setTimeout(function () {
+        $("#main-container").addClass("snap-scroll-parent");
+    }, 2000);
     $(".feature-more").hide();
     $("#noise-reduction").show();
 
