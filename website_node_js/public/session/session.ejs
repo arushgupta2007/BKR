@@ -1253,11 +1253,6 @@
                 col.appendChild(buttonGroupInstance.button_list);
                 col.appendChild(header);
             }
-            var unknown_photo = document.createElement("img");
-            unknown_photo.src = "/static/home/images/person.png";
-            unknown_photo.className = "unknown_user";
-            unknown_photo.setAttribute("id", "unknown_photo-" + nodeId);
-            col.appendChild(unknown_photo);
             document.getElementById(gridId).appendChild(col);
             takeCareGridViewActivatorElementAdded(videoGrid);
             // document.getElementById(gridId).appendChild(videoGrid);
