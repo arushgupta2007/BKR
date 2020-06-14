@@ -112,12 +112,13 @@ video {
     height: 40px;
 }
 
-.profilePhoto {
+.profilePhoto-video-container {
     position: absolute;
     bottom: 0;
     left: 50%;
     max-width: 500px;
     width: 75%;
+    display: none;
 }
 
 p.userName {

@@ -569,8 +569,10 @@
                         audio_of_other_user.html('<i class="fas fa-microphone-slash"></i>'); 
                     }
                     if (data[1] === "1") {
+                        $(".profile-photo-" + connectionId).css("display", "none");
                         video_of_other_user.html('<i class="fas fa-video"></i>');
                     } else {
+                        $(".profile-photo-" + connectionId).css("display", "block");
                         video_of_other_user.html('<i class="fas fa-video-slash"></i>');
                     }
                 } catch(err) {
@@ -1253,6 +1255,11 @@
                 col.appendChild(buttonGroupInstance.button_list);
                 col.appendChild(header);
             }
+            var profilePhoto = document.createElement("img");
+            profilePhoto.src = "/static/home/images/person.png";
+            profilePhoto.className = "profilePhoto-video-container profile-photo-" + nodeId;
+            profilePhoto.setAttribute("id", "profile-photo-grid-" + nodeId);
+            col.appendChild(profilePhoto);
             document.getElementById(gridId).appendChild(col);
             takeCareGridViewActivatorElementAdded(videoGrid);
             // document.getElementById(gridId).appendChild(videoGrid);
