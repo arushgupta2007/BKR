@@ -748,6 +748,8 @@
                 video = false;
                 // change icon
                 document.getElementById("toggleVideo").innerHTML = '<i class="fas fa-video-slash"></i>';
+                // show user profile
+                $(".profile-photo-" + connectionId).css("display", "block");
                 // stop publishing audio
                 publisher.publishVideo(false);
             } else {
@@ -755,6 +757,8 @@
                 video = true;
                 // change icon
                 document.getElementById("toggleVideo").innerHTML = '<i class="fas fa-video"></i>';
+                // hide user profile
+                $(".profile-photo-" + connectionId).css("display", "none");
                 // start publishing video
                 publisher.publishVideo(true);
             }
