@@ -621,17 +621,26 @@
             var card_body = document.createElement("div");
             card_body.setAttribute("id", "card-body-" + event.target.connection.connectionId);
             card_body.className = "card-body p-0 text-center";
-            var video = document.createElement("video");
-            video.setAttribute("id", "vid-" + event.target.connection.connectionId);
-            video.className = "video-user"; 
-            card_body.appendChild(video);
+            var video_user = document.createElement("video");
+            video_user.setAttribute("id", "vid-" + event.target.connection.connectionId);
+            video_user.className = "video-user"; 
+            card_body.appendChild(video_user);
             card_participant.appendChild(card_body);
             document.getElementById("participantList_sideBar").appendChild(card_participant);
             // connect OpenVidu with video element
-            subscriber.addVideoElement(video);
+            subscriber.addVideoElement(video_user);
             // apend user data and buttons to the video
-            appendUserData(video, subscriber.stream.connection, card_participant);
+            appendUserData(video_user, subscriber.stream.connection, card_participant);
             $("#refreshButton").attr("disabled", false);
+            var audio_return = "0"
+            if (audio) {
+                audio_return = "1";
+            }
+            var video_return= "0";
+            if (video) {
+                video_return = "1";
+            }
+            sendStreamStatusMessage(audio_return + "," + video_return);
         });
 
         // function ran when some user disconnect's stream the meeting
@@ -1201,12 +1210,10 @@
             initMainVidsActivator(videoElement, nodeId, clientData);            
         }
 
-        function takeCareOfProfilePhoto (width_of_vid) {
-            var max_width = width_of_vid * 0.75;
-            $(".profilePhoto-video-container").css("max-width", max_width.toString() + "px");
-            var margin_left = $(".profilePhoto-video-container").first().width() / 2;
-            $(".profilePhoto-video-container").css("margin-left", "-" + margin_left.toString() + "px");
-        }
+        // function takeCareOfProfilePhoto (width_of_vid) {
+        //     var mergin_left
+        //     $(".profilePhoto-video-container")
+        // }
 
         function initMainVidsActivator(videoElement, nodeId, clientData) {
             if (videoElement.srcObject) {
@@ -1225,13 +1232,17 @@
             var videoGrid = document.createElement("video");
             videoGrid.setAttribute("id", "vid-grid-" + nodeId);
             videoGrid.className = "vid-grid-view video-user";
-            videoGrid.style.margin = "10px";
             videoGrid.srcObject = videoElement.srcObject;
             if (nodeId === "mine") {
                 videoGrid.muted = true;
             }
             videoGrid.play();
-            col.appendChild(videoGrid);            
+            col.appendChild(videoGrid);
+            var profilePhoto = document.createElement("img");
+            profilePhoto.src = "/static/home/images/unknown_user.png";
+            profilePhoto.className = "profilePhoto-video-container profile-photo-" + nodeId;
+            profilePhoto.setAttribute("id", "profile-photo-grid-" + nodeId);
+            col.appendChild(profilePhoto);     
             if (nodeId !== "mine") {
                 var header = document.createElement("p");
                 header.className = "header-name";
@@ -1273,11 +1284,6 @@
                 col.appendChild(buttonGroupInstance.button_list);
                 col.appendChild(header);
             }
-            var profilePhoto = document.createElement("img");
-            profilePhoto.src = "/static/home/images/person.png";
-            profilePhoto.className = "profilePhoto-video-container profile-photo-" + nodeId;
-            profilePhoto.setAttribute("id", "profile-photo-grid-" + nodeId);
-            col.appendChild(profilePhoto);
             document.getElementById(gridId).appendChild(col);
             takeCareGridViewActivatorElementAdded(videoGrid);
             // document.getElementById(gridId).appendChild(videoGrid);
@@ -1294,7 +1300,7 @@
         }
 
         function takeCareOfGridView() {
-            var height_of_grid = $(window).height() - $("#navbar_session").height() - 150;
+            var height_of_grid = $(window).outerheight() - $("#navbar_session").outerheight() - 150;
             var gridId = "gridViewVideoContainer";
             var noParticipants = document.getElementById(gridId).childElementCount;
             $(".vid-grid-view").css("height", "100%");
@@ -1405,7 +1411,7 @@
                     $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
                     $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
                 }
-                takeCareOfProfilePhoto(max_width_video);
+                // takeCareOfProfilePhoto(max_width_video);
             }
             // $("#" + gridId).height(height_of_grid + 50);
         }
