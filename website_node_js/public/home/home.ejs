@@ -9,7 +9,7 @@
 </head>
 <body>
 	<canvas id="canvas-background-animation"></canvas>
-	<div class="modal fade" data-backdrop="static" id="createNew" tabindex="-1" role="dialog" 
+	<div class="modal fade" id="createNew" tabindex="-1" role="dialog"
 	aria-labelledby="Create New Call" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
@@ -35,7 +35,7 @@
 							<div class="invalid-feedback">
 								Is your meeting that boring?! o.O
 							</div>
-						</div>						
+						</div>
 						<div class="form-group">
 							<input type="password" id="create_new_meeting_code" class="form-control create-new-input" name="meetingCode" aria-describedby="create_new_meeting_code_help" required>
 							<label class="form-control-placeholder" for="create_new_meeting_code"><div class="white-space">Meeting Code</div></label>
@@ -58,7 +58,7 @@
 		</div>
 	</div>
 
-	<div class="modal fade" data-backdrop="static" id="joinCall" tabindex="-1" role="dialog" 
+	<div class="modal fade" id="joinCall" tabindex="-1" role="dialog"
 	aria-labelledby="Join Call" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
@@ -84,12 +84,12 @@
 							<div class="invalid-feedback">
 								Looks like a wrong meeting ID or code! :(
 							</div>
-						</div>						
+						</div>
 						<div class="form-group">
 							<input type="password" id="join_meeting_code" class="form-control join-input" name="meetingCode" aria-describedby="join_meeting_code_help" required>
 							<label class="form-control-placeholder" for="join_meeting_code"><div class="white-space">Meeting Code</div></label>
 							<small id="join_meeting_code_help" class="form-text text-muted">Code created by host</small>
-						</div>		
+						</div>
 						<input type="hidden" name="obj" value="join">
 						<div class="form-group text-center">
 							<button type="submit" class="btn btn-success">Join!</button>
@@ -122,7 +122,7 @@
 		</div>
 		<div id="features" class="snap-scroll">
 		    <h2 class="text-center section-title" style="margin: 20px;color: white;"><strong>Features</strong></h2>
-			<div class="row align-items-center mx-auto" style="position: relative; bottom: -20px;">        
+			<div class="row align-items-center mx-auto" style="position: relative; bottom: -20px;">
 			    <div class="col-sm-2">
 			        <ul class="nav nav-pill flex-column">
 			            <li class="nav-item">
@@ -207,12 +207,12 @@
 			</div>
 		</div>
 		<div id="across-all-devices" class="snap-scroll text-center">
-			<h2 class="section-title" style="margin-bottom: 20px; color: black;">Supported Devices!</h2>
+			<h2 class="section-title" id="supported-devices-h2"><strong>Supported Devices</strong> </h2>
 			<img alt="Devices" id="device-support-img">
 		</div>
 		<div id="footer" class="snap-scroll text-center">
 			<div id="real-footer" class="row row-cols-2 mx-auto">
-				<div id="img-footer" class="col-4"><img src="/static/home/images/footer.png" id="img-footer-panda" alt=""></div>
+				<div id="img-footer" class="col-4 justify-content-center"><img src="/static/home/images/footer.png" id="img-footer-panda" alt=""></div>
 				<div id="links-container" class="row row-cols-2 col-8">
 					<div class="col-6">
 						<h5><a href="#intro-section-row">Scroll Up</a></h5>

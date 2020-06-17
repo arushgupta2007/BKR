@@ -2,18 +2,27 @@ body,
 html {
     width: 100%;
     height: 95%;
+    font-family: 'Questrial', sans-serif;
 }
 
-body {
-    background-image: url("/static/home/images/joinus.png");
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+#main-container {
+    z-index: 10;
+    position: relative;
+    font-size: 20px;
 }
 
-#navbar {
-    font-family: 'B612';
+#img-joinus {
+    z-index: 1;
+    position: absolute;
+    bottom: -10%;
+    display: flex;
+    left:-20%
+}
+
+#img-joinus-panda {
+    width: 150%;
+    bottom: -10%;
+    position: fixed;
 }
 
 #joinUsLink {
@@ -22,4 +31,10 @@ body {
 
 #user-sign {
     display: none;
+}
+
+@media only screen and (max-width: 576px) {
+    #img-joinus-panda {
+        bottom: -3%;
+    }
 }

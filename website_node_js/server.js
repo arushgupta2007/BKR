@@ -83,7 +83,7 @@ function deleteMeeting(session_id, meeting) {
         userModel.findOne({_id: userId._id}, function (err, user) {
             if (err) {
                 // log error if there
-                console.log(err);                
+                console.log(err);
             }
             // check if user exixts
             if (user) {
@@ -109,6 +109,8 @@ app.get("/", function (req, res) {
     // render home ejs file
     res.render(__dirname + "/public/home/home.ejs");
 });
+
+// TODO: SERVER: FAQ page
 
 // GET request to /join_us (sign in / sign up / log in)
 app.get("/join_us/", function (req, res) {
@@ -201,20 +203,20 @@ app.post("/session/", (req, res) => {
                 console.log("SESSION CREATED");
                 // store session object to mapSessions
                 mapSessions[session_id] = session;
-                
+
                 /* mapSessionNamesTokens[session_id] = [];
                 name_codes[session_id] = {
                     name: name_meeting,
                     code: session_code,
                 }; */
-                
+
                 // generate token for user needed by OpenVidu
                 session
                     .generateToken(tokenOptions)
                     .then((token) => {
                         console.log("TOKEN GENERATED FOR FIRST PARICIPANT");
                         /* mapSessionNamesTokens[session_id].push(token); */
-                        // save meeting to MongoDB 
+                        // save meeting to MongoDB
                         console.log("SAVING MEETING TO DATABASE");
                         meetingsModel({
                             _id: new mongoose.Types.ObjectId(),
@@ -273,7 +275,7 @@ app.post("/session/", (req, res) => {
                                 meetingName: name_meeting,
                                 code: session_code,
                             });
-                        })                           
+                        })
                     })
                     .catch((err) => console.log(err)); // log error if there
             })
@@ -299,7 +301,7 @@ app.post("/session/", (req, res) => {
                     var mySession = mapSessions[sessionID];
                     // get client id to put from database
                     var client_id = meetingToJoin.next_id;
-                    // generate token for user needed by OpenVidu                    
+                    // generate token for user needed by OpenVidu
                     mySession
                     .generateToken(tokenOptions)
                     .then((token) => {
@@ -379,18 +381,18 @@ app.post("/session/", (req, res) => {
 // POST request to /session/saveMessage (save the message to database)
 app.post("/session/saveMessage/", (req,res) => {
     console.log("--------------------------------------------------------")
-    console.log("SAVING MESSAGE WITH DATA:" + req.body);    
+    console.log("SAVING MESSAGE WITH DATA:" + req.body);
     // get sessionId, from name, from account id, to, and message from req.body
     var data = req.body;
     // find meeting from data.sessionId
     meetingsModel.findOne({meetingID: data.sessionId}, function(err, meeting) {
         if (err) {
             // log error if there
-            console.log(err);            
+            console.log(err);
         }
         if (meeting) {
             // meeting found
-            // remove unnecessary data 
+            // remove unnecessary data
             delete data.sessionId;
             // append to chat list of meeting
             meeting.chatMessages.push(data);
@@ -497,16 +499,16 @@ app.post("/api/check-id-code/", function (req, res) {
     var meeting_code = req.body.meetingCode;
     meetingsModel.findOne({meetingID: meeting_id}).then(meeting => {
         if (meeting) {
-            console.log("MEETING FOUND");               
+            console.log("MEETING FOUND");
             if (meeting_code === meeting.code) {
-                console.log("MEETING CODE IS RIGHT");                            
+                console.log("MEETING CODE IS RIGHT");
                 res.send("1");
             } else {
                 console.log("MEETING CODE IS WRONG");
                 res.send("0");
             }
         } else {
-            console.log("MEETING NOT FOUND");            
+            console.log("MEETING NOT FOUND");
             res.send("0");
         }
     })
@@ -519,7 +521,7 @@ app.post("/api/user/prevMeetings/", function (req, res) {
     var array_to_return = [];
     userModel.findOne({commonId: userUid}).populate("meetings").then(user => {
         if (user) {
-            console.log("FOUND USER");            
+            console.log("FOUND USER");
             for (var i = 0; i < user.meetings.length; i++) {
                 console.log("MEETING FOUND: " + user.meetings[i]);
                 console.log("NAME: " + user.meetings[i].meetingName);

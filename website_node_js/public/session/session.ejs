@@ -21,7 +21,7 @@
     <!-- Firepad -->
     <link rel="stylesheet" href="https://firepad.io/releases/v1.5.10/firepad.css" />
     <script src="https://firepad.io/releases/v1.5.10/firepad.min.js"></script>
-    
+
     <script src="/static/session/js/openvidu-browser-2.14.0.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
     <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
@@ -108,7 +108,7 @@
             </div>
         </div>
     </div>
-    
+
     <div id="main-container" class="container-fluid p-0">
         <div class="meetingOptionsExtra">
             <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
@@ -128,10 +128,10 @@
                 </form>
             </div>
         </div>
-        
+
         <div id="participantList_sideBar"></div>
         <div id="prevMeetingList_sideBar" class="d-flex justify-content-center"></div>
-        
+
         <div class="inline-block" id="video_container">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item p-0">
@@ -143,7 +143,7 @@
             </ul>
             <div class="tab-content">
                 <div id="gridParticipants" class="container-fluid tab-pane active"><br>
-                    <div class="row justify-content-center" id="gridViewVideoContainer"></div>                    
+                    <div id="gridViewVideoContainer"></div>
                 </div>
                 <div id="pinnedVid" class="container-fluid tab-pane fade"><br>
                     <div class="row" id="pinnedVideoContainer"></div>
@@ -151,7 +151,7 @@
             </div>
         </div>
     </div>
-    <div class="fixed-bottom text-center" id="meetingOptionsButton_User">
+    <div class="text-center" id="meetingOptionsButton_User">
         <button class="btn btn-warning pull-left" onclick="shareMeeting()" data-toggle="tooltip" data-placement="top" title="Add Person To Call">
             <i class="fas fa-user-plus"></i>
         </button>
@@ -192,9 +192,9 @@
         // script to create whiteboard
         // keep track of where the mouse has been dragged on
         var array_of_mouse_loactions = [];
-        
+
         // sketch for p5 js
-        let sketch = function(p) {            
+        let sketch = function(p) {
             document.getElementById("clear-board").addEventListener('click', function() {
                 clearWhiteBoard();
             })
@@ -277,7 +277,7 @@
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
-                    console.log(err);                    
+                    console.log(err);
                 }
             }).done(function(data) {
                 console.log(data);
@@ -334,13 +334,9 @@
         var connection_list = {};
         // keep list for active user to be displayed on main container
         var active_users = {};
-        
         var markdown_to_html_con = new showdown.Converter();
-        
         var chat_audio_notification = document.getElementById("chat-audio");
-        
         var mouse_on_meetingOptions = false;
-        
         var meetingOptionUserimout;
         var notification_timeout;
 
@@ -356,9 +352,9 @@
         // set url of #share_meeting_link
         $("#share_meeting_link").html(" https://" + window.location.hostname + "/?todo=join&id_=" + sessionName);
         $("#share_meeting_link").attr("href", "https://" + window.location.hostname + "/?todo=join&id_=" + sessionName);
-        
+
         $("#refreshButton").attr("disabled", true);
-        
+
         // initialize every thing
         init_every_time();
         // every time window resizes, initialize every thing
@@ -368,16 +364,16 @@
             // alert("orientaion changed");
             setTimeout(init_every_time, 200);
         });
-        
+
         $("#video_container").mousemove(function (event) {
             wakeMeetingOptions();
         });
         $("#video_container").on("tap", function () {
             wakeMeetingOptions();
         })
-        
+
         $("#chat-everybody").show();
-        
+
         $("#everybody").click(function () {
             $(".chat-person").removeClass("active");
             $(this).addClass("active");
@@ -387,21 +383,21 @@
             $("#card-header-chat").text("Everybody");
             $("#everybody").removeClass("new-message-came");
         })
-        
+
         var message_textarea = new SimpleMDE({ element: $("#message-to-send")[0] });
-        
+
         $("#main-container").click( function () {
-            closeSidePanel();           
+            closeSidePanel();
         })
-        
+
         $("#meetingOptionsButton_User").hover(function () {
             mouse_on_meetingOptions = true;
         }, function () {
             mouse_on_meetingOptions = false;
-        })
+        });
 
         // function init_every_time
-        function init_every_time() {            
+        function init_every_time() {
             // set height of meeting extra options
             var height_of_meetingExtraOptions = $(window).height() - $("#navbar_session").height() - 8;
             $(".meetingOptionsExtra").css("height", height_of_meetingExtraOptions.toString() + "px");
@@ -420,25 +416,21 @@
             // set margin of main container as 50px
             $("#video_container").css("margin-left", "60px");
             takeCareOfGridView();
-            
-            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");  
+
+            $("#meetingOptionsButton_User").css("margin-bottom", "-70px");
             // 60 - (16 x 2)
             $("#refreshButton").width("28px")
         }
-            
+
         function wakeMeetingOptions() {
             clearTimeout(meetingOptionUserimout);
-//            $("#meetingOptionsButton_User").animate({marginBottom: "0px"});
-//            meetingOptionUserimout = setTimeout(function () {
-//                $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
-//            }, 100);
             if (parseInt($("#meetingOptionsButton_User").css('margin-bottom').replace("px", "")) < -69) {
-                $("#meetingOptionsButton_User").animate({marginBottom: "0px"});   
+                $("#meetingOptionsButton_User").animate({marginBottom: "0px"});
             }
             meetingOptionUserimout = setTimeout(function () {
                 if (parseInt($("#meetingOptionsButton_User").css('margin-bottom').replace("px", "")) > -1) {
                     if (!mouse_on_meetingOptions || $(window).width() < 576) {
-                        $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});  
+                        $("#meetingOptionsButton_User").animate({marginBottom: "-70px"});
                     }
                 }
             }, 1000)
@@ -515,9 +507,9 @@
             var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
             // append html template with message to DOM
             $("#chat-" + event.from.connectionId).append(html_string);
-            // scroll to bottom when new message has been recv            
+            // scroll to bottom when new message has been recv
             var message_body = document.getElementById("chat-" + event.from.connectionId);
-            message_body.scrollTop = message_body.scrollHeight;              
+            message_body.scrollTop = message_body.scrollHeight;
             if ($("#sidePanel").width() < 10) {
                 // <div id="snackbar-info" class="text-truncate"></div>
                 if (!$("#" + event.from.connectionId).hasClass("active")) {
@@ -553,7 +545,7 @@
 
         // function ran when somebody changed their stream status
         session.on('signal:streamStatus', (event) => {
-            var connectionId = event.from.connectionId;      
+            var connectionId = event.from.connectionId;
 
             if (connection_list[connectionId]) {
                 var data = event.data.split(",");
@@ -566,7 +558,7 @@
                     if (data[0] === "1") {
                         audio_of_other_user.html('<i class="fas fa-microphone"></i>');
                     } else {
-                        audio_of_other_user.html('<i class="fas fa-microphone-slash"></i>'); 
+                        audio_of_other_user.html('<i class="fas fa-microphone-slash"></i>');
                     }
                     if (data[1] === "1") {
                         $(".profile-photo-" + connectionId).css("display", "none");
@@ -623,7 +615,7 @@
             card_body.className = "card-body p-0 text-center";
             var video_user = document.createElement("video");
             video_user.setAttribute("id", "vid-" + event.target.connection.connectionId);
-            video_user.className = "video-user"; 
+            video_user.className = "video-user";
             card_body.appendChild(video_user);
             card_participant.appendChild(card_body);
             document.getElementById("participantList_sideBar").appendChild(card_participant);
@@ -662,7 +654,7 @@
             // delete from connection list
             delete connection_list[event.connection.connectionId];
         });
-        
+
         session.on('sessionDisconnected', (event) => {
             if (event.reason === 'networkDisconnect') {
                 $("#refreshButton").click();
@@ -695,7 +687,7 @@
                 $(card_body).css("text-align", "center")
                 var video = document.createElement("video");
                 video.setAttribute("id", "vid-mine");
-                video.className = "video-user"; 
+                video.className = "video-user";
                 card_body.appendChild(video);
                 card_participant.appendChild(card_body);
                 document.getElementById("participantList_sideBar").appendChild(card_participant);
@@ -781,7 +773,7 @@
             }
             sendStreamStatusMessage(audio_return + "," + video_return);
         }
-        
+
         function toggleSidePanel () {
             if ($("#sidePanel").width() > 10) {
                 closeSidePanel();
@@ -793,14 +785,17 @@
         // function ran when sidepanel has to close
         function closeSidePanel() {
             document.getElementById("sidePanel").style.width = "0px";
+            $("#meetingOptionsButton_User").animate({right: "0"});
         }
 
         // function ran when sidepanel has to open
         function openSidePanel() {
             if ($(window).width() < 576) {
                 document.getElementById("sidePanel").style.width = $(window).width().toString() + "px";
+                $("#meetingOptionsButton_User").animate({right: $(window).width().toString() + "px"});
             } else {
                 document.getElementById("sidePanel").style.width = "400px";
+                $("#meetingOptionsButton_User").animate({right: "400px"});
             }
             $("#chat-open-close").removeClass("red-chat");
         }
@@ -815,7 +810,7 @@
                 if ($(window).width() <= 768) {
                     var width_screen = $(window).width() - 60;
                     $("#participantList_sideBar").animate({width: width_screen.toString() + "px"});
-                    width_of_part_list = width_screen;
+                    width_of_part_list = width_screen + 60;
                 } else if ($(window).width() <= 992) {
                     $("#participantList_sideBar").animate({width: "25%"});
                     width_of_part_list = $(window).width() * (1 / 4) + 60;
@@ -826,25 +821,33 @@
                 $("#video_container").animate({marginLeft: width_of_part_list.toString()});
                 var width_main_container = $(window).width() - width_of_part_list;
                 $("#video_container").animate({width: width_main_container});
+                $("#meetingOptionsButton_User").animate({left: width_of_part_list.toString() + "px"});
             } else if ($("#prevMeetingList_sideBar").width() > 10) {
-                $("#prevMeetingList_sideBar").width("0");
+                $("#prevMeetingList_sideBar").css("width", "0");
+                console.log("REACHED HERE");
                 var width_of_part_list;
                 var width_screen = $(window).width() - 60;
+                console.log("______---------- " + width_screen + "----------______");
                 if ($(window).width() <= 768) {
                     $("#participantList_sideBar").width(width_screen.toString() + "px");
                     width_of_part_list = width_screen;
+                    console.log("REACHED THERE");
                 } else if ($(window).width() <= 992) {
                     var width_to_set = width_screen * 0.25
+                    console.log("______---------- " + width_to_set + "----------______");
                     $("#participantList_sideBar").width(width_to_set.toString() + "px");
                     width_of_part_list = $(window).width() * (1 / 4) + 60;
+                    console.log("REACHED THERE");
                 } else {
                     var width_to_set = width_screen * 0.15;
-                    $("#participantList_sideBar").animate(width_to_set.toString() + "px");
+                    $("#participantList_sideBar").width(width_to_set.toString() + "px");
                     width_of_part_list = $(window).width() * (15 / 100) + 60;
+                    console.log("REACHED THERE");
                 }
                 $("#video_container").css("marginLeft", width_of_part_list.toString() + "px");
                 var width_main_container = $(window).width() - width_of_part_list;
                 $("#video_container").width(width_main_container);
+                console.log("REACHED FINAL");
             } else {
                 // taget element is open
                 // close target element
@@ -852,7 +855,8 @@
                 var width_of_extraOptions = 60;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString() + "px"});
                 var width_main_container = $(window).width() - width_of_extraOptions;
-                $("#video_container").animate({width: width_main_container});
+                $("#video_container").animate({width: width_main_container.toString() + "px"});
+                $("#meetingOptionsButton_User").animate({left: "62px"});
             }
         }
 
@@ -877,8 +881,9 @@
                 $("#video_container").animate({marginLeft: width_of_prev_list.toString()});
                 var width_main_container = $(window).width() - width_of_prev_list;
                 $("#video_container").animate({width: width_main_container});
+                $("#meetingOptionsButton_User").animate({left: width_of_prev_list.toString() + "px"});
             } else if ($("#participantList_sideBar").width() > 10) {
-                $("#participantList_sideBar").width("0");
+                $("#participantList_sideBar").css("width", "0");
                 var width_of_prev_list;
                 var width_screen = $(window).width();
                 if ($(window).width() <= 768) {
@@ -906,7 +911,8 @@
                 var width_of_extraOptions = 60;
                 $("#video_container").animate({marginLeft: width_of_extraOptions.toString()});
                 var width_main_container = $(window).width() - width_of_extraOptions;
-                $("#video_container").animate({width: width_main_container});
+                $("#video_container").animate({width: width_main_container.toString() + "px"});
+                $("#meetingOptionsButton_User").animate({left: "62px"});
             }
         }
 
@@ -998,7 +1004,7 @@
                 type: "streamStatus"
             }).then(() => {}).catch(err => {
                 // log error if there
-                console.log(err);                
+                console.log(err);
             })
         }
 
@@ -1011,7 +1017,7 @@
                 type: "userControlMessage",
             }).then(() => {}).catch(err => {
                 // log error if there
-                console.log(err);                
+                console.log(err);
             })
         }
 
@@ -1073,7 +1079,7 @@
             })
         }
 
-        // function to swicth back to video and audio ran at screenShare() and 
+        // function to swicth back to video and audio ran at screenShare() and
         // when user clicks close at whiteboard model
         function backToVideoAudio() {
             // get video and audio media stream
@@ -1149,9 +1155,9 @@
             videoElement.parentNode.appendChild(img_represent_user);
 
 
-            // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting 
+            // create button group for private chat, toggle video, toggle audio, and drop that user out of meeting
             // if it is not the user itelf
-            if (nodeId !== 'mine') {                
+            if (nodeId !== 'mine') {
                 var buttonGroupInstance = new ButtonGroupControlUser(nodeId, "part");
                 buttonGroupInstance.addChatListner(function () {
                     $("#"+ nodeId).click();
@@ -1178,7 +1184,7 @@
                 });
                 buttonGroupInstance.button_list.style.bottom = "10px"
                 videoElement.parentNode.appendChild(buttonGroupInstance.button_list);
-                
+
                 // show button group when user hovers on the video
                 $(videoElement.parentNode).hover(function () {
                     $(videoElement).css("opacity", "0.3");
@@ -1207,7 +1213,7 @@
             }
 
             $(card_element).css("margin", "10px");
-            initMainVidsActivator(videoElement, nodeId, clientData);            
+            initMainVidsActivator(videoElement, nodeId, clientData);
         }
 
         // function takeCareOfProfilePhoto (width_of_vid) {
@@ -1226,9 +1232,9 @@
         // function ran in appendUserData()
         function initMainVids(videoElement, nodeId, clientData) {
             var gridId = "gridViewVideoContainer";
-            var col = document.createElement("div");
-            col.className = "col fullSpaceGrid";
-            col.setAttribute("id", "col-grid-" + nodeId);
+            var video_parent = document.createElement("div");
+            video_parent.className = "video-parent fullSpaceGrid";
+            video_parent.setAttribute("id", "video-parent-grid-" + nodeId);
             var videoGrid = document.createElement("video");
             videoGrid.setAttribute("id", "vid-grid-" + nodeId);
             videoGrid.className = "vid-grid-view video-user";
@@ -1237,12 +1243,12 @@
                 videoGrid.muted = true;
             }
             videoGrid.play();
-            col.appendChild(videoGrid);
+            video_parent.appendChild(videoGrid);
             var profilePhoto = document.createElement("img");
             profilePhoto.src = "/static/home/images/unknown_user.png";
             profilePhoto.className = "profilePhoto-video-container profile-photo-" + nodeId;
             profilePhoto.setAttribute("id", "profile-photo-grid-" + nodeId);
-            col.appendChild(profilePhoto);     
+            video_parent.appendChild(profilePhoto);
             if (nodeId !== "mine") {
                 var header = document.createElement("p");
                 header.className = "header-name";
@@ -1281,10 +1287,10 @@
                     $(buttonGroupInstance.button_list).css("display", "none");
                     $(header).css("display", "none");
                 })
-                col.appendChild(buttonGroupInstance.button_list);
-                col.appendChild(header);
+                video_parent.appendChild(buttonGroupInstance.button_list);
+                video_parent.appendChild(header);
             }
-            document.getElementById(gridId).appendChild(col);
+            document.getElementById(gridId).appendChild(video_parent);
             takeCareGridViewActivatorElementAdded(videoGrid);
             // document.getElementById(gridId).appendChild(videoGrid);
             // setTimeout(takeCareOfGridView, 5000);
@@ -1300,127 +1306,45 @@
         }
 
         function takeCareOfGridView() {
-            var height_of_grid = $(window).outerheight() - $("#navbar_session").outerheight() - 150;
             var gridId = "gridViewVideoContainer";
-            var noParticipants = document.getElementById(gridId).childElementCount;
-            $(".vid-grid-view").css("height", "100%");
-            $(".vid-grid-view").css("width", "100%");
-            var margin_bottom_grid = $("#navbar_session").height() + 100;
-            $("#" + gridId).css("margin-bottom", margin_bottom_grid.toString() + "px");
-            if ($(window).width() > 575) {
-                $(".col").css("margin-bottom", "0px");
-            } else {
-                $(".col").css("margin-bottom", "50px");
+            var noParticipants = $("#" + gridId).children().length;
+            var grid_view_visible = $(window).outerHeight() - $("#navbar_session").outerHeight() - 80;
+            if ($(window).width() < 576) {
+                var max_height = grid_view_visible * 0.4;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+            } else if (noParticipants === 1) {
+                var max_height = grid_view_visible;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+            } else if (noParticipants === 2) {
+                var max_height = grid_view_visible;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+            } else if (noParticipants === 3) {
+                var max_height = grid_view_visible * 0.6;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+            } else if (noParticipants === 4) {
+                var max_height = grid_view_visible * 0.6;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+            } else if (4 < noParticipants < 7) {
+                var max_height = grid_view_visible * 0.6;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
+            } else if (6 < noParticipants) {
+                var max_height = grid_view_visible * 0.6;
+                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
             }
-            var max_width_video;
-            if (noParticipants !== 0) {
-                if (noParticipants === 1) {
-                    $("#" + gridId).removeClass("row-cols-2");
-                    if ($(window).width() > 575) {
-                        $("#" + gridId).addClass("row-cols-1");
-                    } else {
-                        $("#" + gridId).addClass("row-cols-1");
-                    }
-                    $(".vid-grid-view").css("max-height", height_of_grid.toString() + "px");
-                    $(".vid-grid-view").parent().css("max-height", height_of_grid.toString() + "px");
-                    max_width_video = $(window).width() - 75;
-                    $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                } else if (noParticipants === 2) {
-                    $("#" + gridId).removeClass("row-cols-1");
-                    $("#" + gridId).removeClass("row-cols-3");
-                    if ($(window).width() > 575) {
-                        $("#" + gridId).removeClass("row-cols-1");
-                        $("#" + gridId).addClass("row-cols-2");
-                        max_width_video = ($(window).width() - 75 ) / 2;
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    } else {
-                        $("#" + gridId).removeClass("row-cols-2");
-                        $("#" + gridId).addClass("row-cols-1");
-                        max_width_video = ($(window).width() - 75 );
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    }
-                    $(".vid-grid-view").css("max-height", height_of_grid.toString() + "px");
-                    $(".vid-grid-view").parent().css("max-height", height_of_grid.toString() + "px");
-                } else if (noParticipants === 3) {
-                    $("#" + gridId).removeClass("row-cols-2");
-                    if ($(window).width() > 575) {
-                        $("#" + gridId).removeClass("row-cols-1");
-                        $("#" + gridId).addClass("row-cols-2");
-                        max_width_video = ($(window).width() - 75 ) / 2;
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    } else {
-                        $("#" + gridId).removeClass("row-cols-3");
-                        $("#" + gridId).addClass("row-cols-1");
-                        max_width_video = ($(window).width() - 75 );
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    }
-                    // var max_height_video = height_of_grid * 0.75;
-                    var max_height_video = height_of_grid * 0.4;
-                    $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
-                    $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
-                } else if (noParticipants === 4) {
-                    $("#" + gridId).removeClass("row-cols-3");
-                    if ($(window).width() > 575) {
-                        $("#" + gridId).removeClass("row-cols-1");
-                        $("#" + gridId).addClass("row-cols-2");
-                        max_width_video = ($(window).width() - 75 ) / 2;
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    } else {
-                        $("#" + gridId).removeClass("row-cols-2");
-                        $("#" + gridId).addClass("row-cols-1");
-                        max_width_video = ($(window).width() - 75 );
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    }
-                    // var max_height_video = height_of_grid * 0.75;
-                    var max_height_video = height_of_grid * 0.4;
-                    $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
-                    $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
-                } else if (4 < noParticipants < 7) {
-                    $("#" + gridId).removeClass("row-cols-2");
-                    $("#" + gridId).removeClass("row-cols-4");
-                    if ($(window).width() > 575) {
-                        $("#" + gridId).removeClass("row-cols-1");
-                        $("#" + gridId).addClass("row-cols-3");
-                        max_width_video = ($(window).width() - 75 ) / 3;
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    } else {
-                        $("#" + gridId).removeClass("row-cols-3");
-                        $("#" + gridId).addClass("row-cols-1");
-                        max_width_video = ($(window).width() - 75 );
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    }
-                    // var max_height_video = height_of_grid * 0.75;
-                    var max_height_video = height_of_grid * 0.4;
-                    $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
-                    $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
-                } else if (6 < noParticipants) {
-                    $("#" + gridId).removeClass("row-cols-3");
-                    if ($(window).width() > 575) {
-                        $("#" + gridId).removeClass("row-cols-1");
-                        $("#" + gridId).addClass("row-cols-4");
-                        max_width_video = ($(window).width() - 75 ) / 4;
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    } else {
-                        $("#" + gridId).addClass("row-cols-1");
-                        $("#" + gridId).removeClass("row-cols-4");
-                        max_width_video = ($(window).width() - 75 );
-                        $(".vid-grid-view").css("max-width", max_width_video.toString() + "px");
-                    }
-                    // var max_height_video = height_of_grid * 0.75
-                    var max_height_video = height_of_grid * 0.4;
-                    $(".vid-grid-view").css("max-height", max_height_video.toString() + "px");
-                    $(".vid-grid-view").parent().css("max-height", max_height_video.toString() + "px");
-                }
-                // takeCareOfProfilePhoto(max_width_video);
-            }
-            // $("#" + gridId).height(height_of_grid + 50);
         }
 
         // remove user data when any user disconnects
         function removeUserData(connection) {
-            var nodeId = connection.connectionId;          
+            var nodeId = connection.connectionId;
             document.getElementById("card-" + nodeId).remove();
-            document.getElementById("col-grid-" + nodeId).remove();
+            document.getElementById("video-parent-grid-" + nodeId).remove();
             $("#chat-" + nodeId).remove();
             if ($("#" + nodeId).hasClass("active")) {
                 $("#everybody").click()
@@ -1431,8 +1355,8 @@
             setTimeout(function () {
                 if (Object.keys(connection_list).length > 1) {
                     console.log("Removing");
-                    $("#refreshButton").attr("disabled", false);                
-                }                
+                    $("#refreshButton").attr("disabled", false);
+                }
             }, 100);
         }
 
