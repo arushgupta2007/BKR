@@ -11,8 +11,18 @@ var fs = require("fs");
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var cookieSession = require("cookie-session");
-
 var keys = require("./config/keys");
+const multer = require('multer');
+const storage_file_chat_session = multer.diskStorage({
+  destination: './public/uploads/',
+  filename: function(req, file, cb){
+    cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+var upload_file_chat_session = multer({
+  storage: storage_file_chat_session,
+  limits:{fileSize: 1000000},
+}).single('fileShare');
 // MongoDB models
 var userModel = require("./models/user_model")
 var meetingsModel = require("./models/meeting_model");
@@ -285,7 +295,7 @@ app.post("/session/", (req, res) => {
         console.log("USER WANTS TO JOIN ONGOING MEETING");
         // user wants to join a ongoing meeting
         // get sessionId
-        var sessionID = req.body.meetingId;
+        var sessionID = parseInt(req.body.meetingId);
         // find the meeting in MongoDB with that session id
         console.log("FINDING MEETING FROM MEETING ID");
         meetingsModel.findOne({meetingID: sessionID}).then((meetingToJoin) => {
@@ -365,13 +375,13 @@ app.post("/session/", (req, res) => {
                     // the meeting id or meeting code was incorrect
                     // redirect user to fill right values
                     console.log("WRONG MEETING ID OR MEETING CODE");
-                    res.redirect("/?wrong=meeting&name=" + name_client);
+                    res.redirect("/?todo=join-wrong&name=" + name_client);
                 }
             } else {
                 // meeting does not exist in MongoDB database, meetingId was incorrect
                 // redirect user to fill right values
                 console.log("WRONG MEETING ID");
-                res.redirect("/?wrong=meeting&name=" + name_client);
+                res.redirect("/?todo=join-wrong&name=" + name_client);
             }
         })
     }
@@ -491,6 +501,20 @@ app.post("/leave-session", (req, res) => {
         res.redirect("/");
     }
 });
+
+app.post("/api/file-share-chat/", (req, res) => {
+    upload_file_chat_session(req, res, (err) => {
+        if (err) {
+            res.send(err);
+        } else {
+            if(req.file === undefined){
+                res.send("empty");
+            } else {
+                res.send("ok");
+            }
+        }
+    })
+})
 
 app.post("/api/check-id-code/", function (req, res) {
     console.log("--------------------------------------------------------")

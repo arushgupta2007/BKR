@@ -69,7 +69,7 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<form action="/session/" id="join-form" method="POST" onsubmit="return joinFormValidation()">
+					<form action="/session/" id="join-form" method="POST">
 					    <input type="hidden" class="userId" value="" name="userId">
 						<div class="form-group">
 							<input type="text" id="join_name" class="form-control join-input" name="name" required>
@@ -79,7 +79,7 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<input type="number" id="join_meeting_name" class="form-control join-input" name="meetingId" required>
+							<input type="text" id="join_meeting_name" class="form-control join-input" name="meetingId" required>
 							<label class="form-control-placeholder" for="join_meeting_name"><div class="white-space">Meeting ID</div></label>
 							<div class="invalid-feedback">
 								Looks like a wrong meeting ID or code! :(

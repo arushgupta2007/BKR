@@ -112,10 +112,10 @@
     <div id="main-container" class="container-fluid p-0">
         <div class="meetingOptionsExtra">
             <div class="btn-group-vertical" role="group" aria-label="Meeting Options">
-                <button type="button" class="btn btn-secondary btn-lg" onclick="toggleParticipantList()">
+                <button type="button" class="btn btn-secondary btn-lg" onclick="toggleParticipantList()" data-toggle="tooltip" data-placement="top" title="Participant List" data-trigger="hover">
                     <i class="fas fa-user-friends"></i>
                 </button>
-                <button type="button" class="btn btn-secondary btn-lg" onclick="togglePrevMeetings()">
+                <button type="button" class="btn btn-secondary btn-lg" onclick="togglePrevMeetings()" data-toggle="tooltip" data-placement="top" title="Previous Meetings" data-trigger="hover">
                     <i class="fas fa-history"></i>
                 </button>
                 <form action="/session/refresh" method="post" style="display: inline-block; margin-bottom: 0;">
@@ -124,7 +124,9 @@
                     <input type="hidden" name="name" value="<%= nickName %>" />
                     <input type="hidden" name="meetingId" value="<%= sessionName %>" />
                     <input type="hidden" name="meetingCode" value="<%= code %>" />
-                    <button class="btn btn-secondary btn-lg" type="submit" onclick="leaveSession()" id="refreshButton"><i class="fas fa-sync"></i></button>
+                    <button class="btn btn-secondary btn-lg" type="submit" onclick="leaveSession()" id="refreshButton" data-toggle="tooltip" data-placement="top" title="Refresh your connection" data-trigger="hover">
+                        <i class="fas fa-sync"></i>
+                    </button>
                 </form>
             </div>
         </div>
@@ -152,19 +154,19 @@
         </div>
     </div>
     <div class="text-center" id="meetingOptionsButton_User">
-        <button class="btn btn-warning pull-left" onclick="shareMeeting()" data-toggle="tooltip" data-placement="top" title="Add Person To Call">
+        <button class="btn btn-warning pull-left" onclick="shareMeeting()" data-toggle="tooltip" data-placement="top" title="Add Person To Call" data-trigger="hover">
             <i class="fas fa-user-plus"></i>
         </button>
-        <button id="toggleVideo" class="btn btn-primary" onclick="toggleVideo()" data-toggle="tooltip" data-placement="top" title="Video">
+        <button id="toggleVideo" class="btn btn-primary" onclick="toggleVideo()" data-toggle="tooltip" data-placement="top" title="Video" data-trigger="hover">
             <i class="fas fa-video" id="toggleVideoIcon"></i>
         </button>
-        <button id="toggleAudio" class="btn btn-success" onclick="toggleAudio()" data-toggle="tooltip" data-placement="top" title="Audio">
+        <button id="toggleAudio" class="btn btn-success" onclick="toggleAudio()" data-toggle="tooltip" data-placement="top" title="Audio" data-trigger="hover">
             <i class="fas fa-microphone" id="toggleAudioIcon"></i>
         </button>
         <form action="/leave-session" method="post" style="display: inline-block; margin-bottom: 0;">
             <input type="hidden" name="sessionname" value="<%= sessionName %>" />
             <input type="hidden" name="token" value="<%= token %>" />
-            <button id="buttonLeaveSession" class="btn btn-danger" type="submit" onclick="leaveSession()" data-toggle="tooltip" data-placement="top" title="Leave Call">
+            <button id="buttonLeaveSession" class="btn btn-danger" type="submit" onclick="leaveSession()" data-toggle="tooltip" data-placement="top" title="Leave Call" data-trigger="hover">
                 <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
             </button>
         </form>
@@ -177,7 +179,7 @@
                 <button class="btn dropdown-item" onclick="collabOpen()"><i class="fas fa-handshake" style="color:black;"></i> Collab</button>
             </div>
         </div>
-        <buton class="btn pull-right" id="chat-open-close" onclick="toggleSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat">
+        <buton class="btn pull-right" id="chat-open-close" onclick="toggleSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat" data-trigger="hover">
             <i class="fas fa-comment-alt"></i>
         </buton>
     </div>
@@ -505,6 +507,104 @@
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
             // create html template
             var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
+            // append html template with message to DOM
+            $("#chat-" + event.from.connectionId).append(html_string);
+            // scroll to bottom when new message has been recv
+            var message_body = document.getElementById("chat-" + event.from.connectionId);
+            message_body.scrollTop = message_body.scrollHeight;
+            if ($("#sidePanel").width() < 10) {
+                // <div id="snackbar-info" class="text-truncate"></div>
+                if (!$("#" + event.from.connectionId).hasClass("active")) {
+                    $("#" + event.from.connectionId).addClass("new-message-came");
+                }
+                chat_audio_notification.pause();
+                chat_audio_notification.currentTime = 0;
+                chat_audio_notification.play();
+                var div = document.createElement("div");
+                if ($(".snackbar-info").hasClass("show")) {
+                    div.className = "snackbar-info text-truncate";
+                    div.sytle.visibility = "visible";
+                } else {
+                    div.className = "snackbar-info text-truncate show";
+                }
+                div.innerHTML = "<i class='fas fa-comment-alt red-chat'></i> New Group Message"
+                $(".snackbar-info").remove();
+                document.getElementById("snackbar-info-container").appendChild(div);
+                clearTimeout(notification_timeout);
+                notification_timeout = setTimeout(function () {
+                    $(".snackbar-info").remove();
+                }, 2500);
+                $("#chat-open-close").addClass("red-chat");
+            } else {
+                if (!$("#" + event.from.connectionId).hasClass("active")) {
+                    $("#" + event.from.connectionId).addClass("new-message-came");
+                    chat_audio_notification.pause();
+                    chat_audio_notification.currentTime = 0;
+                    chat_audio_notification.play();
+                }
+            }
+        });
+
+        session.on('signal:fileShare', (event) => {
+            var seprated_values = event.data.split(",")
+            var from_name = seprated_values[0];
+            var from_id = seprated_values[1];
+            var download_link_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
+            var download_link = download_link_to_slice.slice(download_link_to_slice.indexOf(",") + 1, download_link_to_slice.length);
+
+            // create html template of download_link
+            var html_string;
+            if (from_id === userName.toString()) {
+                html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">You:</p> <a href="' + download_link + '" download="file">New File</a></div></div>'
+            } else {
+                html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> <a href="' + download_link + '" download="file">New File</a></div></div>'
+            }
+            // append html template with message in DOM
+            $("#chat-everybody").append(html_string);
+            var everybody_chat = document.getElementById("chat-everybody");
+            // scroll to bottom when new message recv
+            everybody_chat.scrollTop = everybody_chat.scrollHeight;
+            if ($("#sidePanel").width() < 10) {
+                if (!$("#everybody").hasClass("active")) {
+                    $("#everybody").addClass("new-message-came");
+                }
+                chat_audio_notification.pause();
+                chat_audio_notification.currentTime = 0;
+                chat_audio_notification.play();
+                // <div class="snackbar-info text-truncate" id="notification"></div>
+                var div = document.createElement("div");
+                if ($(".snackbar-info").hasClass("show")) {
+                    div.className = "snackbar-info text-truncate";
+                    div.sytle.visibility = "visible";
+                } else {
+                    div.className = "snackbar-info text-truncate show";
+                }
+                div.innerHTML = "<i class='fas fa-comment-alt red-chat'></i> New Group Message"
+                $(".snackbar-info").remove();
+                document.getElementById("snackbar-info-container").appendChild(div);
+                clearTimeout(notification_timeout);
+                notification_timeout = setTimeout(function () {
+                    $(".snackbar-info").remove();
+                }, 2500);
+                $("#chat-open-close").addClass("red-chat");
+            } else {
+                if (!$("#everybody").hasClass("active")) {
+                    $("#everybody").addClass("new-message-came");
+                    chat_audio_notification.pause();
+                    chat_audio_notification.currentTime = 0;
+                    chat_audio_notification.play();
+                }
+            }
+        });
+
+        session.on('signal:fileShare-private', (event) => {
+            var seprated_values = event.data.split(",")
+            var from_name = seprated_values[0];
+            var from_id = seprated_values[1];
+            var download_link_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
+            var download_link = download_link_to_slice.slice(download_link_to_slice.indexOf(",") + 1, download_link_to_slice.length);
+            // create html template
+            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> <a href="' + download_link + '" download="file">New File</a></div></div>'
             // append html template with message to DOM
             $("#chat-" + event.from.connectionId).append(html_string);
             // scroll to bottom when new message has been recv
@@ -1182,6 +1282,11 @@
                 buttonGroupInstance.addDropListner(function () {
                     sendUserControlMessage(nodeId, "drop", "force");
                 });
+
+                buttonGroupInstance.addFullScreenListner(function () {
+                    openFullscreen(videoElement);
+                });
+
                 buttonGroupInstance.button_list.style.bottom = "10px"
                 videoElement.parentNode.appendChild(buttonGroupInstance.button_list);
 
@@ -1277,6 +1382,11 @@
                 buttonGroupInstance.addDropListner(function () {
                     sendUserControlMessage(nodeId, "drop", "force");
                 });
+
+                buttonGroupInstance.addFullScreenListner(function () {
+                    openFullscreen(videoGrid);
+                });
+
                 // show button group when user hovers on the video
                 $(videoGrid.parentNode).hover(function () {
                     $(videoGrid).css("opacity", "0.3");
@@ -1309,34 +1419,60 @@
             var gridId = "gridViewVideoContainer";
             var noParticipants = $("#" + gridId).children().length;
             var grid_view_visible = $(window).outerHeight() - $("#navbar_session").outerHeight() - 80;
-            if ($(window).width() < 576) {
-                var max_height = grid_view_visible * 0.4;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
-                $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
-            } else if (noParticipants === 1) {
+            if (noParticipants === 1) {
                 var max_height = grid_view_visible;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
+                $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                 $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
             } else if (noParticipants === 2) {
-                var max_height = grid_view_visible;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
-                $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.5;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+                }
             } else if (noParticipants === 3) {
-                var max_height = grid_view_visible * 0.6;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
-                $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.6;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+                }
             } else if (noParticipants === 4) {
-                var max_height = grid_view_visible * 0.6;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
-                $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.6;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
+                }
             } else if (4 < noParticipants < 7) {
-                var max_height = grid_view_visible * 0.6;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
-                $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.6;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
+                }
             } else if (6 < noParticipants) {
-                var max_height = grid_view_visible * 0.6;
-                $("#" + gridId + " .video-parent").css("max-height", max_height.toString() + "px");
-                $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.6;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
+                }
             }
         }
 

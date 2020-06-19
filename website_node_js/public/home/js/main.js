@@ -9,17 +9,17 @@ window.addEventListener('mousemove', function (event) {
     mouse.y = event.y;
 })
 
-function alphanumeric(inputtxt) { 
+function alphanumeric(inputtxt) {
     var letters = /^[0-9a-zA-Z]+$/;
     return (inputtxt.match(letters)) ;
 }
-  
+
 
 function createFormValidation() {
     var user_name = $("#create_new_name").val();
     var meeting_name = $("#create_new_meeting_name").val();
     var meeting_code = $("#create_new_meeting_code").val();
-    var ok = true;   
+    var ok = true;
     if (user_name.trim() === "") {
         $("#create_new_name").removeClass("is-valid");
         $("#create_new_name").addClass("is-invalid");
@@ -71,33 +71,6 @@ function joinFormValidation () {
         $("#join_name").removeClass("is-invalid");
         $("#join_name").addClass("is-valid");
     }
-    var data = {
-        meetingId: meetingID,
-        meetingCode: meetingCode,
-    }
-    $.ajax({
-        url: "/api/check-id-code/",
-        type: "POST",
-        data: data,
-        async: false,
-    }).done(function (data_filled_right) {
-        console.log(data_filled_right);
-        if (data_filled_right === "0") {
-            $("#join_meeting_name").removeClass("is-valid");
-            $("#join_meeting_code").removeClass("is-valid");
-            $("#join_meeting_name").addClass("is-invalid");
-            $("#join_meeting_code").addClass("is-invalid");
-            ok = false;
-        } else {
-            $("#join_meeting_name").removeClass("is-invalid");
-            $("#join_meeting_code").removeClass("is-invalid");
-            $("#join_meeting_name").addClass("is-valid");
-            $("#join_meeting_code").addClass("is-valid");
-        }
-    })
-    $(".join-input").change(function () {
-        joinFormValidation();
-    })
     return ok;
 }
 
@@ -180,7 +153,7 @@ $(document).ready( function () {
         var video_height = 30;
         videoImg.addEventListener('load', function () {
             var random_vars = random_x_y_dx_dy();
-            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy, 
+            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: video_width, size_height: video_height, type: "video"});
         })
 
@@ -190,7 +163,7 @@ $(document).ready( function () {
         var person_height = 30;
         person_img.addEventListener('load', function () {
             var random_vars = random_x_y_dx_dy();
-            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy, 
+            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: person_width, size_height: person_height, type: "person"});
         })
 
@@ -200,7 +173,7 @@ $(document).ready( function () {
         var chat_height = 30
         chat_img.addEventListener('load', function () {
             var random_vars = random_x_y_dx_dy();
-            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy, 
+            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: chat_width, size_height: chat_height, type: "chat"});
         })
 
@@ -210,7 +183,7 @@ $(document).ready( function () {
         var mic_height = 35;
         mic_img.addEventListener('load', function () {
             var random_vars = random_x_y_dx_dy();
-            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy, 
+            images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: mic_width, size_height: mic_height, type: "mic"});
         })
 
@@ -243,7 +216,7 @@ $(document).ready( function () {
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: headset_width, size_height: headset_height, type: "headset"});
         })
-        
+
         function animate() {
             requestAnimationFrame(animate);
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -288,7 +261,7 @@ $(document).ready( function () {
                     }
                     ctx.drawImage(person_img, data.x, data.y, data.size_width, data.size_height);
                 } else if (data.type === "chat") {
-                    if (!is_on_phone) {                    
+                    if (!is_on_phone) {
                         if (mouse.x - data.x < mouse_radius && mouse.x - data.x > -mouse_radius && mouse.y - data.y < mouse_radius &&
                             mouse.y - data.y > -mouse_radius) {
                             if (data.size_width < chat_width + 50 || data.size_height < chat_height + 50) {
@@ -323,7 +296,7 @@ $(document).ready( function () {
                                 data.size_height = mic_height;
                             }
                         }
-                    }                    
+                    }
                     ctx.drawImage(mic_img, data.x, data.y, data.size_width, data.size_height);
                 } else if (data.type === "share") {
                     if (!is_on_phone) {
@@ -342,7 +315,7 @@ $(document).ready( function () {
                                 data.size_height = share_height;
                             }
                         }
-                    }                    
+                    }
                     ctx.drawImage(share_img, data.x, data.y, data.size_width, data.size_height);
                 } else if (data.type === "call") {
                     if (!is_on_phone) {
@@ -382,7 +355,7 @@ $(document).ready( function () {
                         }
                     }
                     ctx.drawImage(headset_img, data.x, data.y, data.size_width, data.size_height);
-                } 
+                }
 
                 if (data.x < 0 || data.x + data.size_width > window.innerWidth - scrollbar_width) {
                     if (data.x < 0) {
@@ -398,18 +371,36 @@ $(document).ready( function () {
                         data.dy = -common_velocity;
                     }
                 }
-                
+
                 data.x += data.dx;
                 data.y += data.dy;
             }
         }
         animate();
         const urlParams = new URLSearchParams(window.location.search);
-        const todo = urlParams.get('todo');   
+        const todo = urlParams.get('todo');
         if (todo === "join") {
             const meetingId = urlParams.get('id_');
             $("#join_meeting_name").val(meetingId);
-            $("#joinMeeting").click();
+            $("#joinCall").modal({
+              keyboard: false
+            });
+        } else if (todo === "join-wrong") {
+            const name = urlParams.get('name');
+            $("#join_name").val(name);
+            $("#join_meeting_name").addClass("is-invalid");
+            $("#join_meeting_code").addClass("is-invalid");
+            $(".join-input").change(function () {
+                $("#join_meeting_name").removeClass("is-invalid");
+                $("#join_meeting_code").removeClass("is-invalid");
+                $("#join_meeting_name").removeClass("is-valid");
+                $("#join_meeting_code").removeClass("is-valid");
+                $("#join_name").removeClass("is-valid");
+                $("#join_name").removeClass("is-invalid");
+            });
+            $("#joinCall").modal({
+              keyboard: false
+            });
         }
     }
 

@@ -36,14 +36,6 @@ input.btn {
     background-color: #393a3b;
 }
 
-@media (min-width:500px) and (min-height:500px) {
-    .editor-toolbar a {
-        height: 15px;
-        width: 20px;
-        border: none;
-    }
-}
-
 .firepad {
     width: 100%;
     height: calc(100vh - 150px);
@@ -98,13 +90,6 @@ p.userName {
 
 
 /* xs ans md screen resolutions*/
-
-@media screen and (max-width: 991px) {
-    .container-fluid {
-        margin-right: 0 !important;
-        margin-left: 0 !important;
-    }
-}
 
 .sidePanel {
     display: inline-block;
@@ -497,4 +482,37 @@ i {
 
 body {
     overflow: hidden;
+}
+
+
+@media (min-width:500px) and (min-height:500px) {
+    .editor-toolbar a {
+        height: 15px;
+        width: 20px;
+        border: none;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .container-fluid {
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+}
+
+@media screen and (max-width:576px) {
+    #meetingOptionsButton_User button {
+        font-size: 10px;
+        padding: 10px;
+        width: 35px;
+    }
+    #meetingOptionsButton_User .dropdown-toggle {
+        height: 30px !important;
+        font-size: 125% !important;
+    }
+    #chat-open-close {
+        width: 35px;
+        padding: 10px;
+        font-size: 10px;
+    }
 }

@@ -1,7 +1,7 @@
 class ButtonGroupControlUser {
     constructor (nodeId, where) {
         this.button_list = document.createElement("div");
-        this.button_list.className = "button_list_video btn-button-group";   
+        this.button_list.className = "button_list_video btn-button-group";
         this.button_list.setAttribute("id", "button-list-" + nodeId + "-" + where);
 
         this.private_chat = document.createElement("button");
@@ -24,10 +24,16 @@ class ButtonGroupControlUser {
         this.drop_call.setAttribute("id", "drop-call-button-" + nodeId + "-" + where);
         this.drop_call.innerHTML = '<i class="fas fa-phone" style="transform: rotate(-135deg);"></i>';
 
+        this.full_screen = document.createElement("button");
+        this.full_screen.className = "btn btn-light btn-circle btn-sm pull-right btn-button-group full-screen-desktop full-screen-" + nodeId;
+        this.full_screen.setAttribute("id", "full-screen-" + nodeId + "-" + where);
+        this.full_screen.innerHTML = '<i class="fas fa-phone" style="transform: rotate(-135deg);"></i>';
+
         this.button_list.appendChild(this.private_chat);
         this.button_list.appendChild(this.video_toggle);
         this.button_list.appendChild(this.voice_toggle);
         this.button_list.appendChild(this.drop_call);
+        this.button_list.appendChild(this.full_screen);
     }
 
     addChatListner(function_to_run) {
@@ -45,4 +51,8 @@ class ButtonGroupControlUser {
     addDropListner (function_to_run) {
         this.drop_call.addEventListener('click', function_to_run);
     }
+
+    addFullScreenListner (function_to_run) {
+         this.full_screen.addEventListener('click', function_to_run);
+     }
 }
