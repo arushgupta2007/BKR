@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,11 @@
 	<script src="/static/head_imports.js"></script>
 	<link rel="stylesheet" href="/static/home/css/main.css">
 </head>
+
 <body>
 	<canvas id="canvas-background-animation"></canvas>
-	<div class="modal fade" id="createNew" tabindex="-1" role="dialog"
-	aria-labelledby="Create New Call" aria-hidden="true">
+	<div class="modal fade" id="createNew" tabindex="-1" role="dialog" aria-labelledby="Create New Call"
+		aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -20,46 +22,59 @@
 					</button>
 				</div>
 				<div class="modal-body">
-					<form action="/session/" id="create-new-form" method="POST" onsubmit="return createFormValidation()">
-					    <input type="hidden" class="userId" value="" name="userId">
+					<form action="/session/" id="create-new-form" method="POST"
+						onsubmit="return createFormValidation()">
+						<input type="hidden" class="userId" value="" name="userId">
 						<div class="form-group">
-							<input type="text" id="create_new_name" class="form-control create-new-input" name="name" required>
-							<label class="form-control-placeholder" for="create_new_name"><div class="white-space">Your Name</div></label>
+							<input type="text" id="create_new_name" class="form-control create-new-input" name="name"
+								required>
+							<label class="form-control-placeholder" for="create_new_name">
+								<div class="white-space">Your Name</div>
+							</label>
 							<div class="invalid-feedback">
-								Please enter a valid name! >.<
+								Please enter a valid name! >.< </div>
 							</div>
-						</div>
-						<div class="form-group">
-							<input type="text" id="create_new_meeting_name" class="form-control create-new-input" name="meetingName" required>
-							<label class="form-control-placeholder" for="create_new_meeting_name"><div class="white-space">Meeting Name</div></label>
-							<div class="invalid-feedback">
-								Is your meeting that boring?! o.O
+							<div class="form-group">
+								<input type="text" id="create_new_meeting_name" class="form-control create-new-input"
+									name="meetingName" required>
+								<label class="form-control-placeholder" for="create_new_meeting_name">
+									<div class="white-space">Meeting Name</div>
+								</label>
+								<div class="invalid-feedback">
+									Is your meeting that boring?! o.O
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<input type="password" id="create_new_meeting_code" class="form-control create-new-input" name="meetingCode" aria-describedby="create_new_meeting_code_help" required>
-							<label class="form-control-placeholder" for="create_new_meeting_code"><div class="white-space">Meeting Code</div></label>
-							<small id="create_new_meeting_code_help" class="form-text text-muted">Atleast 8 characters alphanumeric</small>
-						</div>
-						<div class="form-group">
-							<textarea type="text" id="create_new_meeting_description" class="form-control create-new-input" name="meetingDesc"></textarea>
-							<label class="form-control-placeholder" for="create_new_meeting_description"><div class="white-space text-muted">Meeting Description (optional)</div></label>
-							<div class="valid-feedback">
-								Ok!
+							<div class="form-group">
+								<input type="password" id="create_new_meeting_code"
+									class="form-control create-new-input" name="meetingCode"
+									aria-describedby="create_new_meeting_code_help" required>
+								<label class="form-control-placeholder" for="create_new_meeting_code">
+									<div class="white-space">Meeting Code</div>
+								</label>
+								<small id="create_new_meeting_code_help" class="form-text text-muted">Atleast 8
+									characters alphanumeric</small>
 							</div>
-						</div>
-						<input type="hidden" name="obj" value="create">
-						<div class="form-group text-center">
-							<button type="submit" class="btn btn-success">Create!</button>
-						</div>
+							<div class="form-group">
+								<textarea type="text" id="create_new_meeting_description"
+									class="form-control create-new-input" name="meetingDesc"></textarea>
+								<label class="form-control-placeholder" for="create_new_meeting_description">
+									<div class="white-space text-muted">Meeting Description (optional)</div>
+								</label>
+								<div class="valid-feedback">
+									Ok!
+								</div>
+							</div>
+							<input type="hidden" name="obj" value="create">
+							<div class="form-group text-center">
+								<button type="submit" class="btn btn-success">Create!</button>
+							</div>
 					</form>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="modal fade" id="joinCall" tabindex="-1" role="dialog"
-	aria-labelledby="Join Call" aria-hidden="true">
+	<div class="modal fade" id="joinCall" tabindex="-1" role="dialog" aria-labelledby="Join Call" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -70,30 +85,38 @@
 				</div>
 				<div class="modal-body">
 					<form action="/session/" id="join-form" method="POST">
-					    <input type="hidden" class="userId" value="" name="userId">
+						<input type="hidden" class="userId" value="" name="userId">
 						<div class="form-group">
 							<input type="text" id="join_name" class="form-control join-input" name="name" required>
-							<label class="form-control-placeholder" for="join_name"><div class="white-space">Your Name</div></label>
+							<label class="form-control-placeholder" for="join_name">
+								<div class="white-space">Your Name</div>
+							</label>
 							<div class="invalid-feedback">
-								Please enter a valid name! >.<
+								Please enter a valid name! >.< </div>
 							</div>
-						</div>
-						<div class="form-group">
-							<input type="text" id="join_meeting_name" class="form-control join-input" name="meetingId" required>
-							<label class="form-control-placeholder" for="join_meeting_name"><div class="white-space">Meeting ID</div></label>
-							<div class="invalid-feedback">
-								Looks like a wrong meeting ID or code! :(
+							<div class="form-group">
+								<input type="text" id="join_meeting_name" class="form-control join-input"
+									name="meetingId" required>
+								<label class="form-control-placeholder" for="join_meeting_name">
+									<div class="white-space">Meeting ID</div>
+								</label>
+								<div class="invalid-feedback">
+									Looks like a wrong meeting ID or code! :(
+								</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<input type="password" id="join_meeting_code" class="form-control join-input" name="meetingCode" aria-describedby="join_meeting_code_help" required>
-							<label class="form-control-placeholder" for="join_meeting_code"><div class="white-space">Meeting Code</div></label>
-							<small id="join_meeting_code_help" class="form-text text-muted">Code created by host</small>
-						</div>
-						<input type="hidden" name="obj" value="join">
-						<div class="form-group text-center">
-							<button type="submit" class="btn btn-success">Join!</button>
-						</div>
+							<div class="form-group">
+								<input type="password" id="join_meeting_code" class="form-control join-input"
+									name="meetingCode" aria-describedby="join_meeting_code_help" required>
+								<label class="form-control-placeholder" for="join_meeting_code">
+									<div class="white-space">Meeting Code</div>
+								</label>
+								<small id="join_meeting_code_help" class="form-text text-muted">Code created by
+									host</small>
+							</div>
+							<input type="hidden" name="obj" value="join">
+							<div class="form-group text-center">
+								<button type="submit" class="btn btn-success">Join!</button>
+							</div>
 					</form>
 				</div>
 			</div>
@@ -121,89 +144,98 @@
 			</div>
 		</div>
 		<div id="features" class="snap-scroll">
-		    <h2 class="text-center section-title" style="margin: 20px;color: white;"><strong>Features</strong></h2>
+			<h2 class="text-center section-title" style="margin: 20px;color: white;"><strong>Features</strong></h2>
 			<div class="row align-items-center mx-auto" style="position: relative; bottom: -20px;">
-			    <div class="col-sm-2">
-			        <ul class="nav nav-pill flex-column">
-			            <li class="nav-item">
-			                <a href="#" class="nav-link active btn side-button-features" onclick="featureOpen('noise-reduction', 'noise-reduction-button')" id="noise-reduction-button">Noise Reduction</a>
-			            </li>
-			            <li class="nav-item">
-			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('privacy', 'privacy-button')" id="privacy-button">Privacy</a>
-			            </li>
-			            <li class="nav-item">
-			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('user-control', 'user-control-button')" id="user-control-button">User Control</a>
-			            </li>
-			            <li class="nav-item">
-			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('collaboration', 'collaboration-button')" id="collaboration-button">Collaboration</a>
-			            </li>
-			            <li class="nav-item">
-			                <a href="#" class="nav-link btn side-button-features" onclick="featureOpen('share-anything', 'share-anything-button')" id="share-anything-button">Share Anything</a>
-			            </li>
-			        </ul>
-			    </div>
-			    <div class="col-sm-10">
-                    <div id="noise-reduction" class="feature-more row">
-                        <img src="/static/home/images/noise.gif" alt="" class="col-sm-6 info-img">
-                        <div class="info-feature col-sm-6">
-                            <h3><strong>Noise Reduction</strong></h3>
-                            Crying baby? No problem, we've got your back!
-                            <ul>
-                                <li>Communicate in public places</li>
-                                <li>No machine noise</li>
-                                <li>AI/ML adapted noise reduction</li>
-                            </ul>
-                        </div>
-                    </div>
-			        <div id="privacy" class="feature-more row">
-			            <img src="/static/home/images/privacy.gif" alt="" class="col-sm-6 info-img">
-			            <div class="info-feature col-sm-6">
-                            <h3><strong>Privacy</strong></h3>
-                            Bla Bla This feature is awesome Bla Bla Bla Pivacy
-                            <ul>
-                                <li>End to End Encyption</li>
-                                <li>No intruders</li>
-                                <li>No personal information needed</li>
-                            </ul>
-			            </div>
-			        </div>
-			        <div id="user-control" class="feature-more row">
-			            <img src="/static/home/images/usercontrol.gif" alt="" class="col-sm-6 info-img">
-			            <div class="info-feature col-sm-6">
-                            <h3><strong>User Control</strong></h3>
-                            Bla Bla This feature is awesome Bla Bla Bla User Control
-                            <ul>
-                                <li>Mute/Stop Video/Remove participants</li>
-                                <li>Bleh</li>
-                                <li>Bleh</li>
-                            </ul>
-			            </div>
-			        </div>
-			        <div id="collaboration" class="feature-more row">
-			            <img src="/static/home/images/whiteboard.gif" alt="" class="col-sm-6 info-img">
-			            <div class="info-feature col-sm-6">
-                            <h3><strong>Collaboration</strong></h3>
-                            All hands on deck!
-                            <ul>
-                                <li>Edit documents and code</li>
-                                <li>Mindmap</li>
-                                <li>Whiteboard</li>
-                            </ul>
-			            </div>
-			        </div>
-			        <div id="share-anything" class="feature-more row">
-			            <img src="/static/home/images/share-animation.gif" alt="" class="col-sm-6 info-img">
-			            <div class="info-feature col-sm-6">
-                            <h3><strong>Share Anything</strong></h3>
-                            Share just about anything!
-                            <ul>
-                                <li>Share files, photos and fun</li>
-                                <li>Share screen</li>
-                                <li>Share ideas</li>
-                            </ul>
-			            </div>
-			        </div>
-			    </div>
+				<div class="col-sm-2">
+					<ul class="nav nav-pill flex-column">
+						<li class="nav-item">
+							<a href="#" class="nav-link active btn side-button-features"
+								onclick="featureOpen('noise-reduction', 'noise-reduction-button')"
+								id="noise-reduction-button">Noise Reduction</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link btn side-button-features"
+								onclick="featureOpen('privacy', 'privacy-button')" id="privacy-button">Privacy</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link btn side-button-features"
+								onclick="featureOpen('user-control', 'user-control-button')"
+								id="user-control-button">User Control</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link btn side-button-features"
+								onclick="featureOpen('collaboration', 'collaboration-button')"
+								id="collaboration-button">Collaboration</a>
+						</li>
+						<li class="nav-item">
+							<a href="#" class="nav-link btn side-button-features"
+								onclick="featureOpen('share-anything', 'share-anything-button')"
+								id="share-anything-button">Share Anything</a>
+						</li>
+					</ul>
+				</div>
+				<div class="col-sm-10">
+					<div id="noise-reduction" class="feature-more row">
+						<img src="/static/home/images/noise.gif" alt="" class="col-sm-6 info-img">
+						<div class="info-feature col-sm-6">
+							<h3><strong>Noise Reduction</strong></h3>
+							Crying baby? No problem, we've got your back!
+							<ul>
+								<li>Communicate in public places</li>
+								<li>No machine noise</li>
+								<li>AI/ML adapted noise reduction</li>
+							</ul>
+						</div>
+					</div>
+					<div id="privacy" class="feature-more row">
+						<img src="/static/home/images/privacy.gif" alt="" class="col-sm-6 info-img">
+						<div class="info-feature col-sm-6">
+							<h3><strong>Privacy</strong></h3>
+							Bla Bla This feature is awesome Bla Bla Bla Pivacy
+							<ul>
+								<li>End to End Encyption</li>
+								<li>No intruders</li>
+								<li>No personal information needed</li>
+							</ul>
+						</div>
+					</div>
+					<div id="user-control" class="feature-more row">
+						<img src="/static/home/images/usercontrol.gif" alt="" class="col-sm-6 info-img">
+						<div class="info-feature col-sm-6">
+							<h3><strong>User Control</strong></h3>
+							Bla Bla This feature is awesome Bla Bla Bla User Control
+							<ul>
+								<li>Mute/Stop Video/Remove participants</li>
+								<li>Bleh</li>
+								<li>Bleh</li>
+							</ul>
+						</div>
+					</div>
+					<div id="collaboration" class="feature-more row">
+						<img src="/static/home/images/whiteboard.gif" alt="" class="col-sm-6 info-img">
+						<div class="info-feature col-sm-6">
+							<h3><strong>Collaboration</strong></h3>
+							All hands on deck!
+							<ul>
+								<li>Edit documents and code</li>
+								<li>Mindmap</li>
+								<li>Whiteboard</li>
+							</ul>
+						</div>
+					</div>
+					<div id="share-anything" class="feature-more row">
+						<img src="/static/home/images/share-animation.gif" alt="" class="col-sm-6 info-img">
+						<div class="info-feature col-sm-6">
+							<h3><strong>Share Anything</strong></h3>
+							Share just about anything!
+							<ul>
+								<li>Share files, photos and fun</li>
+								<li>Share screen</li>
+								<li>Share ideas</li>
+							</ul>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div id="across-all-devices" class="snap-scroll text-center">
@@ -212,7 +244,8 @@
 		</div>
 		<div id="footer" class="snap-scroll text-center">
 			<div id="real-footer" class="row row-cols-2 mx-auto">
-				<div id="img-footer" class="col-4 justify-content-center"><img src="/static/home/images/footer.png" id="img-footer-panda" alt=""></div>
+				<div id="img-footer" class="col-4 justify-content-center"><img src="/static/home/images/footer.png"
+						id="img-footer-panda" alt=""></div>
 				<div id="links-container" class="row row-cols-2 col-8">
 					<div class="col-6">
 						<h5><a href="#intro-section-row">Scroll Up</a></h5>
@@ -232,12 +265,16 @@
 	</div>
 	<div id="meetingOptions" class="fixed-bottom">
 		<div class="row row-cols-3" id="meetingButtons">
-			<button class="btn btn-lg col meeting-buttons text-center" id="newMeeting" data-toggle="modal" data-target="#createNew">New Call</button>
-			<button class="btn btn-success btn-lg col meeting-buttons text-center" id="joinMeeting" data-toggle="modal" data-target="#joinCall">Join Call</button>
-			<button class="btn btn-primary btn-lg col meeting-buttons text-center" id="scheduleMeeting" data-toggle="modal" data-target="#scheduleNew">Schedule Call</button>
+			<button class="btn btn-lg col meeting-buttons text-center" id="newMeeting" data-toggle="modal"
+				data-target="#createNew">New Call</button>
+			<button class="btn btn-success btn-lg col meeting-buttons text-center" id="joinMeeting" data-toggle="modal"
+				data-target="#joinCall">Join Call</button>
+			<button class="btn btn-primary btn-lg col meeting-buttons text-center" id="scheduleMeeting"
+				data-toggle="modal" data-target="#scheduleNew">Schedule Call</button>
 		</div>
 	</div>
 	<script src="/static/scripts_end_of_body.js"></script>
 	<script src="/static/home/js/main.js"></script>
 </body>
+
 </html>

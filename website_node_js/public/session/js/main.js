@@ -27,7 +27,7 @@ class ButtonGroupControlUser {
         this.full_screen = document.createElement("button");
         this.full_screen.className = "btn btn-light btn-circle btn-sm pull-right btn-button-group full-screen-desktop full-screen-" + nodeId;
         this.full_screen.setAttribute("id", "full-screen-" + nodeId + "-" + where);
-        this.full_screen.innerHTML = '<i class="fas fa-phone" style="transform: rotate(-135deg);"></i>';
+        this.full_screen.innerHTML = '<i class="fas fa-expand"></i>';
 
         this.button_list.appendChild(this.private_chat);
         this.button_list.appendChild(this.video_toggle);

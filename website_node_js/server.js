@@ -12,17 +12,8 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var cookieSession = require("cookie-session");
 var keys = require("./config/keys");
-const multer = require('multer');
-const storage_file_chat_session = multer.diskStorage({
-  destination: './public/uploads/',
-  filename: function(req, file, cb){
-    cb(null,file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-  }
-});
-var upload_file_chat_session = multer({
-  storage: storage_file_chat_session,
-  limits:{fileSize: 1000000},
-}).single('fileShare');
+// const fileupload = require('express-fileupload')
+
 // MongoDB models
 var userModel = require("./models/user_model")
 var meetingsModel = require("./models/meeting_model");
@@ -59,6 +50,8 @@ app.use(
     })
 );
 
+// app.use(fileupload());
+
 // setting view engine as ejs
 app.set("view engine", "ejs");
 
@@ -67,6 +60,8 @@ app.use('/favicon.ico', express.static('public/home/images/favicon.ico'));
 // Connecting to Openvidu Server
 var OPENVIDU_URL = process.env.OPENVIDU_URL;
 var OPENVIDU_SECRET = process.env.OPENVIDU_SECRET;
+// var OPENVIDU_URL = "https://localhost:4443";
+// var OPENVIDU_SECRET = "MY_SECRET";
 var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 
 // Storing all session objects in mapSessions Object
@@ -79,36 +74,43 @@ var mapSessions = {};
 // setting all files of public to be hosted on /static
 app.use("/static", express.static("public"));
 
+// var options = {
+//     key: fs.readFileSync('openvidukey.pem'),
+//     cert: fs.readFileSync('openviducert.pem')
+// };
+//
+// var https = require("https").createServer(options, app);
+
 // helper functions
 // function to delete meeting
 function deleteMeeting(session_id, meeting) {
     //delete from mapSession
     delete mapSessions[session_id];
     // get users in meeting's user list in MongoDB
-    usersArray = meeting.usersPrev;
-    // delete this meeting from user's meeting list
-    for (userId of usersArray) {
-        /* userModel.deleteOne({_id: user}, function(err){}); */
-        // find user in database with meeting in it's meeting list
-        userModel.findOne({_id: userId._id}, function (err, user) {
-            if (err) {
-                // log error if there
-                console.log(err);
-            }
-            // check if user exixts
-            if (user) {
-                // user exists
-                // find index of current meeting in meeting's list
-                var index_of_meeting = user.meetings.indexOf(meeting._id);
-                // remove current meeting from meeting's list
-                user.meetings.splice(index_of_meeting, 1);
-                // save user to MongoDB database
-                user.save();
-            }
-        })
-    }
+    // usersArray = meeting.usersPrev;
+    // // delete this meeting from user's meeting list
+    // for (userId of usersArray) {
+    //     /* userModel.deleteOne({_id: user}, function(err){}); */
+    //     // find user in database with meeting in it's meeting list
+    //     userModel.findOne({_id: userId._id}, function (err, user) {
+    //         if (err) {
+    //             // log error if there
+    //             console.log(err);
+    //         }
+    //         // check if user exixts
+    //         if (user) {
+    //             // user exists
+    //             // find index of current meeting in meeting's list
+    //             var index_of_meeting = user.meetings.indexOf(meeting._id);
+    //             // remove current meeting from meeting's list
+    //             user.meetings.splice(index_of_meeting, 1);
+    //             // save user to MongoDB database
+    //             user.save();
+    //         }
+    //     })
+    // }
     // delete meeting from MongoDB database
-    meetingsModel.deleteOne({meetingID: session_id}).catch((err, b, c) => {})
+    // meetingsModel.deleteOne({meetingID: session_id}).catch((err, b, c) => {})
     console.log("DELETED MEETING");
 }
 
@@ -502,21 +504,25 @@ app.post("/leave-session", (req, res) => {
     }
 });
 
-app.post("/api/file-share-chat/", (req, res) => {
-    upload_file_chat_session(req, res, (err) => {
-        if (err) {
-            res.send(err);
-        } else {
-            if(req.file === undefined){
-                res.send("empty");
-            } else {
-                res.send("ok");
-            }
-        }
-    })
-})
+// app.post("/user-api/file-share-chat/", (req, res) => {
+//     console.log(req.files);
+//     if (req.files) {
+//         var file = req.files.fileShare,
+//             filename = file.name;
+//         var now = Date.now();
+//         file.mv("./public/uploads/" + now + "-" + filename, (err) => {
+//             if (err) {
+//                 res.send("err");
+//             } else {
+//                 res.send("ok," + now + "-" + filename);
+//             }
+//         });
+//     } else {
+//         res.send("emptyvbahahahahah");
+//     }
+// })
 
-app.post("/api/check-id-code/", function (req, res) {
+app.post("/user-api/check-id-code/", function (req, res) {
     console.log("--------------------------------------------------------")
     console.log("API CHECK ID AND CODE");
     var meeting_id = parseInt(req.body.meetingId);
@@ -538,7 +544,7 @@ app.post("/api/check-id-code/", function (req, res) {
     })
 })
 
-app.post("/api/user/prevMeetings/", function (req, res) {
+app.post("/user-api/user/prevMeetings/", function (req, res) {
     console.log("--------------------------------------------------------")
     console.log("USER RQUESTED IT'S PREV MEETINGS");
     var userUid = req.body.userUID;
@@ -570,6 +576,6 @@ console.log("PORT: " + process.env.SERVER_PORT);
 http.listen(process.env.SERVER_PORT, () => {
     // log after server has started
     console.log("+--------------------------------------------------+");
-    console.log("|          Started Server at port 5542             |");
+    console.log("|          Started Server at port 5442             |");
     console.log("+--------------------------------------------------+");
 });

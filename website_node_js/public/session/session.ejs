@@ -104,6 +104,10 @@
                         <textarea id="message-to-send" rows="4" class="mb-3 form-control" placeholder="Send a message..."></textarea>
                     </div>
                     <button class="btn btn-primary btn-lg" id="sumbit-new-message" onclick="sendMessage()"><i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i></button>
+                    <!-- <div class="form-group">
+                      <input type="file" class="form-control-file border" id="fileShare" name="fileShare">
+                    </div>
+                    <button class="btn btn-primary btn-lg" id="send-file" onclick="sendFileChat()"><i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i></button> -->
                 </div>
             </div>
         </div>
@@ -189,6 +193,7 @@
     <audio src="/static/session/audio/unconvinced.mp3" id="chat-audio"></audio>
     <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/session/js/main.js"></script>
     <script>
         // script to create whiteboard
@@ -275,7 +280,7 @@
                 userUID: accountID,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + "/api/user/prevMeetings",
+                url: "https://" + window.location.hostname + "/user-api/user/prevMeetings",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -1095,6 +1100,35 @@
             message_textarea.value("");
         }
 
+        // function sendFileChat () {
+        //     var file_to_send = document.getElementById('fileShare');
+        //     if (file_to_send.files.length !== 0) {
+        //         var real_file = file_to_send[0];
+        //         var formData = new FormData();
+        //         formData.append("fileShare", real_file);
+        //         axios.post("/user-api/file-share-chat/", formData)
+        //         .then(function (res) {
+        //             console.log(res);
+        //             var ok_not_ok = res.data.split(",")[0];
+        //             if(ok_not_ok === "ok") {
+        //                 var to = $(".chat-person.active").attr("id");
+        //                 if (to === "everybody") {
+        //                     session.signal({
+        //                         data: nickName + "," + userName + "," + res.split(",")[1],
+        //                         to: [],
+        //                         type: "fileShare",
+        //                     })
+        //                 } else {
+        //
+        //                 }
+        //             }
+        //         })
+        //         .catch(function (err) {
+        //             console.log(err);
+        //         });
+        //     }
+        // }
+
         // send streamStatus message
         function sendStreamStatusMessage(streamStatus) {
             // send stream status to everybody
@@ -1439,7 +1473,7 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.6;
+                    var max_height = grid_view_visible * 0.5;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
                 }
@@ -1449,7 +1483,7 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.6;
+                    var max_height = grid_view_visible * 0.5;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
                 }
@@ -1459,19 +1493,49 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.6;
+                    var max_height = grid_view_visible * 0.5;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
                 }
-            } else if (6 < noParticipants) {
+            } else if (6 < noParticipants < 10) {
                 if ($(window).width() < 576) {
                     var max_height = grid_view_visible * 0.4;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.6;
+                    var max_height = grid_view_visible * 0.3;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
+                }
+            } else if (9 < noParticipants < 13) {
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.3;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(4, 1fr)");
+                }
+            } else if (12 < noParticipants < 17) {
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.25;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(4, 1fr)");
+                }
+            } else if (16 < noParticipants) {
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.3;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.2;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(5, 1fr)");
                 }
             }
         }
