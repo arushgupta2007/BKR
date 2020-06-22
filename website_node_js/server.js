@@ -122,7 +122,13 @@ app.get("/", function (req, res) {
     res.render(__dirname + "/public/home/home.ejs");
 });
 
-// TODO: SERVER: FAQ page
+// GET request to /faq (faq page)
+app.get("/faq/", (req, res) => {
+    console.log("--------------------------------------------------------")
+    console.log("RENDERING FAQ PAGE");
+    // render home ejs file
+    res.render(__dirname + "/public/FAQ/FAQ.ejs");
+})
 
 // GET request to /join_us (sign in / sign up / log in)
 app.get("/join_us/", function (req, res) {

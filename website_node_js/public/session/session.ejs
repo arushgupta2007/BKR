@@ -133,28 +133,36 @@
                     </button>
                 </form>
             </div>
+            <div class="btn-group-vertical" role="group" aria-label="Layout" style="position: absolute; bottom: 0;">
+                <button class="btn btn-secondary btn-lg" onclick="layoutOpen('gridParticipants')">
+                    <i class="fas fa-border-all in-white-back"></i>
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="layoutOpen('pinnedVid')">
+                    <i class="fas fa-thumbtack in-white-back"></i>
+                </button>
+            </div>
         </div>
 
         <div id="participantList_sideBar"></div>
         <div id="prevMeetingList_sideBar" class="d-flex justify-content-center"></div>
 
         <div class="inline-block" id="video_container">
-            <ul class="nav nav-tabs" role="tablist">
+            <!-- <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item p-0">
                     <a class="nav-link active" data-toggle="tab" href="#gridParticipants"><i class="fas fa-border-all in-white-back"></i> Grid View</a>
                 </li>
                 <li class="nav-item p-0">
                     <a class="nav-link" data-toggle="tab" href="#pinnedVid"><i class="fas fa-thumbtack in-white-back"></i> Pinned</a>
                 </li>
-            </ul>
-            <div class="tab-content">
-                <div id="gridParticipants" class="container-fluid tab-pane active"><br>
+            </ul> -->
+            <!-- <div style="width: 100%; height: 100%;"> -->
+                <div id="gridParticipants" class="layout-videos"><br>
                     <div id="gridViewVideoContainer"></div>
                 </div>
-                <div id="pinnedVid" class="container-fluid tab-pane fade"><br>
+                <div id="pinnedVid" class="layout-videos"><br>
                     <div class="row" id="pinnedVideoContainer"></div>
                 </div>
-            </div>
+            <!-- </div> -->
         </div>
     </div>
     <div class="text-center" id="meetingOptionsButton_User">
@@ -346,6 +354,9 @@
         var mouse_on_meetingOptions = false;
         var meetingOptionUserimout;
         var notification_timeout;
+
+        $(".layout-videos").css("display", "none");
+        $("#gridParticipants").css("display", "block")
 
         $(document).ready(function () {
             var firepadRef = firebase.database().ref().child("firepad").child(sessionName);
@@ -932,14 +943,12 @@
                 console.log("REACHED HERE");
                 var width_of_part_list;
                 var width_screen = $(window).width() - 60;
-                console.log("______---------- " + width_screen + "----------______");
                 if ($(window).width() <= 768) {
                     $("#participantList_sideBar").width(width_screen.toString() + "px");
                     width_of_part_list = width_screen;
                     console.log("REACHED THERE");
                 } else if ($(window).width() <= 992) {
                     var width_to_set = width_screen * 0.25
-                    console.log("______---------- " + width_to_set + "----------______");
                     $("#participantList_sideBar").width(width_to_set.toString() + "px");
                     width_of_part_list = $(window).width() * (1 / 4) + 60;
                     console.log("REACHED THERE");
@@ -1244,6 +1253,11 @@
             })
         }
 
+        function layoutOpen(id_to_open) {
+            $(".layout-videos").css("display", "none");
+            $("#" + id_to_open).css("display", "block");
+        }
+
         function openFullscreen(elem) {
             if (elem.requestFullscreen) {
                 elem.requestFullscreen();
@@ -1503,7 +1517,7 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.3;
+                    var max_height = grid_view_visible * 0.27;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
                 }
@@ -1513,7 +1527,7 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.3;
+                    var max_height = grid_view_visible * 0.27;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(4, 1fr)");
                 }

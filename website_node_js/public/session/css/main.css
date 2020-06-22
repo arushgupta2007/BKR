@@ -157,7 +157,7 @@ canvas {
 
 .meetingOptionsExtra {
     height: 100%;
-    display: inline-block;
+    display: relative;
     background-color: #6c757d;
     position:absolute;
 }

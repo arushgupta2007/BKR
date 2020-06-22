@@ -1,0 +1,73 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: 'Questrial', sans-serif;
+    overflow: hidden;
+/*    cursor: url('/static/home/images/awesomeface.png'), auto;*/
+}
+
+.main-container {
+    overflow-y: auto;
+    height: calc(100vh - 50px);
+}
+
+#faq {
+    height: 100vh;
+    padding: 30px 100px;
+    background-color: #28402e;
+}
+
+.section-title {
+    font-size: 10vw;
+    font-family: 'Lexend Tera', sans-serif;
+}
+
+.sub-section-title {
+    font-size: 6vw;
+    font-family: 'Lexend Tera', sans-serif;
+}
+
+#joinUsLink {
+    color: white;
+}
+
+.snap-scroll-parent {
+    scroll-snap-type: y mandatory;
+}
+
+.snap-scroll {
+    scroll-snap-align: center;
+}
+
+#questions {
+    height: 100vh;
+    padding: 50px 50px;
+    background-color: #1f97ac;
+}
+
+.questionpadding {
+    padding: 10px 40px;
+}
+
+.buttontitle {
+    font-size: 3vh;
+}
+
+#how-to {
+    height: auto;
+    padding: 30px 20px;
+    background-color: #fbff05;
+}
+
+.how-to-more {
+    padding: 0px 10px;
+}
+
+.side-button-features {
+    opacity: 0.5;
+}
+
+.side-button-features.active {
+    opacity: 1;
+    background-color: #007bff;
+}
