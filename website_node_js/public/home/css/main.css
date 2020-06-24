@@ -7,7 +7,7 @@ html, body {
 }
 
 #navbar {
-    z-index: 2;
+    z-index: 5;
 }
 
 #dropdown-user-data {

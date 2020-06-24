@@ -132,13 +132,14 @@
                         <i class="fas fa-sync"></i>
                     </button>
                 </form>
-            </div>
-            <div class="btn-group-vertical" role="group" aria-label="Layout" style="position: absolute; bottom: 0;">
                 <button class="btn btn-secondary btn-lg" onclick="layoutOpen('gridParticipants')">
-                    <i class="fas fa-border-all in-white-back"></i>
+                    <i class="fas fa-border-all"></i>
                 </button>
                 <button class="btn btn-secondary btn-lg" onclick="layoutOpen('pinnedVid')">
-                    <i class="fas fa-thumbtack in-white-back"></i>
+                    <i class="fas fa-thumbtack"></i>
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="fullScreenCurrentLayout()">
+                    <i class="fas fa-expand"></i>
                 </button>
             </div>
         </div>
@@ -156,10 +157,10 @@
                 </li>
             </ul> -->
             <!-- <div style="width: 100%; height: 100%;"> -->
-                <div id="gridParticipants" class="layout-videos"><br>
+                <div id="gridParticipants" class="layout-videos layout-is-open">
                     <div id="gridViewVideoContainer"></div>
                 </div>
-                <div id="pinnedVid" class="layout-videos"><br>
+                <div id="pinnedVid" class="layout-videos">
                     <div class="row" id="pinnedVideoContainer"></div>
                 </div>
             <!-- </div> -->
@@ -334,6 +335,22 @@
                     card_title.appendChild(button_group);
                     card.appendChild(card_body);
                     prev_meeting_container.appendChild(card);
+
+                    button_delete.addEventListener('click', function () {
+                        card.remove();
+                        var data_del_meeting = {
+                            userId: accountID,
+                            meetingId: item.meeting_id
+                        }
+                        $.ajax({
+                            url: "https://" + window.location.hostname + "/user-api/prevMeeting/delete",
+                            type: "POST",
+                            data: data_del_meeting,
+                            error: function (err) {
+                                console.log(err);
+                            }
+                        })
+                    });
                 });
                 document.getElementById("prevMeetingList_sideBar").appendChild(prev_meeting_container);
             });
@@ -421,7 +438,6 @@
             $(".meetingOptionsExtra").css("height", height_of_meetingExtraOptions.toString() + "px");
             $("#participantList_sideBar").css("height", height_of_meetingExtraOptions.toString() + "px");
             $("#prevMeetingList_sideBar").css("height", height_of_meetingExtraOptions.toString() + "px");
-            $("#video_container").css("height", height_of_meetingExtraOptions.toString() + "px")
 
             // set width of main container
             var max_width_video_container = $(window).width() - 60;
@@ -1255,7 +1271,14 @@
 
         function layoutOpen(id_to_open) {
             $(".layout-videos").css("display", "none");
+            $(".layout-videos").removeClass("layout-is-open");
             $("#" + id_to_open).css("display", "block");
+            $("#" + id_to_open).addClass("layout-is-open");
+        }
+
+        function fullScreenCurrentLayout() {
+            // layout-is-open
+            openFullscreen(document.getElementsByClassName('layout-is-open')[0]);
         }
 
         function openFullscreen(elem) {
@@ -1466,12 +1489,15 @@
         function takeCareOfGridView() {
             var gridId = "gridViewVideoContainer";
             var noParticipants = $("#" + gridId).children().length;
-            var grid_view_visible = $(window).outerHeight() - $("#navbar_session").outerHeight() - 80;
+            var grid_view_visible = $(window).outerHeight() - $("#navbar_session").outerHeight() - 40;
+            $("#" + gridId).removeClass("grid-auto-class");
             if (noParticipants === 1) {
+                console.log("ONNNNNNNNEEEEEE!!!!!!!");
                 var max_height = grid_view_visible;
                 $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                 $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
             } else if (noParticipants === 2) {
+                console.log("TWWWWWWWOOOOOOOO!!!!!!!");
                 if ($(window).width() < 576) {
                     var max_height = grid_view_visible * 0.5;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
@@ -1482,6 +1508,7 @@
                     $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
                 }
             } else if (noParticipants === 3) {
+                console.log("THREEEEEEEEEEEEEE!!!!!!!");
                 if ($(window).width() < 576) {
                     var max_height = grid_view_visible * 0.4;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
@@ -1492,6 +1519,7 @@
                     $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
                 }
             } else if (noParticipants === 4) {
+                console.log("FFFFFFOOOOOUUURRR!!!!!!!");
                 if ($(window).width() < 576) {
                     var max_height = grid_view_visible * 0.4;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
@@ -1501,7 +1529,8 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(2, 1fr)");
                 }
-            } else if (4 < noParticipants < 7) {
+            } else if (4 < noParticipants && noParticipants < 7) {
+                console.log("4 < part < 7!!!!!!!");
                 if ($(window).width() < 576) {
                     var max_height = grid_view_visible * 0.4;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
@@ -1511,27 +1540,29 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
                 }
-            } else if (6 < noParticipants < 10) {
+            } else if (6 < noParticipants && noParticipants < 9) {
+                console.log("6 < part < 10!!!!!!!");
                 if ($(window).width() < 576) {
+                    console.log("6 < part < 10 SMAAALLLLLLL!!!!!!!");
                     var max_height = grid_view_visible * 0.4;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.27;
-                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
-                    $("#" + gridId).css("grid-template-columns", "repeat(3, 1fr)");
-                }
-            } else if (9 < noParticipants < 13) {
-                if ($(window).width() < 576) {
-                    var max_height = grid_view_visible * 0.4;
-                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
-                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
-                } else {
-                    var max_height = grid_view_visible * 0.27;
+                    var max_height = grid_view_visible * 0.5;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(4, 1fr)");
                 }
-            } else if (12 < noParticipants < 17) {
+            } else if (8 < noParticipants && noParticipants < 13) {
+                if ($(window).width() < 576) {
+                    var max_height = grid_view_visible * 0.4;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
+                } else {
+                    var max_height = grid_view_visible * 0.3;
+                    $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
+                    $("#" + gridId).css("grid-template-columns", "repeat(4, 1fr)");
+                }
+            } else if (12 < noParticipants && noParticipants < 17) {
                 if ($(window).width() < 576) {
                     var max_height = grid_view_visible * 0.4;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
@@ -1547,7 +1578,7 @@
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(1, 1fr)");
                 } else {
-                    var max_height = grid_view_visible * 0.2;
+                    var max_height = grid_view_visible * 0.25;
                     $("#" + gridId + " .video-parent").css("height", max_height.toString() + "px");
                     $("#" + gridId).css("grid-template-columns", "repeat(5, 1fr)");
                 }

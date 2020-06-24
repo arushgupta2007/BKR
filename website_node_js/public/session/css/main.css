@@ -29,6 +29,10 @@ input.btn {
     margin-bottom: 150px;
 }
 
+.layout-videos {
+    padding: 20px;
+}
+
 #video_container video {
     height: 100%;
     width: 100%;
@@ -397,6 +401,11 @@ canvas {
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     text-align: center;
+    width: 100%;
+}
+
+.small-font-and-size-button {
+    font-size: 75%;
 }
 
 button.btn-button-group {
@@ -429,14 +438,21 @@ button.private-chat-desktop {
     overflow: auto;
 }
 
+.black-icon {
+    color: black;
+}
+
 #gridViewVideoContainer {
     width: 100%;
-    height: 100%;
+    height: auto;
     margin-bottom: 50px;
     display: grid;
-    /* grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); */
     grid-gap: 1em;
     grid-auto-rows: min-content;
+}
+
+.grid-auto-class {
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
 }
 
 .vid-grid-view {

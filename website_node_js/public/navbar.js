@@ -28,7 +28,7 @@ document.write('\
       <a class="nav-item nav-link" id="joinUsLink" href="/join_us/"\
         ><i class="fas fa-sign-in-alt"></i> Join Us</a\
       >\
-      <div class="dropdown" id="user-sign">\
+      <div class="dropdown" id="user-sign" style="display: none;">\
         <a href="#" class="dropdown-toggle nav-item nav-link" id="user-extra" data-toggle="dropdown"><img alt="You" style="border-radius: 50%;" id="user-profile-photo-navbar" width="27" height="27"> My Account</a>\
         <div class="dropdown-menu dropdown-menu-right" id="dropdown-user-data">\
           <a class="dropdown-item" href="/profile/"><i class="fas fa-user-circle"></i> Profile</a>\

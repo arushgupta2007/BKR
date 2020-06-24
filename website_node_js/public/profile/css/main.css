@@ -1,0 +1,102 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Questrial', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.snap-scroll-parent {
+    scroll-snap-type: y mandatory;
+}
+
+.snap-scroll {
+    scroll-snap-align: center;
+}
+
+#main-container {
+    /* height: 100%; */
+    width: 100%;
+    padding: 0;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+#half-height-background-div {
+    height: calc(50vh - 25px);
+    position: relative;
+    background-image: url("/static/home/images/abstract-background.jpg");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#other-half-height-background-div {
+    background-color: #FBF194;
+    height: calc(50vh - 25px);
+}
+
+#initials {
+    width: 100%;
+    height: auto;
+    position: relative;
+    bottom: -45%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#initials img {
+    height: 40vh;
+    border-radius: 50%;
+    border: 5px solid #363436;
+    display: none;
+}
+
+#initials #name-of-user {
+    font-size: min(max(30px, 8vw), 55px);
+    font-family: 'Lexend Tera', sans-serif
+}
+
+#next-section {
+    height: 100vh;
+}
+
+#next-section .row {
+    height: 100%;
+    background-color: #FBF194;
+}
+
+#chat-with-friends {
+    height: 100%;
+}
+
+#prevMeetings {
+    height: 100%;
+}
+
+#dropdown-user-data {
+    background-color: #50565c;
+    color: white;
+}
+
+#dropdown-user-data .dropdown-item:hover {
+    background-color: #717579;
+}
+
+#user-extra {
+    padding-left: 0 !important;
+    color: white;
+}
+
+@media only screen and (max-width: 576px) {
+    #snap-scroll-parent {
+        scroll-snap-type: none;
+    }
+    #half-height-background-div {
+        background-attachment: scroll;
+    }
+    #next-section {
+        height: auto;
+    }
+}

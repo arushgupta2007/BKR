@@ -7,7 +7,7 @@ const userSchema = new Schema({
     phoneNo: String,
     commonId:String,
     meetings: [{ type: Schema.Types.ObjectId, ref: 'meeting' }],
-})
+});
 
 const User = mongoose.model("user", userSchema);
 module.exports = User;

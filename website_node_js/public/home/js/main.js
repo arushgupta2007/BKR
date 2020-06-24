@@ -2,12 +2,12 @@ var canvas_background;
 var mouse = {
     x: $(window).width() / 2,
     y: $(window).height() / 2,
-}
+};
 
 window.addEventListener('mousemove', function (event) {
     mouse.x = event.x;
     mouse.y = event.y;
-})
+});
 
 function alphanumeric(inputtxt) {
     var letters = /^[0-9a-zA-Z]+$/;
@@ -53,7 +53,7 @@ function createFormValidation() {
 
     $(".create-new-input").change(function () {
         createFormValidation();
-    })
+    });
 
     return ok;
 }
@@ -84,7 +84,7 @@ function featureOpen(id_element, id_button) {
 $("#user-sign-out-navbar").click(function () {
     firebase.auth().signOut();
     location.reload();
-})
+});
 
 $(document).ready( function () {
     $(window).resize(initEveryTime);
@@ -132,15 +132,17 @@ $(document).ready( function () {
         function random_x_y_dx_dy() {
             var x = Math.random() * (window.innerWidth - 50 - scrollbar_width);
             var y = Math.random() * (window.innerHeight - 30 - navabar_height - buttonGroup_height) + navabar_height;
+            var dx;
+            var dy;
             if (Math.random() > 0.5) {
-                var dx = common_velocity;
+                dx = common_velocity;
             } else {
-                var dx = -common_velocity;
+                dx = -common_velocity;
             }
             if (Math.random() > 0.5) {
-                var dy = common_velocity;
+                dy = common_velocity;
             } else {
-                var dy = -common_velocity;
+                dy = -common_velocity;
             }
             return {x: x, y: y, dx: dx, dy: dy};
         }
@@ -155,7 +157,7 @@ $(document).ready( function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: video_width, size_height: video_height, type: "video"});
-        })
+        });
 
         var person_img = new Image;
         person_img.src = "/static/home/images/person.png"; // 30 x 30
@@ -165,17 +167,17 @@ $(document).ready( function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: person_width, size_height: person_height, type: "person"});
-        })
+        });
 
         var chat_img = new Image;
         chat_img.src = "/static/home/images/chat.png"; // 34 x 30
         var chat_width = 34;
-        var chat_height = 30
+        var chat_height = 30;
         chat_img.addEventListener('load', function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: chat_width, size_height: chat_height, type: "chat"});
-        })
+        });
 
         var mic_img = new Image;
         mic_img.src = "/static/home/images/mic.png"; // 22 x 30
@@ -185,7 +187,7 @@ $(document).ready( function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: mic_width, size_height: mic_height, type: "mic"});
-        })
+        });
 
         var share_img = new Image;
         share_img.src = "/static/home/images/share.png" // 37 x 30;
@@ -195,7 +197,7 @@ $(document).ready( function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: share_width, size_height: share_height, type: "share"});
-        })
+        });
 
         var call_img = new Image;
         call_img.src = "/static/home/images/call.png"; // 24 x 30
@@ -205,7 +207,7 @@ $(document).ready( function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: call_width, size_height: call_height, type: "call"});
-        })
+        });
 
         var headset_img = new Image;
         headset_img.src = "/static/home/images/headset.png"; // 27 x 30
@@ -215,7 +217,7 @@ $(document).ready( function () {
             var random_vars = random_x_y_dx_dy();
             images.push({x: random_vars.x, y: random_vars.y, dx: random_vars.dx, dy: random_vars.dy,
                 size_width: headset_width, size_height: headset_height, type: "headset"});
-        })
+        });
 
         function animate() {
             requestAnimationFrame(animate);
@@ -376,17 +378,17 @@ $(document).ready( function () {
                 data.y += data.dy;
             }
         }
-        animate();
-        const urlParams = new URLSearchParams(window.location.search);
-        const todo = urlParams.get('todo');
+        // animate();
+        var urlParams = new URLSearchParams(window.location.search);
+        var todo = urlParams.get('todo');
         if (todo === "join") {
-            const meetingId = urlParams.get('id_');
+            var meetingId = urlParams.get('id_');
             $("#join_meeting_name").val(meetingId);
             $("#joinCall").modal({
               keyboard: false
             });
         } else if (todo === "join-wrong") {
-            const name = urlParams.get('name');
+            var name = urlParams.get('name');
             $("#join_name").val(name);
             $("#join_meeting_name").addClass("is-invalid");
             $("#join_meeting_code").addClass("is-invalid");
@@ -409,7 +411,7 @@ $(document).ready( function () {
         $(this).css("opacity", "1");
     }, function () {
         $("#features .card").css("opacity", "1");
-    })
+    });
 
     $("#user-sign").css("display", "none");
     firebase.auth().onAuthStateChanged(function(user) {
@@ -423,6 +425,8 @@ $(document).ready( function () {
             $("#joinUsLink").css("display", "none");
             $("#user-profile-photo-navbar").attr("src", photoURL);
             $("#user-profile-photo-navbar").attr("alt", displayName);
+            $("#create_new_name").val(displayName);
+            $("#join_name").val(displayName);
             $("#user-sign").css("display", "block");
             $(".userId").val(uid);
             initEveryTime();
@@ -433,4 +437,4 @@ $(document).ready( function () {
     }, function(error) {
         console.log(error);
     });
-})
+});

@@ -15,7 +15,7 @@ var keys = require("./config/keys");
 // const fileupload = require('express-fileupload')
 
 // MongoDB models
-var userModel = require("./models/user_model")
+var userModel = require("./models/user_model");
 var meetingsModel = require("./models/meeting_model");
 
 // Connecting to local MongoDB
@@ -35,7 +35,7 @@ var http = require("http").createServer(app);
 app.use(cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [keys.cookie.encryptKey],
-}))
+}));
 
 // unknown
 app.use(
@@ -116,7 +116,7 @@ function deleteMeeting(session_id, meeting) {
 
 // GET request to / (home page)
 app.get("/", function (req, res) {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("RENDERING HOME PAGE");
     // render home ejs file
     res.render(__dirname + "/public/home/home.ejs");
@@ -124,31 +124,39 @@ app.get("/", function (req, res) {
 
 // GET request to /faq (faq page)
 app.get("/faq/", (req, res) => {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("RENDERING FAQ PAGE");
     // render home ejs file
     res.render(__dirname + "/public/FAQ/FAQ.ejs");
-})
+});
+
+// GET request to /profile (profile page)
+app.get("/profile/", (req, res) => {
+    console.log("--------------------------------------------------------");
+    console.log("RENDERING PROFILE PAGE");
+    // render home ejs file
+    res.render(__dirname + "/public/profile/profile.ejs");
+});
 
 // GET request to /join_us (sign in / sign up / log in)
 app.get("/join_us/", function (req, res) {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("RENDERING JOIN US PAGE");
     // render join_us ejs file
     res.render(__dirname + "/public/join_us/join_us.ejs");
-})
+});
 
 // GET request to /join_us/success (success of joining us above)
 app.get("/join_us/success/", function (req, res) {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("RENDERING JOIN US SUCCESS PAGE");
     // render success of joining us ejs file
     res.render(__dirname + "/public/join_us/success/success.ejs");
-})
+});
 
 // POST request to /join_us/addUser (adding user to MongoDB database)
 app.post("/join_us/addUser/", function (req, res) {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("ADD USER CALLED");
     // find if there is existing user with same user id
     userModel.findOne({commonId: req.body.id_to_keep}, function(err, user) {
@@ -169,16 +177,16 @@ app.post("/join_us/addUser/", function (req, res) {
                 meetings: [],
             }).save().then(user => {
                 console.log("USER HAS BEEN SUCCESSFULLY ADDED TO DATABASE");
-            })
+            });
         }
-    })
+    });
     // Send some dummy text back
     res.send("Bla");
-})
+});
 
 // POST request to /session (meeting)
 app.post("/session/", (req, res) => {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("ENTERED MEETING PAGE");
     // name of user
     var name_client = req.body.name;
@@ -202,7 +210,7 @@ app.post("/session/", (req, res) => {
     };
     // check objective of user
     if (objective === "create") {
-        console.log("--------------------------------------------------------")
+        console.log("--------------------------------------------------------");
         console.log("USER WANTS TO CREATE NEW MEETING");
         // what name should the meeting have
         var name_meeting = req.body.meetingName;
@@ -278,7 +286,7 @@ app.post("/session/", (req, res) => {
                                         // user was not found
                                         console.log("USER WAS NOT FOUND IN DATABASE BUT WAS SIGNED IN");
                                     }
-                                })
+                                });
                             } else {
                                 // user was not logged in
                                 console.log("USER IS NOT LOGGED IN");
@@ -293,13 +301,13 @@ app.post("/session/", (req, res) => {
                                 meetingName: name_meeting,
                                 code: session_code,
                             });
-                        })
+                        });
                     })
                     .catch((err) => console.log(err)); // log error if there
             })
             .catch((err) => console.log(err)); // log error if there
     } else {
-        console.log("--------------------------------------------------------")
+        console.log("--------------------------------------------------------");
         console.log("USER WANTS TO JOIN ONGOING MEETING");
         // user wants to join a ongoing meeting
         // get sessionId
@@ -359,7 +367,7 @@ app.post("/session/", (req, res) => {
                                         // user does not exists in database
                                         console.log("USER IS SIGNED IN BUT NOT FOUND IN DATABASE");
                                     }
-                                })
+                                });
                             } else {
                                 // user is not logged in
                                 console.log("USER IS NOT LOGGED IN");
@@ -391,14 +399,14 @@ app.post("/session/", (req, res) => {
                 console.log("WRONG MEETING ID");
                 res.redirect("/?todo=join-wrong&name=" + name_client);
             }
-        })
+        });
     }
 });
 
 
 // POST request to /session/saveMessage (save the message to database)
 app.post("/session/saveMessage/", (req,res) => {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("SAVING MESSAGE WITH DATA:" + req.body);
     // get sessionId, from name, from account id, to, and message from req.body
     var data = req.body;
@@ -417,7 +425,7 @@ app.post("/session/saveMessage/", (req,res) => {
             // save changes done to meeting to MongoDB
             meeting.save();
         }
-    })
+    });
     res.send("Bla");
 });
 
@@ -455,16 +463,16 @@ app.post("/session/refresh", (req, res) => {
             }
             // redirect users after process
             res.redirect(307, "/session/");
-        })
+        });
     } else {
         // there was no session object in mapSession
         res.redirect("/");
     }
-})
+});
 
 // POST request to /leave-session (leave the current session)
 app.post("/leave-session", (req, res) => {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("LEAVING SESSION");
     // get session name
     var sessionName = req.body.sessionname;
@@ -503,7 +511,7 @@ app.post("/leave-session", (req, res) => {
             }
             // redirect users after process
             res.redirect("/");
-        })
+        });
     } else {
         // there was no session object in mapSession
         res.redirect("/");
@@ -529,7 +537,7 @@ app.post("/leave-session", (req, res) => {
 // })
 
 app.post("/user-api/check-id-code/", function (req, res) {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("API CHECK ID AND CODE");
     var meeting_id = parseInt(req.body.meetingId);
     var meeting_code = req.body.meetingCode;
@@ -547,11 +555,11 @@ app.post("/user-api/check-id-code/", function (req, res) {
             console.log("MEETING NOT FOUND");
             res.send("0");
         }
-    })
-})
+    });
+});
 
 app.post("/user-api/user/prevMeetings/", function (req, res) {
-    console.log("--------------------------------------------------------")
+    console.log("--------------------------------------------------------");
     console.log("USER RQUESTED IT'S PREV MEETINGS");
     var userUid = req.body.userUID;
     var array_to_return = [];
@@ -566,7 +574,7 @@ app.post("/user-api/user/prevMeetings/", function (req, res) {
                     meeting_id_mongo: user.meetings[i]._id,
                     meeting_name: user.meetings[i].meetingName,
                     meeting_id: user.meetings[i].meetingID,
-                }
+                };
                 array_to_return.push(data_meeting);
             }
             console.log("SENDING DATA BACK TO USER");
@@ -575,7 +583,33 @@ app.post("/user-api/user/prevMeetings/", function (req, res) {
             res.send("bla");
         }
     });
-})
+});
+
+app.post("/user-api/prevMeeting/delete", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("PREV MEETING TO BE DELETED");
+    var uid = req.body.userId;
+    var meetingId = req.body.meetingId;
+    console.log(uid);
+    console.log(meetingId);
+    userModel.findOne({commonId: uid}).populate("meetings").then(user => {
+        console.log("USER FOUND");
+        if (user) {
+            for (var i=0; i < user.meetings.length; i++) {
+                console.log(i.toString() + "\t" + user.meetings[i].meetingID.toString());
+                if (user.meetings[i].meetingID.toString() === meetingId.toString()) {
+                    console.log("MEETING FOUND");
+                    user.meetings.splice(i, 1);
+                    user.save();
+                    res.send("done");
+                }
+            }
+        } else {
+            console.log("USER NOT FOND");
+            res.send(":(")
+        }
+    });
+});
 
 // start http server at port 8000
 console.log("PORT: " + process.env.SERVER_PORT);
