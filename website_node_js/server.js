@@ -138,6 +138,14 @@ app.get("/profile/", (req, res) => {
     res.render(__dirname + "/public/profile/profile.ejs");
 });
 
+// GET request to /meetings-rooms (meetings-rooms page)
+app.get("/meetings-rooms/", (req, res) => {
+    console.log("--------------------------------------------------------");
+    console.log("RENDERING PREV MEETING PAGE");
+    // render home ejs file
+    res.render(__dirname + "/public/meetingRoom/meetingRoom.ejs");
+})
+
 // GET request to /join_us (sign in / sign up / log in)
 app.get("/join_us/", function (req, res) {
     console.log("--------------------------------------------------------");
@@ -306,6 +314,78 @@ app.post("/session/", (req, res) => {
                     .catch((err) => console.log(err)); // log error if there
             })
             .catch((err) => console.log(err)); // log error if there
+    } else if (objective === "join-or-create") {
+        console.log("--------------------------------------------------------");
+        console.log("USER WANTS TO JOIN PREV MEETING");
+        var sessionID = parseInt(req.body.meetingId);
+        meetingsModel.findOne({meetingID: sessionID}).then((meetingToJoin) => {
+            if (meetingToJoin) {
+                console.log("FOUND MEETING");
+                if (meetingToJoin.code === session_code) {
+                    console.log("MEETING CODE WAS CORRECT");
+                    var client_id = meetingToJoin.next_id;
+                    if (mapSessions[sessionID]) {
+                        mapSessions[sessionID]
+                        .generateToken(tokenOptions)
+                        .then((token) => {
+                            console.log("GENERATED TOKEN FOR USER");
+                            // push token to meeting's token array in MongoDB
+                            meetingToJoin.tokens.push(token);
+                            // Increment meeting's next Id in MongoDB
+                            meetingToJoin.next_id = meetingToJoin.next_id + 1;
+                            // saving changes of meeting to MongoDB
+                            meetingToJoin.save().then((meeting) => {
+                                // render meeting ejs file with passing some data
+                                console.log("RENDERING MEETING PAGE");
+                                res.render(__dirname + "/public/session/session.ejs", {
+                                    token: token,
+                                    nickName: name_client,
+                                    userName: client_id,
+                                    sessionName: sessionID,
+                                    meetingName: meeting.meetingName,
+                                    code: session_code,
+                                });
+                            });
+                        })
+                        .catch((error) => {
+                            console.error(error); // log error if there
+                        });
+                    } else {
+                        OV.createSession()
+                            .then((session) => {
+                                console.log("SESSION CREATED");
+                                // store session object to mapSessions
+                                mapSessions[sessionID] = session;
+
+                                // generate token for user needed by OpenVidu
+                                session
+                                    .generateToken(tokenOptions)
+                                    .then((token) => {
+                                        console.log("TOKEN GENERATED FOR FIRST PARICIPANT");
+                                        /* mapSessionNamesTokens[sessionID].push(token); */
+                                        meetingToJoin.tokens.push(token);
+                                        // Increment meeting's next Id in MongoDB
+                                        meetingToJoin.next_id = meetingToJoin.next_id + 1;
+                                        meetingToJoin.save().then((meeting) => {
+                                            console.log("RENDERING MEETING PAGE");
+                                            res.render(__dirname + "/public/session/session.ejs", {
+                                                sessionName: sessionID,
+                                                token: token,
+                                                nickName: name_client,
+                                                userName: client_id,
+                                                meetingName: meeting.meetingName,
+                                                code: session_code,
+                                            });
+                                        })
+                                        // render meeting ejs file with passing some data
+                                    })
+                                    .catch((err) => console.log(err)); // log error if there
+                            })
+                            .catch((err) => console.log(err));
+                    }
+                }
+            }
+        });
     } else {
         console.log("--------------------------------------------------------");
         console.log("USER WANTS TO JOIN ONGOING MEETING");
@@ -574,6 +654,7 @@ app.post("/user-api/user/prevMeetings/", function (req, res) {
                     meeting_id_mongo: user.meetings[i]._id,
                     meeting_name: user.meetings[i].meetingName,
                     meeting_id: user.meetings[i].meetingID,
+                    meeting_code: user.meetings[i].code,
                 };
                 array_to_return.push(data_meeting);
             }
@@ -585,13 +666,34 @@ app.post("/user-api/user/prevMeetings/", function (req, res) {
     });
 });
 
+app.post("/user-api/prevMeeting/chats/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("PREV MEETING CHATS TO BE GIVEN");
+    var uid = req.body.userId;
+    var meetingId = req.body.meetingId;
+    userModel.findOne({commonId: uid}).populate("meetings").then(user => {
+        console.log("USER FOUND");
+        if (user) {
+            for (var i=0; i < user.meetings.length; i++) {
+                console.log(i.toString() + "\t" + user.meetings[i].meetingID.toString());
+                if (user.meetings[i].meetingID.toString() === meetingId.toString()) {
+                    console.log("MEETING FOUND");
+                    res.send(JSON.stringify(user.meetings[i].chatMessages));
+                    break;
+                }
+            }
+        } else {
+            console.log("USER NOT FOND");
+            res.send(":(")
+        }
+    });
+})
+
 app.post("/user-api/prevMeeting/delete", (req, res) => {
     console.log("---------------------------------------");
     console.log("PREV MEETING TO BE DELETED");
     var uid = req.body.userId;
     var meetingId = req.body.meetingId;
-    console.log(uid);
-    console.log(meetingId);
     userModel.findOne({commonId: uid}).populate("meetings").then(user => {
         console.log("USER FOUND");
         if (user) {
@@ -602,6 +704,7 @@ app.post("/user-api/prevMeeting/delete", (req, res) => {
                     user.meetings.splice(i, 1);
                     user.save();
                     res.send("done");
+                    break;
                 }
             }
         } else {

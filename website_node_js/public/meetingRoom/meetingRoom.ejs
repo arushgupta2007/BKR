@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meetings Roooms | BKR</title>
+    <script src="/static/head_imports.js"></script>
+    <link rel="stylesheet" href="/static/meetingRoom/css/main.css" />
+</head>
+
+<body>
+    <script src="/static/navbar.js"></script>
+    <div class="modal" tabindex="-1" role="dialog" id="deleteConfirmation">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Meeting</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="delete-modal-text"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" id="delete-meeting-for-sure">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="main-container" class="container-fluid">
+        <div id="meeting-room-row" class="overflow height-100 row">
+            <div class="col-lg-3 col-sm-4 col-12 height-100" id="meetings">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchMeetings" placeholder="Meeting Rooms">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+                <br>
+                <ul class="list-group" id="meetings-list">
+                </ul>
+            </div>
+            <div class="col-lg-9 col-sm-8 col-12 height-100 p-0 d-none d-sm-block" id="meeting-rooms-parent">
+                <div id="none-selected" class="height-100 width-100"></div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/scripts_end_of_body.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+    <script src="/static/meetingRoom/js/main.js"></script>
+</body>
+
+</html>

@@ -23,7 +23,7 @@
     <script src="https://firepad.io/releases/v1.5.10/firepad.min.js"></script>
 
     <script src="/static/session/js/openvidu-browser-2.14.0.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
     <link rel="styleSheet" href="/static/session/css/main.css" type="text/css" media="screen" />
 </head>
 
@@ -101,7 +101,7 @@
                 </div>
                 <div class="card-footer">
                     <div class="form-group">
-                        <textarea id="message-to-send" rows="4" class="mb-3 form-control" placeholder="Send a message..."></textarea>
+                        <textarea id="message-to-send" rows="4" class="mb-3 form-control"></textarea>
                     </div>
                     <button class="btn btn-primary btn-lg" id="sumbit-new-message" onclick="sendMessage()"><i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i></button>
                     <!-- <div class="form-group">
@@ -200,7 +200,7 @@
         <div class="snackbar-info text-truncate" id="notification"></div>
     </div>
     <audio src="/static/session/audio/unconvinced.mp3" id="chat-audio"></audio>
-    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="/static/session/js/main.js"></script>
@@ -419,7 +419,11 @@
             $("#everybody").removeClass("new-message-came");
         })
 
-        var message_textarea = new SimpleMDE({ element: $("#message-to-send")[0] });
+        var message_textarea = new EasyMDE({
+            hideIcons: ["guide","image", "fullscreen", "side-by-side", "horizontal-rule", "table"],
+            element: $("#message-to-send")[0],
+            placeholder: "Send a message",
+        });
 
         $("#main-container").click( function () {
             closeSidePanel();
@@ -483,7 +487,7 @@
             var from_id = seprated_values[1];
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
-
+            message = message.replace("\n", "<br>");
             // create html template of message
             var html_string;
             if (from_id === userName.toString()) {
@@ -537,6 +541,7 @@
             var from_id = seprated_values[1];
             var message_to_slice = event.data.slice(event.data.indexOf(",") + 1, event.data.length);
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+            message = message.replace("\n", "<br>");
             // create html template
             var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
             // append html template with message to DOM
@@ -1071,7 +1076,7 @@
         function sendMessage() {
             // get message
 //            var message = $("#message-to-send").val();
-            var message = message_textarea.value();
+            var message = message_textarea.value() + " ";
             // check if message is empty
             if (message.trim() !== "") {
                 // get recver of message
@@ -1111,6 +1116,7 @@
                     }).then(() => {}).catch((error) => {
                         console.log(error);
                     })
+                    message = message.replace("\n", "<br>");
                     // create html template to render in the users page
                     var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;background-color:#5cb3db;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">You:</p>' + markdown_to_html_con.makeHtml(message) + '</div></div>';
                     // append html template with message to DOM

@@ -4,6 +4,19 @@
     overflow: hidden;
 }
 
+.editor-toolbar i {
+    color: black !important;
+}
+
+.editor-toolbar button {
+    height: 20px !important;
+    width: 20px !important;
+}
+
+i.separator {
+    display: none;
+}
+
 .form-control {
     color: #0088aa;
     font-weight: bold;

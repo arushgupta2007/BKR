@@ -1,5 +1,4 @@
 $(document).ready(function () {
-
     $("#main-container").scroll(function () {
         var scrollTop = $("#main-container").scrollTop();
         if (scrollTop < $("#landing-section").height()) {
@@ -41,10 +40,27 @@ $(document).ready(function () {
             $("#name-of-user").html(displayName);
             $("#initials img").css("display", "block");
             takeCareOfProfilePhoto();
+            var data_ajax = {
+                userUID: uid,
+            }
+            $.ajax({
+                url: "https://" + window.location.hostname + "/user-api/user/prevMeetings/",
+                type: "POST",
+                data: data_ajax,
+                error: function (err) {
+                    console.log(err);
+                }
+            }).done(function(data) {
+                data.forEach((item, i) => {
+                    var meetingName = item.meeting_name;
+                    var meetingId = item.meeting_id;
+
+                });
+
+            });
             // initEveryTime();
         } else {
             window.location.replace("https://" + window.location.hostname + "/join_us/")
-            // initEveryTime();
         }
     }, function(error) {
         console.log(error);

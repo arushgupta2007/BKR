@@ -89,6 +89,10 @@ html, body {
     color: white;
 }
 
+#section-title {
+    text-align: center;
+}
+
 @media only screen and (max-width: 576px) {
     #snap-scroll-parent {
         scroll-snap-type: none;
