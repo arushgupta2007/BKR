@@ -12,6 +12,7 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var cookieSession = require("cookie-session");
 var keys = require("./config/keys");
+var cors = require('cors');
 // const fileupload = require('express-fileupload')
 
 // MongoDB models
@@ -38,18 +39,19 @@ app.use(cookieSession({
 }));
 
 // unknown
+app.use(bodyParser.json());
 app.use(
     bodyParser.urlencoded({
         extended: "true",
     })
 );
-app.use(bodyParser.json());
 app.use(
     bodyParser.json({
         type: "application/vnd.api+json",
     })
 );
 
+app.use(cors({origin: 'http://localhost'}));
 // app.use(fileupload());
 
 // setting view engine as ejs
@@ -67,19 +69,8 @@ var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 // Storing all session objects in mapSessions Object
 var mapSessions = {};
 
-/* var mapSessionNamesTokens = {};
- var name_codes = {};
- var id_tracker = {}; */
-
 // setting all files of public to be hosted on /static
 app.use("/static", express.static("public"));
-
-// var options = {
-//     key: fs.readFileSync('openvidukey.pem'),
-//     cert: fs.readFileSync('openviducert.pem')
-// };
-//
-// var https = require("https").createServer(options, app);
 
 // helper functions
 // function to delete meeting
@@ -115,7 +106,7 @@ function deleteMeeting(session_id, meeting) {
 }
 
 // GET request to / (home page)
-app.get("/", function (req, res) {
+app.get("/", function(req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING HOME PAGE");
     // render home ejs file
@@ -147,7 +138,7 @@ app.get("/meetings-rooms/", (req, res) => {
 })
 
 // GET request to /join_us (sign in / sign up / log in)
-app.get("/join_us/", function (req, res) {
+app.get("/join_us/", function(req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING JOIN US PAGE");
     // render join_us ejs file
@@ -155,7 +146,7 @@ app.get("/join_us/", function (req, res) {
 });
 
 // GET request to /join_us/success (success of joining us above)
-app.get("/join_us/success/", function (req, res) {
+app.get("/join_us/success/", function(req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING JOIN US SUCCESS PAGE");
     // render success of joining us ejs file
@@ -163,11 +154,13 @@ app.get("/join_us/success/", function (req, res) {
 });
 
 // POST request to /join_us/addUser (adding user to MongoDB database)
-app.post("/join_us/addUser/", function (req, res) {
+app.post("/join_us/addUser/", function(req, res) {
     console.log("--------------------------------------------------------");
     console.log("ADD USER CALLED");
     // find if there is existing user with same user id
-    userModel.findOne({commonId: req.body.id_to_keep}, function(err, user) {
+    userModel.findOne({
+        commonId: req.body.id_to_keep
+    }, function(err, user) {
         if (err) {
             // log error if there
             console.log(err);
@@ -232,7 +225,11 @@ app.post("/session/", (req, res) => {
         id_tracker[session_id.toString()] = 1; */
 
         // create OpenVidu session
-        OV.createSession()
+        var prop = {
+            customSessionId: session_id.toString()
+        };
+
+        OV.createSession(prop)
             .then((session) => {
                 console.log("SESSION CREATED");
                 // store session object to mapSessions
@@ -254,10 +251,10 @@ app.post("/session/", (req, res) => {
                         console.log("SAVING MEETING TO DATABASE");
                         meetingsModel({
                             _id: new mongoose.Types.ObjectId(),
-                            meetingID:session_id,
-                            meetingName:name_meeting,
+                            meetingID: session_id,
+                            meetingName: name_meeting,
                             meetingDesc: meeting_desc,
-                            tokens:[token],
+                            tokens: [token],
                             code: session_code,
                             next_id: 1,
                             usersPrev: [],
@@ -271,7 +268,9 @@ app.post("/session/", (req, res) => {
                                 // user was signed in
                                 // find user in the database
                                 console.log("FINDING SIGNED IN USER IN DATABASE");
-                                userModel.findOne({commonId: req.body.userId}, function (err, user) {
+                                userModel.findOne({
+                                    commonId: req.body.userId
+                                }, function(err, user) {
                                     // if user was found continue
                                     if (user) {
                                         console.log("FOUND USER");
@@ -318,7 +317,9 @@ app.post("/session/", (req, res) => {
         console.log("--------------------------------------------------------");
         console.log("USER WANTS TO JOIN PREV MEETING");
         var sessionID = parseInt(req.body.meetingId);
-        meetingsModel.findOne({meetingID: sessionID}).then((meetingToJoin) => {
+        meetingsModel.findOne({
+            meetingID: sessionID
+        }).then((meetingToJoin) => {
             if (meetingToJoin) {
                 console.log("FOUND MEETING");
                 if (meetingToJoin.code === session_code) {
@@ -326,32 +327,35 @@ app.post("/session/", (req, res) => {
                     var client_id = meetingToJoin.next_id;
                     if (mapSessions[sessionID]) {
                         mapSessions[sessionID]
-                        .generateToken(tokenOptions)
-                        .then((token) => {
-                            console.log("GENERATED TOKEN FOR USER");
-                            // push token to meeting's token array in MongoDB
-                            meetingToJoin.tokens.push(token);
-                            // Increment meeting's next Id in MongoDB
-                            meetingToJoin.next_id = meetingToJoin.next_id + 1;
-                            // saving changes of meeting to MongoDB
-                            meetingToJoin.save().then((meeting) => {
-                                // render meeting ejs file with passing some data
-                                console.log("RENDERING MEETING PAGE");
-                                res.render(__dirname + "/public/session/session.ejs", {
-                                    token: token,
-                                    nickName: name_client,
-                                    userName: client_id,
-                                    sessionName: sessionID,
-                                    meetingName: meeting.meetingName,
-                                    code: session_code,
+                            .generateToken(tokenOptions)
+                            .then((token) => {
+                                console.log("GENERATED TOKEN FOR USER");
+                                // push token to meeting's token array in MongoDB
+                                meetingToJoin.tokens.push(token);
+                                // Increment meeting's next Id in MongoDB
+                                meetingToJoin.next_id = meetingToJoin.next_id + 1;
+                                // saving changes of meeting to MongoDB
+                                meetingToJoin.save().then((meeting) => {
+                                    // render meeting ejs file with passing some data
+                                    console.log("RENDERING MEETING PAGE");
+                                    res.render(__dirname + "/public/session/session.ejs", {
+                                        token: token,
+                                        nickName: name_client,
+                                        userName: client_id,
+                                        sessionName: sessionID,
+                                        meetingName: meeting.meetingName,
+                                        code: session_code,
+                                    });
                                 });
+                            })
+                            .catch((error) => {
+                                console.error(error); // log error if there
                             });
-                        })
-                        .catch((error) => {
-                            console.error(error); // log error if there
-                        });
                     } else {
-                        OV.createSession()
+                        var prop = {
+                            customSessionId: session_id.toString()
+                        };
+                        OV.createSession(prop)
                             .then((session) => {
                                 console.log("SESSION CREATED");
                                 // store session object to mapSessions
@@ -394,7 +398,9 @@ app.post("/session/", (req, res) => {
         var sessionID = parseInt(req.body.meetingId);
         // find the meeting in MongoDB with that session id
         console.log("FINDING MEETING FROM MEETING ID");
-        meetingsModel.findOne({meetingID: sessionID}).then((meetingToJoin) => {
+        meetingsModel.findOne({
+            meetingID: sessionID
+        }).then((meetingToJoin) => {
             // check if meeting exists
             if (meetingToJoin) {
                 console.log("FOUND MEETING");
@@ -409,64 +415,66 @@ app.post("/session/", (req, res) => {
                     var client_id = meetingToJoin.next_id;
                     // generate token for user needed by OpenVidu
                     mySession
-                    .generateToken(tokenOptions)
-                    .then((token) => {
-                        console.log("GENERATED TOKEN FOR USER");
-                        // push token to meeting's token array in MongoDB
-                        meetingToJoin.tokens.push(token);
-                        // Increment meeting's next Id in MongoDB
-                        meetingToJoin.next_id = meetingToJoin.next_id + 1;
-                        // saving changes of meeting to MongoDB
-                        meetingToJoin.save().then((meeting) => {
-                            // check if user is logged in
-                            if (req.body.userId !== "") {
-                                console.log("USER IS LOGGED IN");
-                                // user is logged in
-                                // find the user who is logged in in MongoDB
-                                console.log("FINDING LOGGED IN USER IN DATABASE");
-                                userModel.findOne({commonId: req.body.userId}, function (err, user) {
-                                    // check if user exists in the database
-                                    if (user) {
-                                        console.log("FOUND LOGGED IN USER IN DATABASE");
-                                        // user exists
-                                        // check if user's meeting list contains current meeting
-                                        if (!user.meetings.includes(meeting._id)) {
-                                            console.log("MEETING NOT IN USER'S MEETING LIST");
-                                            // user's meeting list does not have the current meeting
-                                            // add current meeting to user's meeting list
-                                            user.meetings.push(meeting._id);
-                                            // save chages done to user in MongoDB
-                                            user.save();
-                                            // push user to meeting'suser list
-                                            meeting.usersPrev.push(user._id);
-                                            // save changes done to meeting in MongoDB
-                                            meeting.save();
-                                            console.log("ADDED MEETING IN USER'S MEETING LIST AND USER IN MEETING'S USER LIST");
+                        .generateToken(tokenOptions)
+                        .then((token) => {
+                            console.log("GENERATED TOKEN FOR USER");
+                            // push token to meeting's token array in MongoDB
+                            meetingToJoin.tokens.push(token);
+                            // Increment meeting's next Id in MongoDB
+                            meetingToJoin.next_id = meetingToJoin.next_id + 1;
+                            // saving changes of meeting to MongoDB
+                            meetingToJoin.save().then((meeting) => {
+                                // check if user is logged in
+                                if (req.body.userId !== "") {
+                                    console.log("USER IS LOGGED IN");
+                                    // user is logged in
+                                    // find the user who is logged in in MongoDB
+                                    console.log("FINDING LOGGED IN USER IN DATABASE");
+                                    userModel.findOne({
+                                        commonId: req.body.userId
+                                    }, function(err, user) {
+                                        // check if user exists in the database
+                                        if (user) {
+                                            console.log("FOUND LOGGED IN USER IN DATABASE");
+                                            // user exists
+                                            // check if user's meeting list contains current meeting
+                                            if (!user.meetings.includes(meeting._id)) {
+                                                console.log("MEETING NOT IN USER'S MEETING LIST");
+                                                // user's meeting list does not have the current meeting
+                                                // add current meeting to user's meeting list
+                                                user.meetings.push(meeting._id);
+                                                // save chages done to user in MongoDB
+                                                user.save();
+                                                // push user to meeting'suser list
+                                                meeting.usersPrev.push(user._id);
+                                                // save changes done to meeting in MongoDB
+                                                meeting.save();
+                                                console.log("ADDED MEETING IN USER'S MEETING LIST AND USER IN MEETING'S USER LIST");
+                                            }
+                                        } else {
+                                            // user does not exists in database
+                                            console.log("USER IS SIGNED IN BUT NOT FOUND IN DATABASE");
                                         }
-                                    } else {
-                                        // user does not exists in database
-                                        console.log("USER IS SIGNED IN BUT NOT FOUND IN DATABASE");
-                                    }
+                                    });
+                                } else {
+                                    // user is not logged in
+                                    console.log("USER IS NOT LOGGED IN");
+                                }
+                                // render meeting ejs file with passing some data
+                                console.log("RENDERING MEETING PAGE");
+                                res.render(__dirname + "/public/session/session.ejs", {
+                                    token: token,
+                                    nickName: name_client,
+                                    userName: client_id,
+                                    sessionName: sessionID,
+                                    meetingName: meeting.meetingName,
+                                    code: session_code,
                                 });
-                            } else {
-                                // user is not logged in
-                                console.log("USER IS NOT LOGGED IN");
-                            }
-                            // render meeting ejs file with passing some data
-                            console.log("RENDERING MEETING PAGE");
-                            res.render(__dirname + "/public/session/session.ejs", {
-                                token: token,
-                                nickName: name_client,
-                                userName: client_id,
-                                sessionName: sessionID,
-                                meetingName: meeting.meetingName,
-                                code: session_code,
                             });
+                        })
+                        .catch((error) => {
+                            console.error(error); // log error if there
                         });
-                    })
-                    .catch((error) => {
-                        console.error(error); // log error if there
-                    });
                 } else {
                     // the meeting id or meeting code was incorrect
                     // redirect user to fill right values
@@ -485,13 +493,15 @@ app.post("/session/", (req, res) => {
 
 
 // POST request to /session/saveMessage (save the message to database)
-app.post("/session/saveMessage/", (req,res) => {
+app.post("/session/saveMessage/", (req, res) => {
     console.log("--------------------------------------------------------");
     console.log("SAVING MESSAGE WITH DATA:" + req.body);
     // get sessionId, from name, from account id, to, and message from req.body
     var data = req.body;
     // find meeting from data.sessionId
-    meetingsModel.findOne({meetingID: data.sessionId}, function(err, meeting) {
+    meetingsModel.findOne({
+        meetingID: data.sessionId
+    }, function(err, meeting) {
         if (err) {
             // log error if there
             console.log(err);
@@ -517,7 +527,9 @@ app.post("/session/refresh", (req, res) => {
     if (mapSessions[sessionName]) {
         // session object exists
         // find meeting in MongoDB database
-        meetingsModel.findOne({meetingID: sessionName}).then((meeting) => {
+        meetingsModel.findOne({
+            meetingID: sessionName
+        }).then((meeting) => {
             // get all tokens
             var tokens = meeting.tokens;
             // get index of token of the user who wants to exit the meeting
@@ -565,7 +577,9 @@ app.post("/leave-session", (req, res) => {
     if (mapSessions[sessionName]) {
         // session object exists
         // find meeting in MongoDB database
-        meetingsModel.findOne({meetingID: sessionName}).then((meeting) => {
+        meetingsModel.findOne({
+            meetingID: sessionName
+        }).then((meeting) => {
             // get all tokens
             var tokens = meeting.tokens;
             // get index of token of the user who wants to exit the meeting
@@ -598,6 +612,107 @@ app.post("/leave-session", (req, res) => {
     }
 });
 
+app.post("/mobile-api/create-meeting-get-token", (req, res) => {
+    console.log("GOT REQUEST FROM MOBILE");
+    console.log(req.body);
+    var userName = req.body.userName;
+    var meetingName = req.body.meetingName;
+    var meetingCode = req.body.meetingCode;
+    var meetingDesc = req.body.meetingDesc;
+    var userId = req.body.userId;
+    var role = OpenViduRole.PUBLISHER;
+    // server data needed by OpenVidu
+    var serverData = JSON.stringify({
+        serverData: userName
+    });
+    // token configuration needed by OpenVidu
+    var tokenOptions = {
+        data: serverData,
+        role: role,
+        kurentoOptions: {
+            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter", "ChromaFilter"]
+        },
+    };
+    var session_id = Date.now();
+
+    // create OpenVidu session
+    var prop = {
+        customSessionId: session_id.toString()
+    };
+    OV.createSession(prop)
+        .then((session) => {
+            console.log("SESSION CREATED");
+            // store session object to mapSessions
+            mapSessions[session_id] = session;
+
+            // generate token for user needed by OpenVidu
+            session
+                .generateToken(tokenOptions)
+                .then((token) => {
+                    console.log("TOKEN GENERATED FOR FIRST PARICIPANT");
+                    /* mapSessionNamesTokens[session_id].push(token); */
+                    // save meeting to MongoDB
+                    console.log("SAVING MEETING TO DATABASE");
+                    meetingsModel({
+                        _id: new mongoose.Types.ObjectId(),
+                        meetingID: session_id,
+                        meetingName: meetingName,
+                        meetingDesc: meetingDesc,
+                        tokens: [token],
+                        code: meetingCode,
+                        next_id: 1,
+                        usersPrev: [],
+                        isRecording: false,
+                        chatMessages: [],
+                    }).save().then((newMeeting) => {
+                        console.log("MEETING SAVED TO DATABASE");
+                        // check if user was signed in, If yes save in it's meetings list
+                        if (req.body.userId !== "") {
+                            console.log("USER IS SIGNED IN");
+                            // user was signed in
+                            // find user in the database
+                            console.log("FINDING SIGNED IN USER IN DATABASE");
+                            userModel.findOne({
+                                commonId: req.body.userId
+                            }, function(err, user) {
+                                // if user was found continue
+                                if (user) {
+                                    console.log("FOUND USER");
+                                    // user was found
+                                    // check if that meeting aldready exists in user's meeting lis or not
+                                    if (!user.meetings.includes(session_id)) {
+                                        console.log("MEETING NOT IN MEETING LIST OF USER");
+                                        // meeting does not exixt in user's meeting list
+                                        // push meeting in user's meeting list
+                                        user.meetings.push(newMeeting._id);
+                                        // save user to MongoDB
+                                        user.save();
+                                        // store users in meeting's user list
+                                        newMeeting.usersPrev.push(user._id);
+                                        // save meeting to MongoDB
+                                        newMeeting.save();
+                                        console.log("ADDED MEETING TO USER'S MEETING LIST AND USER TO MEETING'S USER LIST");
+                                    }
+                                } else {
+                                    // user was not found
+                                    console.log("USER WAS NOT FOUND IN DATABASE BUT WAS SIGNED IN");
+                                }
+                            });
+                        } else {
+                            // user was not logged in
+                            console.log("USER IS NOT LOGGED IN");
+                        }
+                        res.send(JSON.stringify({
+                            token: token,
+                            session_id: session_id
+                        }))
+                    });
+                })
+                .catch((err) => console.log(err)); // log error if there
+        })
+        .catch((err) => console.log(err));
+})
+
 // app.post("/user-api/file-share-chat/", (req, res) => {
 //     console.log(req.files);
 //     if (req.files) {
@@ -616,12 +731,14 @@ app.post("/leave-session", (req, res) => {
 //     }
 // })
 
-app.post("/user-api/check-id-code/", function (req, res) {
+app.post("/user-api/check-id-code/", function(req, res) {
     console.log("--------------------------------------------------------");
     console.log("API CHECK ID AND CODE");
     var meeting_id = parseInt(req.body.meetingId);
     var meeting_code = req.body.meetingCode;
-    meetingsModel.findOne({meetingID: meeting_id}).then(meeting => {
+    meetingsModel.findOne({
+        meetingID: meeting_id
+    }).then(meeting => {
         if (meeting) {
             console.log("MEETING FOUND");
             if (meeting_code === meeting.code) {
@@ -638,12 +755,14 @@ app.post("/user-api/check-id-code/", function (req, res) {
     });
 });
 
-app.post("/user-api/user/prevMeetings/", function (req, res) {
+app.post("/user-api/user/prevMeetings/", function(req, res) {
     console.log("--------------------------------------------------------");
     console.log("USER RQUESTED IT'S PREV MEETINGS");
     var userUid = req.body.userUID;
     var array_to_return = [];
-    userModel.findOne({commonId: userUid}).populate("meetings").then(user => {
+    userModel.findOne({
+        commonId: userUid
+    }).populate("meetings").then(user => {
         if (user) {
             console.log("FOUND USER");
             for (var i = 0; i < user.meetings.length; i++) {
@@ -671,10 +790,12 @@ app.post("/user-api/prevMeeting/chats/", (req, res) => {
     console.log("PREV MEETING CHATS TO BE GIVEN");
     var uid = req.body.userId;
     var meetingId = req.body.meetingId;
-    userModel.findOne({commonId: uid}).populate("meetings").then(user => {
+    userModel.findOne({
+        commonId: uid
+    }).populate("meetings").then(user => {
         console.log("USER FOUND");
         if (user) {
-            for (var i=0; i < user.meetings.length; i++) {
+            for (var i = 0; i < user.meetings.length; i++) {
                 console.log(i.toString() + "\t" + user.meetings[i].meetingID.toString());
                 if (user.meetings[i].meetingID.toString() === meetingId.toString()) {
                     console.log("MEETING FOUND");
@@ -694,10 +815,12 @@ app.post("/user-api/prevMeeting/delete", (req, res) => {
     console.log("PREV MEETING TO BE DELETED");
     var uid = req.body.userId;
     var meetingId = req.body.meetingId;
-    userModel.findOne({commonId: uid}).populate("meetings").then(user => {
+    userModel.findOne({
+        commonId: uid
+    }).populate("meetings").then(user => {
         console.log("USER FOUND");
         if (user) {
-            for (var i=0; i < user.meetings.length; i++) {
+            for (var i = 0; i < user.meetings.length; i++) {
                 console.log(i.toString() + "\t" + user.meetings[i].meetingID.toString());
                 if (user.meetings[i].meetingID.toString() === meetingId.toString()) {
                     console.log("MEETING FOUND");
