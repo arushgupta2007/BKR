@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Join Meeting</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <form [formGroup]="rForm" (ngSubmit)="joinMeeting(rForm.value)">
+    <div id="form-container">
+      <ion-item>
+        <ion-label position="floating" color="light">Your Name</ion-label>
+        <ion-input autocomplete="off" clearInput color="light" type="text" formControlName="name_form"></ion-input>
+      </ion-item>
+      <ion-label color="danger" *ngIf="nameErr">{{ nameErr }}</ion-label>
+      <ion-item>
+        <ion-label position="floating" color="light">Meeting Id</ion-label>
+        <ion-input autocomplete="off" clearInput color="light" type="number" formControlName="meetingId_form"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label position="floating" color="light">Meeting Code</ion-label>
+        <ion-input autocomplete="off" clearInput color="light" type="password" formControlName="meetingCode_form"></ion-input>
+      </ion-item>
+      <br>
+      <ion-label color="danger" *ngIf="meetingErr">{{ meetingErr }}</ion-label>
+      <br>
+      <button type="submit" class="btn btn-lg btn-success" [disabled]="!rForm.valid">Join Meeting!</button>
+    </div>
+  </form>
+</ion-content>

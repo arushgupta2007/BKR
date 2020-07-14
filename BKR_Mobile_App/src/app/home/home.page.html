@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <img class="logo-nav" src="assets/icon/favicon.png" />
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">BKR</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content id="home-page">
+    <div id="img-logo"><img src="assets/logo.PNG" alt="BKR"></div>
+    <div id="baatkarteraho-text"><h1>BaatKarteRaho</h1></div>
+    <div id="button-group-call-for-action">
+        <div id="button-group">
+          <ion-button expand="block" size="large" (click)="createMeeting()">Create New Meeting</ion-button>
+          <ion-button expand="block" size="large" color="secondary" (click)="joinMeeting()">Join Meeting</ion-button>
+          <ion-button expand="block" size="large" color="tertiary" (click)="scheduleMeeting()">Schedule Meeting</ion-button>
+        </div>
+    </div>
+  </ion-content>
+  
+</ion-content>

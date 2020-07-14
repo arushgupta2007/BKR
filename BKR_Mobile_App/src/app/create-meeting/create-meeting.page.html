@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create Meeting</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="rForm" (ngSubmit)="createMeeting(rForm.value)">
+    <div id="form-container">
+      <ion-item>
+        <ion-label position="floating" color="light">Your Name</ion-label>
+        <ion-input autocomplete="off" clearInput color="light" type="text" formControlName="name_form" [(ngModel)]="name"></ion-input>
+      </ion-item>
+      <ion-label color="danger" *ngIf="nameErr">{{ nameErr }}</ion-label>
+      <ion-item>
+        <ion-label position="floating" color="light">Meeting Name</ion-label>
+        <ion-input autocomplete="off" clearInput color="light" type="text" formControlName="meetingName_form" [(ngModel)]="meetingName"></ion-input>
+      </ion-item>
+      <ion-label color="danger" *ngIf="meetingNameErr">{{ meetingNameErr }}</ion-label>
+      <ion-item>
+        <ion-label position="floating" color="light">Meeting Code</ion-label>
+        <ion-input autocomplete="off" clearInput color="light" type="password" formControlName="meetingCode_form" [(ngModel)]="meetingCode"></ion-input>
+      </ion-item>
+      <ion-label color="danger" *ngIf="meetingCodeErr">{{ meetingCodeErr }}</ion-label>
+      <ion-item>
+        <ion-label position="floating" color="light">Meeting Desc</ion-label>
+        <ion-textarea autocomplete="off" color="light" formControlName="meetingDesc_form" [(ngModel)]="meetingDesc"></ion-textarea>
+      </ion-item>
+      <br *ngIf="meetingDescErr">
+      <ion-label color="danger" *ngIf="meetingDescErr">{{ meetingDescErr }}</ion-label>
+      <br><br>
+      <button type="submit" class="btn btn-lg btn-warning" [disabled]="!rForm.valid">Create Meeting!</button>
+    </div>
+  </form>
+</ion-content>

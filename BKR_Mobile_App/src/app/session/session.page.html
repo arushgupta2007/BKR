@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>{{meetingName}}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-fab id="fab-meeting-options" vertical="top" horizontal="end" slot="fixed">
+  <ion-fab-button id="fab-list-activator">
+    <ion-icon name="arrow-down-circle"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-list side="bottom">
+    <ion-fab-button (click)="shareAlert()" id="share-icon">
+      <ion-icon name="share-social"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button (click)="goToSlide(2)" id="whiteboard-icon">
+      <ion-icon name="pencil"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button (click)="goToSlide(0)" id="chat-icon">
+      <ion-icon name="chatbox"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button (click)="toggleVideo()" id="video-icon">
+      <i class="fas fa-video-slash" *ngIf="!video"></i>
+      <i class="fas fa-video" *ngIf="video"></i>
+    </ion-fab-button>
+    <ion-fab-button (click)="toggleAudio()" id="audio-icon">
+      <ion-icon name="mic" *ngIf="audio"></ion-icon>
+      <ion-icon name="mic-off" *ngIf="!audio"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-button (click)="leaveSession()" id="end-call-icon">
+      <ion-icon name="call" class="end-call-icon"></ion-icon>
+    </ion-fab-button>
+  </ion-fab-list>
+</ion-fab>
+
+<ion-content>
+  <ion-slides [options]="slidesOptions" (ionSlideDidChange)="slideChanged()" #slides>
+    <ion-slide>
+      <ion-list id="participant_list">
+        <ion-list-header id="participant-list-header">
+          <ion-label class="white-text">Participant List</ion-label>
+        </ion-list-header>
+        <ion-item *ngFor="let participant of participantList" class="white-text">
+          <ion-label>{{participant.nickName}}</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-slide>
+    <ion-slide>
+      <h1 class="white-text">CHAT</h1>
+    </ion-slide>
+    <ion-slide>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6">
+            <div *ngIf="publisher" class="stream-container">
+              <user-video [streamManager]="publisher"></user-video>
+            </div>
+          </ion-col>
+          <ion-col size="6" *ngFor="let sub of subscribers">
+            <div class="stream-container">
+              <user-video [streamManager]="sub"></user-video>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-slide>
+    <ion-slide>
+      <h1 class="white-text">Whiteboard</h1>
+    </ion-slide>
+  </ion-slides>
+</ion-content>

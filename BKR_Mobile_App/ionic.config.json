@@ -1,0 +1,7 @@
+{
+  "name": "BKR",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,62 @@
+.end-call-icon {
+    transform: rotate(135deg);
+}
+
+.white-text {
+    --color: white;
+    color: white;
+}
+
+#fab-meeting-options {
+    margin: 15px;
+    margin-left: auto;
+}
+
+.alert-message .alert-wrapper {
+    --color: white;
+}
+
+ion-slide {
+    align-items: flex-start;
+}
+
+ion-fab-button {
+    --color: white;
+}
+
+#fab-list-activator {
+    --background: #fff;
+    --color: #000;
+}
+
+#share-icon {
+    --background: var(--ion-color-warning);
+}
+
+#whiteboard-icon {
+    --background: #dca6f5;
+}
+
+#chat-icon {
+    --background: #9eb5db;
+}
+
+#video-icon {
+    --background: var(--ion-color-tertiary);
+}
+
+#audio-icon {
+    --background: var(--ion-color-secondary);
+}
+
+#end-call-icon {
+    --background: var(--ion-color-danger);
+}
+
+#participant-list-header {
+    font-size: 200%;
+}
+
+#participant_list {
+    width: 100%;
+}

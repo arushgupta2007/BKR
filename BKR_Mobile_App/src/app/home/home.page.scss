@@ -1,0 +1,69 @@
+#container {
+  text-align: center;
+  color: white;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#container strong {
+  font-size: 20px;
+  line-height: 26px;
+}
+
+#container p {
+  font-size: 16px;
+  line-height: 22px;
+
+  color: #8c8c8c;
+
+  margin: 0;
+}
+
+#container a {
+  text-decoration: none;
+}
+
+#home-page {
+  position: absolute;
+}
+
+#img-logo {
+  width: 100%;
+  margin-top: 20px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    max-width: 90%;
+  }
+}
+
+#baatkarteraho-text {
+  font-weight: bold;
+  color: white;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  h1 {
+    font-size: 50px;
+  }
+}
+
+#button-group-call-for-action {
+  height: 100%;
+  position: relative;
+
+  #button-group {
+    width: 100%;
+    padding: 0 50px;
+    position: absolute;
+    bottom: 65%;
+  }  
+}
