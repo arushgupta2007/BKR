@@ -1,0 +1,50 @@
+.end-call-icon {
+    transform: rotate(135deg);
+}
+
+.white-text {
+    --color: white;
+    color: white;
+}
+
+#video-icon {
+    --background: var(--ion-color-tertiary);
+}
+
+#audio-icon {
+    --background: var(--ion-color-secondary);
+}
+
+.end-call-icon-background-red {
+    --background: var(--ion-color-danger);
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px);
+}
+
+#participant-control-button-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    ion-button {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+#chat-area {
+    height: 100%;
+}
+
+#chat-input-container {
+    display: flex;
+    flex-direction: row;
+
+    ion-item {
+        width: 100%;
+    }
+}

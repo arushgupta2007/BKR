@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>{{ this.meetingService.participantList[this.connectionId].name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="main-container">
+    <div id="participant-control-button-group">
+      <ion-button id="video-icon" (click)="toggleParticipantVideo()" class="white-text" expand="full">
+        <i class="fas fa-video" *ngIf="meetingService.participantList[connectionId].videoStatus"></i>
+        <i class="fas fa-video-slash" *ngIf="!meetingService.participantList[connectionId].videoStatus"></i>
+      </ion-button>
+      <ion-button id="audio-icon" (click)="toggleParticipantAudio()" class="white-text" expand="full">
+        <ion-icon name="mic" *ngIf="meetingService.participantList[connectionId].audioStatus"></ion-icon>
+        <ion-icon name="mic-off" *ngIf="!meetingService.participantList[connectionId].audioStatus"></ion-icon>
+      </ion-button>
+      <ion-button class="end-call-icon-background-red white-text" (click)="endParticipantCall()" expand="full">
+        <ion-icon name="call" class="end-call-icon"></ion-icon>
+      </ion-button>
+    </div>
+    <div id="chat-area">
+      
+    </div>
+    <div id="chat-input-container">
+      <ion-item>
+        <ion-label position="floating">Chat with {{ this.meetingService.participantList[this.connectionId].name }}</ion-label>
+        <ion-input clearInput type="text" [(ngModel)]="chatMessage"></ion-input>
+      </ion-item>
+      <ion-fab-button (click)="sendMessage()">
+        <ion-icon name="send"></ion-icon>
+      </ion-fab-button>
+    </div>
+  </div>
+</ion-content>

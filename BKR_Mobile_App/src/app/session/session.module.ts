@@ -12,15 +12,10 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { IonicRouteStrategy } from '@ionic/angular';
 import { OpenViduVideoComponent } from '../ov-video.component'  
 import { UserVideoComponent } from '../user-video.component';
-
-// <config-file mode="merge" parent="/*" target="AndroidManifest.xml">
-// <uses-permission android:name="android.permission.CAMERA" />
-// <uses-permission android:name="android.permission.RECORD_AUDIO" />
-// <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-// </config-file>
+import { ChatModalComponent } from '../components/chat-modal/chat-modal.component';
 
 @NgModule({
-  declarations: [SessionPage, UserVideoComponent, OpenViduVideoComponent],
+  declarations: [SessionPage, UserVideoComponent, OpenViduVideoComponent, ChatModalComponent],
   imports: [
     CommonModule,
     FormsModule,

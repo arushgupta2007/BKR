@@ -49,7 +49,7 @@ ion-fab-button {
     --background: var(--ion-color-secondary);
 }
 
-#end-call-icon {
+.end-call-icon-background-red {
     --background: var(--ion-color-danger);
 }
 
@@ -59,4 +59,8 @@ ion-fab-button {
 
 #participant_list {
     width: 100%;
+}
+
+.background-red {
+    --background: var(--ion-color-danger)
 }

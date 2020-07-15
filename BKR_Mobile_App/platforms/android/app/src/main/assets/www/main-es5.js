@@ -526,6 +526,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(
     /*! ./services/oauth.service */
     "./src/app/services/oauth.service.ts");
+    /* harmony import */
+
+
+    var _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(
+    /*! ./services/meeting-session.service */
+    "./src/app/services/meeting-session.service.ts");
 
     var AppModule = function AppModule() {
       _classCallCheck(this, AppModule);
@@ -538,7 +544,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       providers: [_ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_6__["StatusBar"], _ionic_native_splash_screen_ngx__WEBPACK_IMPORTED_MODULE_5__["SplashScreen"], {
         provide: _angular_router__WEBPACK_IMPORTED_MODULE_3__["RouteReuseStrategy"],
         useClass: _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["IonicRouteStrategy"]
-      }, _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"], _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"]],
+      }, _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"], _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"], _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"]],
       bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_7__["AppComponent"]]
     })], AppModule);
     /***/
@@ -689,6 +695,450 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       selector: 'ov-video',
       template: '<video #videoElement style="width: 100%"></video>'
     })], OpenViduVideoComponent);
+    /***/
+  },
+
+  /***/
+  "./src/app/services/meeting-session.service.ts":
+  /*!*****************************************************!*\
+    !*** ./src/app/services/meeting-session.service.ts ***!
+    \*****************************************************/
+
+  /*! exports provided: MeetingSessionService */
+
+  /***/
+  function srcAppServicesMeetingSessionServiceTs(module, __webpack_exports__, __webpack_require__) {
+    "use strict";
+
+    __webpack_require__.r(__webpack_exports__);
+    /* harmony export (binding) */
+
+
+    __webpack_require__.d(__webpack_exports__, "MeetingSessionService", function () {
+      return MeetingSessionService;
+    });
+    /* harmony import */
+
+
+    var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(
+    /*! tslib */
+    "./node_modules/tslib/tslib.es6.js");
+    /* harmony import */
+
+
+    var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(
+    /*! @angular/core */
+    "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+    /* harmony import */
+
+
+    var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
+    /*! @angular/common/http */
+    "./node_modules/@angular/common/__ivy_ngcc__/fesm2015/http.js");
+    /* harmony import */
+
+
+    var _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(
+    /*! @ionic-native/android-permissions/ngx */
+    "./node_modules/@ionic-native/android-permissions/__ivy_ngcc__/ngx/index.js");
+    /* harmony import */
+
+
+    var _ionic_native_splash_screen_ngx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
+    /*! @ionic-native/splash-screen/ngx */
+    "./node_modules/@ionic-native/splash-screen/__ivy_ngcc__/ngx/index.js");
+    /* harmony import */
+
+
+    var _ionic_angular__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(
+    /*! @ionic/angular */
+    "./node_modules/@ionic/angular/__ivy_ngcc__/fesm2015/ionic-angular.js");
+    /* harmony import */
+
+
+    var openvidu_browser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(
+    /*! openvidu-browser */
+    "./node_modules/openvidu-browser/lib/index.js");
+    /* harmony import */
+
+
+    var openvidu_browser__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(openvidu_browser__WEBPACK_IMPORTED_MODULE_6__);
+
+    var MeetingSessionService = /*#__PURE__*/function () {
+      function MeetingSessionService(platform, splashScreen, httpClient, androidPermissions) {
+        var _this6 = this;
+
+        _classCallCheck(this, MeetingSessionService);
+
+        this.platform = platform;
+        this.splashScreen = splashScreen;
+        this.httpClient = httpClient;
+        this.androidPermissions = androidPermissions;
+        this.audio = true;
+        this.video = true;
+        this.subscribers = [];
+        this.ANDROID_PERMISSIONS = [this.androidPermissions.PERMISSION.CAMERA, this.androidPermissions.PERMISSION.RECORD_AUDIO, this.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS];
+        this.participantList = {};
+        this.SERVER_URL = "https://192.168.1.16:5442";
+        this.platform.ready().then(function () {
+          _this6.splashScreen.hide();
+
+          if (_this6.platform.is('ios') && _this6.platform.is('cordova')) {
+            cordova.plugins.iosrtc.registerGlobals();
+          }
+        });
+      }
+
+      _createClass(MeetingSessionService, [{
+        key: "deleteSubscriber",
+        value: function deleteSubscriber(streamManager) {
+          var index = this.subscribers.indexOf(streamManager, 0);
+
+          if (index > -1) {
+            this.subscribers.splice(index, 1);
+          }
+        }
+      }, {
+        key: "joinSession",
+        value: function joinSession(data_recv_server, obj) {
+          var _this7 = this;
+
+          console.log("JOINING SESSION");
+          this.OV = new openvidu_browser__WEBPACK_IMPORTED_MODULE_6__["OpenVidu"]();
+          this.session = this.OV.initSession();
+          this.session.on('signal:userControlMessage', function (event) {
+            var data_split = event.data.split(",");
+
+            _this7.ETUserControl(data_split);
+          });
+          this.session.on('signal:streamStatus', function (event) {
+            var connection_id = event.from.connectionId;
+
+            if (_this7.participantList[connection_id]) {
+              var data = event.data.split(",");
+              _this7.participantList[connection_id].audioStatus = data[0] === "1";
+              _this7.participantList[connection_id].videoStatus = data[1] === "1";
+            }
+          });
+          this.session.on('streamCreated', function (event) {
+            var subscriber = _this7.session.subscribe(event.stream, undefined);
+
+            _this7.subscribers.push(subscriber);
+
+            var nickname;
+
+            try {
+              nickname = JSON.parse(subscriber.stream.connection.data).clientData;
+            } catch (err) {
+              nickname = JSON.parse(subscriber.stream.connection.data.split('%/%')[0]).clientData; // serverData = JSON.parse(this.streamManager.stream.connection.data.split('%/%')[1]).serverData;
+            }
+
+            var connection_id = subscriber.stream.connection.connectionId;
+            var participant_obj = {
+              name: nickname,
+              connectionId: connection_id,
+              chatMessages: [],
+              videoStatus: true,
+              audioStatus: true,
+              connectionObject: subscriber.stream.connection
+            };
+            _this7.participantList[connection_id] = participant_obj;
+          });
+          this.session.on('streamDestroyed', function (event) {
+            // Remove the stream from 'subscribers' array
+            _this7.deleteSubscriber(event.stream.streamManager);
+
+            delete _this7.participantList[event.stream.connection.connectionId];
+          });
+          this.session.on("connectionDestroyed", function (event) {
+            delete _this7.participantList[event.connection.connectionId];
+          });
+          var token = data_recv_server.token;
+          this.mySessionId = data_recv_server.session_id;
+
+          if (obj === "join") {
+            this.meetingName = data_recv_server.meetingName;
+            this.meetingCode = data_recv_server.meetingCode;
+            this.meetingDesc = data_recv_server.meetingDesc;
+          }
+
+          this.session.connect(token, {
+            clientData: this.name
+          }).then(function () {
+            // --- 5) Requesting and Checking Android Permissions
+            if (_this7.platform.is('cordova')) {
+              // Ionic platform
+              if (_this7.platform.is('android')) {
+                console.log('Android platform');
+
+                _this7.checkAndroidPermissions().then(function () {
+                  return _this7.initPublisher(_this7.audio, _this7.video);
+                })["catch"](function (err) {
+                  return console.error(err);
+                });
+              } else if (_this7.platform.is('ios')) {
+                console.log('iOS platform');
+
+                _this7.initPublisher(_this7.audio, _this7.video);
+              }
+            } else {
+              _this7.initPublisher(_this7.audio, _this7.video);
+            }
+
+            if (_this7.callbackVariables) {
+              _this7.callbackVariables(_this7.meetingName, _this7.meetingCode, _this7.mySessionId, _this7.meetingDesc);
+            }
+          })["catch"](function (error) {
+            console.log('There was an error connecting to the session:', error.code, error.message);
+          });
+        }
+      }, {
+        key: "initPublisher",
+        value: function initPublisher(audio_input, video_input) {
+          var _this8 = this;
+
+          if (this.OV) {
+            var publisher = this.OV.initPublisher(undefined, {
+              audioSource: undefined,
+              videoSource: undefined,
+              publishAudio: audio_input,
+              publishVideo: video_input,
+              resolution: '640x480',
+              frameRate: 30,
+              insertMode: 'APPEND',
+              mirror: true
+            });
+            this.publisher_publisher = publisher;
+            this.session.publish(publisher).then(function () {
+              _this8.publisher = publisher;
+              console.log(typeof publisher);
+              console.log(typeof _this8.publisher);
+            });
+          }
+        }
+      }, {
+        key: "leaveSession",
+        value: function leaveSession() {
+          if (this.session) {
+            this.session.disconnect();
+          }
+
+          if (this.callbackAfterSessionLeave) {
+            this.callbackAfterSessionLeave();
+          }
+
+          this.subscribers = [];
+          delete this.publisher;
+          delete this.session;
+          delete this.OV;
+        }
+      }, {
+        key: "getTokenCreate",
+        value: function getTokenCreate(name, meetingName, meetingCode, meetingDesc) {
+          console.log("Getting Token Create");
+          this.name = name;
+          this.meetingName = meetingName;
+          this.meetingCode = meetingCode;
+          this.meetingDesc = meetingDesc;
+          var postData_create = {
+            "userName": this.name,
+            "meetingName": this.meetingName,
+            "meetingCode": this.meetingCode,
+            "meetingDesc": this.meetingDesc,
+            "userId": ""
+          };
+          return this.httpClient.post(this.SERVER_URL + "/mobile-api/create-meeting-get-token", postData_create, {
+            responseType: 'text'
+          }).toPromise();
+        }
+      }, {
+        key: "getTokenJoin",
+        value: function getTokenJoin(name, meetingId, meetingCode) {
+          console.log("Getting Token Join");
+          this.name = name;
+          this.mySessionId = meetingId;
+          this.meetingCode = meetingCode;
+          var postData_join = {
+            "userName": this.name,
+            "meetingId": this.mySessionId,
+            "meetingCode": this.meetingCode,
+            "userId": ""
+          };
+          return this.httpClient.post(this.SERVER_URL + "/mobile-api/join-meeting-and-get-token/", postData_join, {
+            responseType: 'text'
+          }).toPromise();
+        }
+      }, {
+        key: "ETUserControl",
+        value: function ETUserControl(data_split) {
+          console.log(data_split);
+
+          if (data_split[0] === "audio") {
+            if (data_split[1] === "0") {
+              if (this.audio) {
+                this.toggleAudio();
+              }
+            } else {
+              if (!this.audio) {
+                this.toggleAudio();
+              }
+            }
+          } else if (data_split[0] === "video") {
+            if (data_split[1] === "0") {
+              if (this.video) {
+                this.toggleVideo();
+              }
+            } else {
+              if (!this.video) {
+                this.toggleVideo();
+              }
+            }
+          } else {
+            this.leaveSession();
+          }
+        }
+      }, {
+        key: "toggleVideo",
+        value: function toggleVideo() {
+          if (this.session) {
+            this.publisher_publisher.publishVideo(!this.video);
+            this.video = !this.video;
+            var audio_return = "0";
+            var video_return = "0";
+
+            if (this.audio) {
+              audio_return = "1";
+            }
+
+            if (this.video) {
+              video_return = "1";
+            }
+
+            this.sendStreamStatusMessage(audio_return + "," + video_return);
+          }
+        }
+      }, {
+        key: "toggleAudio",
+        value: function toggleAudio() {
+          if (this.session) {
+            this.publisher_publisher.publishAudio(!this.audio);
+            this.audio = !this.audio;
+            var audio_return = "0";
+            var video_return = "0";
+
+            if (this.audio) {
+              audio_return = "1";
+            }
+
+            if (this.video) {
+              video_return = "1";
+            }
+
+            this.sendStreamStatusMessage(audio_return + "," + video_return);
+          }
+        }
+      }, {
+        key: "sendStreamStatusMessage",
+        value: function sendStreamStatusMessage(streamStatus) {
+          this.session.signal({
+            data: streamStatus,
+            to: [],
+            type: "streamStatus"
+          }).then(function () {})["catch"](function (err) {
+            console.log(err);
+          });
+        }
+      }, {
+        key: "sendUserCtrl",
+        value: function sendUserCtrl(connection_id, type, value) {
+          if (this.participantList[connection_id]) {
+            this.session.signal({
+              data: type + "," + value,
+              to: [this.participantList[connection_id].connectionObject],
+              type: "userControlMessage"
+            });
+          }
+        }
+      }, {
+        key: "removeParticipant",
+        value: function removeParticipant(participant) {
+          this.session.signal({
+            data: "drop,force",
+            to: [participant.connectionObject],
+            type: "userControlMessage"
+          });
+        }
+      }, {
+        key: "refreshVideos",
+        value: function refreshVideos() {
+          if (this.platform.is('ios') && this.platform.is('cordova')) {
+            cordova.plugins.iosrtc.refreshVideos();
+          }
+        }
+      }, {
+        key: "setCallbackVariables",
+        value: function setCallbackVariables(callback) {
+          this.callbackVariables = callback;
+        }
+      }, {
+        key: "setCallbackLeaveSession",
+        value: function setCallbackLeaveSession(callback) {
+          this.callbackAfterSessionLeave = callback;
+        }
+      }, {
+        key: "checkAndroidPermissions",
+        value: function checkAndroidPermissions() {
+          var _this9 = this;
+
+          return new Promise(function (resolve, reject) {
+            _this9.platform.ready().then(function () {
+              _this9.androidPermissions.requestPermissions(_this9.ANDROID_PERMISSIONS).then(function () {
+                _this9.androidPermissions.checkPermission(_this9.androidPermissions.PERMISSION.CAMERA).then(function (camera) {
+                  _this9.androidPermissions.checkPermission(_this9.androidPermissions.PERMISSION.RECORD_AUDIO).then(function (audio) {
+                    _this9.androidPermissions.checkPermission(_this9.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS).then(function (modifyAudio) {
+                      if (camera.hasPermission && audio.hasPermission && modifyAudio.hasPermission) {
+                        resolve();
+                      } else {
+                        reject(new Error('Permissions denied: ' + '\n' + ' CAMERA = ' + camera.hasPermission + '\n' + ' AUDIO = ' + audio.hasPermission + '\n' + ' AUDIO_SETTINGS = ' + modifyAudio.hasPermission));
+                      }
+                    })["catch"](function (err) {
+                      console.error('Checking permission ' + _this9.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS + ' failed');
+                      reject(err);
+                    });
+                  })["catch"](function (err) {
+                    console.error('Checking permission ' + _this9.androidPermissions.PERMISSION.RECORD_AUDIO + ' failed');
+                    reject(err);
+                  });
+                })["catch"](function (err) {
+                  console.error('Checking permission ' + _this9.androidPermissions.PERMISSION.CAMERA + ' failed');
+                  reject(err);
+                });
+              })["catch"](function (err) {
+                return console.error('Error requesting permissions: ', err);
+              });
+            });
+          });
+        }
+      }]);
+
+      return MeetingSessionService;
+    }();
+
+    MeetingSessionService.ctorParameters = function () {
+      return [{
+        type: _ionic_angular__WEBPACK_IMPORTED_MODULE_5__["Platform"]
+      }, {
+        type: _ionic_native_splash_screen_ngx__WEBPACK_IMPORTED_MODULE_4__["SplashScreen"]
+      }, {
+        type: _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"]
+      }, {
+        type: _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_3__["AndroidPermissions"]
+      }];
+    };
+
+    MeetingSessionService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+      providedIn: 'root'
+    })], MeetingSessionService);
     /***/
   },
 
@@ -951,7 +1401,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   /***/
   function _(module, exports, __webpack_require__) {
     module.exports = __webpack_require__(
-    /*! /home/aputron/Desktop/Krishna/App_Ionic_BKR/BKR/src/main.ts */
+    /*! /home/aputron/Desktop/Krishna/BKR_server/BKR/BKR_Mobile_App/src/main.ts */
     "./src/main.ts");
     /***/
   }

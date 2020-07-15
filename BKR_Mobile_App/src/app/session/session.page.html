@@ -18,15 +18,15 @@
     <ion-fab-button (click)="goToSlide(0)" id="chat-icon">
       <ion-icon name="chatbox"></ion-icon>
     </ion-fab-button>
-    <ion-fab-button (click)="toggleVideo()" id="video-icon">
-      <i class="fas fa-video-slash" *ngIf="!video"></i>
-      <i class="fas fa-video" *ngIf="video"></i>
+    <ion-fab-button (click)="this.meetingService.toggleVideo()" id="video-icon">
+      <i class="fas fa-video-slash" *ngIf="!meetingService.video"></i>
+      <i class="fas fa-video" *ngIf="meetingService.video"></i>
     </ion-fab-button>
-    <ion-fab-button (click)="toggleAudio()" id="audio-icon">
-      <ion-icon name="mic" *ngIf="audio"></ion-icon>
-      <ion-icon name="mic-off" *ngIf="!audio"></ion-icon>
+    <ion-fab-button (click)="this.meetingService.toggleAudio()" id="audio-icon">
+      <ion-icon name="mic" *ngIf="meetingService.audio"></ion-icon>
+      <ion-icon name="mic-off" *ngIf="!meetingService.audio"></ion-icon>
     </ion-fab-button>
-    <ion-fab-button (click)="leaveSession()" id="end-call-icon">
+    <ion-fab-button (click)="meetingService.leaveSession()" class="end-call-icon-background-red">
       <ion-icon name="call" class="end-call-icon"></ion-icon>
     </ion-fab-button>
   </ion-fab-list>
@@ -39,23 +39,34 @@
         <ion-list-header id="participant-list-header">
           <ion-label class="white-text">Participant List</ion-label>
         </ion-list-header>
-        <ion-item *ngFor="let participant of participantList" class="white-text">
-          <ion-label>{{participant.nickName}}</ion-label>
+
+        <ion-item class="white-text">
+          <ion-avatar slot="start">
+            <img src="assets/unknown_user.png" alt="">
+          </ion-avatar>
+          <ion-label>
+            <h1>{{ name }}</h1>
+          </ion-label>
+        </ion-item>
+        <ion-item detail button (click)="openChatModal(participant_key_value.value)" class="white-text" *ngFor="let participant_key_value of meetingService.participantList | keyvalue">
+          <ion-avatar slot="start">
+            <img src="assets/unknown_user.png" alt="">
+          </ion-avatar>
+          <ion-label>
+            <h1>{{ participant_key_value.value.name }}</h1>
+          </ion-label>
         </ion-item>
       </ion-list>
-    </ion-slide>
-    <ion-slide>
-      <h1 class="white-text">CHAT</h1>
     </ion-slide>
     <ion-slide>
       <ion-grid>
         <ion-row>
           <ion-col size="6">
-            <div *ngIf="publisher" class="stream-container">
-              <user-video [streamManager]="publisher"></user-video>
+            <div *ngIf="meetingService.publisher" class="stream-container">
+              <user-video [streamManager]="meetingService.publisher"></user-video>
             </div>
           </ion-col>
-          <ion-col size="6" *ngFor="let sub of subscribers">
+          <ion-col size="6" *ngFor="let sub of meetingService.subscribers">
             <div class="stream-container">
               <user-video [streamManager]="sub"></user-video>
             </div>

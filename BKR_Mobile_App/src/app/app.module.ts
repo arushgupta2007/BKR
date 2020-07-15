@@ -13,6 +13,7 @@ import { OpenViduVideoComponent } from './ov-video.component';
 import { UserVideoComponent } from './user-video.component';
 import { SessionPipe } from './session.pipe';
 import { OauthService } from './services/oauth.service';
+import { MeetingSessionService } from './services/meeting-session.service';
 
 @NgModule({
   declarations: [AppComponent, UserVideoComponent, OpenViduVideoComponent, SessionPipe],
@@ -31,6 +32,7 @@ import { OauthService } from './services/oauth.service';
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     AndroidPermissions,
     OauthService,
+    MeetingSessionService,
   ],
   bootstrap: [AppComponent]
 })
