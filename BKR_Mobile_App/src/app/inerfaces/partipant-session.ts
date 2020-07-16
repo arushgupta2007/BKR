@@ -1,10 +1,5 @@
-import { Connection } from 'openvidu-browser';
-
-interface ChatMessage {
-    from: string,
-    to: string,
-    message: string,
-}
+import { Connection, StreamManager } from 'openvidu-browser';
+import { ChatMessage } from './chat-message';
 
 export interface Participant {
     name: string;
@@ -13,4 +8,5 @@ export interface Participant {
     videoStatus: boolean;
     audioStatus: boolean;
     connectionObject: Connection;
+    subscriberObject: StreamManager
 }

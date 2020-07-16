@@ -13,9 +13,12 @@ import { IonicRouteStrategy } from '@ionic/angular';
 import { OpenViduVideoComponent } from '../ov-video.component'  
 import { UserVideoComponent } from '../user-video.component';
 import { ChatModalComponent } from '../components/chat-modal/chat-modal.component';
+import { EverybodyChatModelComponent } from '../components/everybody-chat-model/everybody-chat-model.component';
+import { AutosizeModule } from 'ngx-autosize'
+import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 
 @NgModule({
-  declarations: [SessionPage, UserVideoComponent, OpenViduVideoComponent, ChatModalComponent],
+  declarations: [SessionPage, UserVideoComponent, OpenViduVideoComponent, ChatModalComponent, EverybodyChatModelComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -23,12 +26,14 @@ import { ChatModalComponent } from '../components/chat-modal/chat-modal.componen
     SessionPageRoutingModule,
     HttpClientModule,
     IonicModule.forRoot(),
+    AutosizeModule
   ],
   providers: [
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    AndroidPermissions
+    AndroidPermissions,
+    ScreenOrientation
   ],
 })
 export class SessionPageModule {}

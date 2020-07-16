@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>Everybody</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content id="ion-content-parent">
+  <ion-grid id="grid-messages">
+    <ion-row *ngFor="let message of this.meetingService.chatMessagesEverybody">
+      <ion-col size="9" *ngIf="!message.isSentByMe" class="message their-message">
+        <b>{{ message.from }}</b><br>
+        <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(convertMarkdownToHTML(message.message))" class="real-message"></div>
+        <div class="time" text-right>
+          {{ message.createdAt | date:'short' }}
+        </div>
+      </ion-col>
+
+      <ion-col offset="3" size="9" *ngIf="message.isSentByMe" class="message user-message">
+        <b>{{ message.from }}</b><br>
+        <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(convertMarkdownToHTML(message.message))" class="real-message"></div>
+        <div class="time" text-right>
+          {{ message.createdAt | date:'short' }}
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="light">
+    <ion-row align-items-center no-padding>
+      <ion-col size="10" id="textarea-parent">
+        <textarea autosize maxRows="5" [(ngModel)]="chatMessage" id="message-input" 
+            placeholder="Chat with Everybody">
+        </textarea>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button expand="block" fill="clear" color="tertiary" [disabled]="chatMessage.trim() === ''" id="msg-send"
+          (click)="sendMessage()">
+          <ion-icon name="send" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

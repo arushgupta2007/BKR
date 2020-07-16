@@ -37,20 +37,33 @@
     <ion-slide>
       <ion-list id="participant_list">
         <ion-list-header id="participant-list-header">
-          <ion-label class="white-text">Participant List</ion-label>
+          <ion-label class="white-text">Chat</ion-label>
         </ion-list-header>
 
         <ion-item class="white-text">
           <ion-avatar slot="start">
-            <img src="assets/unknown_user.png" alt="">
+            <!-- <img src="assets/unknown_user.png" alt=""> -->
+            <ion-icon name="person-circle" class="avatar-icon"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h1>{{ name }}</h1>
           </ion-label>
         </ion-item>
-        <ion-item detail button (click)="openChatModal(participant_key_value.value)" class="white-text" *ngFor="let participant_key_value of meetingService.participantList | keyvalue">
+
+        <ion-item detail button (click)="openEverybodyModal()" class="white-text">
           <ion-avatar slot="start">
-            <img src="assets/unknown_user.png" alt="">
+            <ion-icon name="people-circle" class="avatar-icon"></ion-icon>
+          </ion-avatar>
+          <ion-label>
+            <h1>Everybody</h1>
+          </ion-label>
+        </ion-item>
+
+        <ion-item detail button (click)="openChatModal(participant_key_value.value)" class="white-text"
+          *ngFor="let participant_key_value of meetingService.participantList | keyvalue">
+          <ion-avatar slot="start">
+            <!-- <img src="assets/unknown_user.png" alt=""> -->
+            <ion-icon name="person-circle" class="avatar-icon"></ion-icon>
           </ion-avatar>
           <ion-label>
             <h1>{{ participant_key_value.value.name }}</h1>
@@ -59,20 +72,26 @@
       </ion-list>
     </ion-slide>
     <ion-slide>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="6">
-            <div *ngIf="meetingService.publisher" class="stream-container">
-              <user-video [streamManager]="meetingService.publisher"></user-video>
-            </div>
-          </ion-col>
-          <ion-col size="6" *ngFor="let sub of meetingService.subscribers">
-            <div class="stream-container">
-              <user-video [streamManager]="sub"></user-video>
-            </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+      <ion-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="{{ layoutNo }}" [ngStyle]="video_styles">
+              <div *ngIf="meetingService.publisher" class="stream-container">
+                <user-video [streamManager]="meetingService.publisher" id="self-video"
+                (click)="toggleFullscreen('self-video')"></user-video>
+              </div>
+            </ion-col>
+            <ion-col size="{{ layoutNo }}" [ngStyle]="video_styles"
+              *ngFor="let part of meetingService.participantList | keyvalue">
+              <div class="stream-container">
+                <user-video [streamManager]="part.value.subscriberObject" 
+                    id="user-video-{{ part.value.connectionId }}"
+                    (click)="toggleFullscreen('user-video-' + part.value.connectionId)"></user-video>
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-content>
     </ion-slide>
     <ion-slide>
       <h1 class="white-text">Whiteboard</h1>

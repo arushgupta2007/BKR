@@ -631,6 +631,7 @@ AppModule = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
             _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"],
             _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"],
             _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"],
+            ScreenOrientation
         ],
         bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_7__["AppComponent"]]
     })
@@ -728,7 +729,8 @@ Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
 OpenViduVideoComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
         selector: 'ov-video',
-        template: '<video #videoElement style="width: 100%"></video>'
+        template: '<video #videoElement></video>',
+        styles: ["\n        video {\n            width: 100%;\n            height: 100%;\n            object-fit: cover;\n        }\n    "]
     })
 ], OpenViduVideoComponent);
 
@@ -769,7 +771,9 @@ let MeetingSessionService = class MeetingSessionService {
         this.androidPermissions = androidPermissions;
         this.audio = true;
         this.video = true;
-        this.subscribers = [];
+        this.chatMessagesEverybody = [];
+        this.callbackChatListners = {};
+        this.callbackLeaveListners = {};
         this.ANDROID_PERMISSIONS = [
             this.androidPermissions.PERMISSION.CAMERA,
             this.androidPermissions.PERMISSION.RECORD_AUDIO,
@@ -784,13 +788,7 @@ let MeetingSessionService = class MeetingSessionService {
             }
         });
     }
-    deleteSubscriber(streamManager) {
-        const index = this.subscribers.indexOf(streamManager, 0);
-        if (index > -1) {
-            this.subscribers.splice(index, 1);
-        }
-    }
-    joinSession(data_recv_server, obj) {
+    joinSession(data_recv_server, obj, client_id) {
         console.log("JOINING SESSION");
         this.OV = new openvidu_browser__WEBPACK_IMPORTED_MODULE_6__["OpenVidu"]();
         this.session = this.OV.initSession();
@@ -806,9 +804,44 @@ let MeetingSessionService = class MeetingSessionService {
                 this.participantList[connection_id].videoStatus = data[1] === "1";
             }
         });
+        this.session.on('signal:private-chat', (event) => {
+            var from_connectionId = event.from.connectionId;
+            if (this.participantList[from_connectionId]) {
+                var message_append = {
+                    from: this.participantList[from_connectionId].name,
+                    to: this.name,
+                    message: event.data,
+                    isSentByMe: false,
+                    createdAt: Date.now(),
+                };
+                this.participantList[from_connectionId].chatMessages.push(message_append);
+                if (this.callbackChatListners[from_connectionId]) {
+                    this.callbackChatListners[from_connectionId]();
+                }
+            }
+        });
+        this.session.on('signal:chat', (event) => {
+            var from_connection_id = event.from.connectionId;
+            var seprated_values = event.data.split(",");
+            var from_id = seprated_values[0];
+            var message_to_slice = event.data.slice(event.data.indexOf(","), event.data.length);
+            var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+            if (from_id !== this.user_id.toString()) {
+                var message_obj = {
+                    from: this.participantList[from_connection_id].name,
+                    to: 'Everybody',
+                    message: message,
+                    isSentByMe: false,
+                    createdAt: Date.now()
+                };
+                this.chatMessagesEverybody.push(message_obj);
+            }
+            if (this.callbackEverybodyChat) {
+                this.callbackEverybodyChat();
+            }
+        });
         this.session.on('streamCreated', (event) => {
             const subscriber = this.session.subscribe(event.stream, undefined);
-            this.subscribers.push(subscriber);
             var nickname;
             try {
                 nickname = JSON.parse(subscriber.stream.connection.data).clientData;
@@ -825,19 +858,34 @@ let MeetingSessionService = class MeetingSessionService {
                 videoStatus: true,
                 audioStatus: true,
                 connectionObject: subscriber.stream.connection,
+                subscriberObject: subscriber
             };
             this.participantList[connection_id] = participant_obj;
+            if (this.callbackSomeoneJoinLeave) {
+                this.callbackSomeoneJoinLeave();
+            }
         });
         this.session.on('streamDestroyed', (event) => {
-            // Remove the stream from 'subscribers' array
-            this.deleteSubscriber(event.stream.streamManager);
             delete this.participantList[event.stream.connection.connectionId];
+            if (this.callbackLeaveListners[event.stream.connection.connectionId]) {
+                this.callbackLeaveListners[event.stream.connection.connectionId]();
+            }
+            if (this.callbackSomeoneJoinLeave) {
+                this.callbackSomeoneJoinLeave();
+            }
         });
         this.session.on("connectionDestroyed", (event) => {
             delete this.participantList[event.connection.connectionId];
+            if (this.callbackLeaveListners[event.connection.connectionId]) {
+                this.callbackLeaveListners[event.connection.connectionId]();
+            }
+            if (this.callbackSomeoneJoinLeave) {
+                this.callbackSomeoneJoinLeave();
+            }
         });
         var token = data_recv_server.token;
         this.mySessionId = data_recv_server.session_id;
+        this.user_id = client_id;
         if (obj === "join") {
             this.meetingName = data_recv_server.meetingName;
             this.meetingCode = data_recv_server.meetingCode;
@@ -865,6 +913,9 @@ let MeetingSessionService = class MeetingSessionService {
             }
             if (this.callbackVariables) {
                 this.callbackVariables(this.meetingName, this.meetingCode, this.mySessionId, this.meetingDesc);
+            }
+            if (this.callbackSomeoneJoinLeave) {
+                this.callbackSomeoneJoinLeave();
             }
         })
             .catch(error => {
@@ -898,7 +949,6 @@ let MeetingSessionService = class MeetingSessionService {
         if (this.callbackAfterSessionLeave) {
             this.callbackAfterSessionLeave();
         }
-        this.subscribers = [];
         delete this.publisher;
         delete this.session;
         delete this.OV;
@@ -1025,8 +1075,53 @@ let MeetingSessionService = class MeetingSessionService {
     setCallbackVariables(callback) {
         this.callbackVariables = callback;
     }
+    setCallbackSomeoneJoinLeave(callback) {
+        this.callbackSomeoneJoinLeave = callback;
+    }
+    setCallbackChatOther(callback, connection_id) {
+        this.callbackChatListners[connection_id] = callback;
+    }
+    setCallbackLeaveOther(callback, connection_id) {
+        this.callbackLeaveListners[connection_id] = callback;
+    }
+    setCallbackEverybodyChat(callback) {
+        this.callbackEverybodyChat = callback;
+    }
+    removeCallbackEverybodyChat() {
+        this.callbackEverybodyChat = undefined;
+    }
     setCallbackLeaveSession(callback) {
         this.callbackAfterSessionLeave = callback;
+    }
+    removeCallbackOther(connection_id, chat = true, leave = true) {
+        if (chat) {
+            delete this.callbackChatListners[connection_id];
+        }
+        if (leave) {
+            delete this.callbackLeaveListners[connection_id];
+        }
+    }
+    sendMessage(to, data, type) {
+        var new_data = data;
+        if (type === "chat") {
+            new_data = this.user_id + "," + data;
+        }
+        this.session.signal({
+            data: new_data,
+            to: to,
+            type: type,
+        }).then(() => {
+            if (type === "chat") {
+                var data = {
+                    sessionId: this.mySessionId,
+                    from: this.name,
+                    from_account: "",
+                    to: "Everyone",
+                    message: data,
+                };
+                this.httpClient.post(this.SERVER_URL + "/session/saveMessage/", data, { responseType: 'text' });
+            }
+        });
     }
     checkAndroidPermissions() {
         return new Promise((resolve, reject) => {
@@ -1191,11 +1286,11 @@ UserVideoComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
         selector: 'user-video',
         template: `
-        <div>
+        <div class="ov-video-parent">
             <ov-video [streamManager]="streamManager"></ov-video>
             <div><p>{{nickname}}</p></div>
         </div>`,
-        styles: ["\n            ov-video {\n                width: 100%;\n                height: auto;\n                float: left;\n                cursor: pointer;\n            }\n            div div {\n                position: absolute;\n                background: #f8f8f8;\n                padding-left: 5px;\n                padding-right: 5px;\n                color: #777777;\n                font-weight: bold;\n                border-bottom-right-radius: 4px;\n            }\n            p {\n                margin: 0;\n            }\n        "]
+        styles: ["\n            ov-video {\n                width: 100%;\n                height: 100%;\n                float: left;\n                cursor: pointer;\n            }\n            .ov-video-parent {\n                height: 100%;\n                width: 100%;\n            }\n            div div {\n                position: absolute;\n                background: #f8f8f8;\n                padding-left: 5px;\n                padding-right: 5px;\n                color: #777777;\n                font-weight: bold;\n                border-bottom-right-radius: 4px;\n            }\n            p {\n                margin: 0;\n            }\n        "]
     })
 ], UserVideoComponent);
 

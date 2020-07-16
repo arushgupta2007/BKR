@@ -8,9 +8,13 @@ import { StreamManager } from 'openvidu-browser';
         `
             ov-video {
                 width: 100%;
-                height: auto;
+                height: 100%;
                 float: left;
                 cursor: pointer;
+            }
+            .ov-video-parent {
+                height: 100%;
+                width: 100%;
             }
             div div {
                 position: absolute;
@@ -27,7 +31,7 @@ import { StreamManager } from 'openvidu-browser';
         `,
     ],
     template: `
-        <div>
+        <div class="ov-video-parent">
             <ov-video [streamManager]="streamManager"></ov-video>
             <div><p>{{nickname}}</p></div>
         </div>`,

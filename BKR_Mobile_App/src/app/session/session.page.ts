@@ -1,8 +1,10 @@
 import { Component, OnInit, HostListener, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AlertController, IonSlides, ModalController } from '@ionic/angular';
+import { AlertController, IonSlides, ModalController, Platform } from '@ionic/angular';
 import { ChatModalComponent } from '../components/chat-modal/chat-modal.component';
 import { MeetingSessionService } from '../services/meeting-session.service';
+import { EverybodyChatModelComponent } from '../components/everybody-chat-model/everybody-chat-model.component';
+import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 
 @Component({
   selector: 'app-session',
@@ -11,12 +13,14 @@ import { MeetingSessionService } from '../services/meeting-session.service';
 })
 export class SessionPage implements OnInit {
   data;
-  obj;
-  meetingName;
-  meetingDesc;
-  mySessionId;
-  name;
-  meetingCode;
+  obj: string;
+  meetingName: string;
+  meetingDesc: string;
+  mySessionId: string;
+  name: string;
+  meetingCode: string;
+  layoutNo: number = 6;
+  video_styles = {};
 
   @ViewChild('slides', { static: true }) slides: IonSlides;
   slidesOptions = {
@@ -28,7 +32,9 @@ export class SessionPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     public alertController: AlertController,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private platform: Platform,
+    private screenOrientation: ScreenOrientation
   ) {
     this.route.queryParams.subscribe(() => {
       if (this.router.getCurrentNavigation().extras.state) {
@@ -50,7 +56,9 @@ export class SessionPage implements OnInit {
     }
     this.name = this.data.name_form;
     this.meetingCode = this.data.meetingCode_form;
+    this.meetingService.setCallbackSomeoneJoinLeave(() => { this.layoutManager() })
     this.joinSession();
+    this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
   }
 
   @HostListener('window:beforeunload')
@@ -100,6 +108,13 @@ export class SessionPage implements OnInit {
     chat_modal.present();
   }
 
+  async openEverybodyModal() {
+    const eb_modal = await this.modalCtrl.create({
+      component: EverybodyChatModelComponent,
+    })
+    eb_modal.present();
+  }
+
   async shareAlert() {
     var message_alert = `Share this link: 
       <a href='https://baatkarteraho.in/?todo=join&id_=${this.meetingService.mySessionId}'>
@@ -124,6 +139,37 @@ export class SessionPage implements OnInit {
     this.slides.getActiveIndex().then(() => {
       // TODO: LOGIC
     })
+  }
+
+  layoutManager() {
+    var no_participants: number = Object.keys(this.meetingService.participantList).length + 1;
+    var toolbarHeight = 56;
+    var offset = 15;
+    var video_height;
+    if (no_participants === 1) {
+      this.layoutNo = 12;
+      video_height = this.platform.height() - toolbarHeight;
+    } else if (no_participants === 2) {
+      this.layoutNo = 12;
+      video_height = ((this.platform.height() - toolbarHeight) / 2) - offset
+    } else if (no_participants >= 3) {
+      this.layoutNo = 6;
+      video_height = ((this.platform.height() - toolbarHeight) / 2) - offset;
+    }
+    this.video_styles = {
+      'height.px': video_height.toString()
+    }
+  }
+
+  toggleFullscreen(elemId: string) {
+    var elem = document.getElementById(elemId);
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      }
+    }
   }
 
   ngOnInit() {

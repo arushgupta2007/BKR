@@ -544,7 +544,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       providers: [_ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_6__["StatusBar"], _ionic_native_splash_screen_ngx__WEBPACK_IMPORTED_MODULE_5__["SplashScreen"], {
         provide: _angular_router__WEBPACK_IMPORTED_MODULE_3__["RouteReuseStrategy"],
         useClass: _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["IonicRouteStrategy"]
-      }, _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"], _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"], _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"]],
+      }, _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"], _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"], _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"], ScreenOrientation],
       bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_7__["AppComponent"]]
     })], AppModule);
     /***/
@@ -693,7 +693,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])()], OpenViduVideoComponent.prototype, "streamManager", null);
     OpenViduVideoComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
       selector: 'ov-video',
-      template: '<video #videoElement style="width: 100%"></video>'
+      template: '<video #videoElement></video>',
+      styles: ["\n        video {\n            width: 100%;\n            height: 100%;\n            object-fit: cover;\n        }\n    "]
     })], OpenViduVideoComponent);
     /***/
   },
@@ -776,7 +777,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.androidPermissions = androidPermissions;
         this.audio = true;
         this.video = true;
-        this.subscribers = [];
+        this.chatMessagesEverybody = [];
+        this.callbackChatListners = {};
+        this.callbackLeaveListners = {};
         this.ANDROID_PERMISSIONS = [this.androidPermissions.PERMISSION.CAMERA, this.androidPermissions.PERMISSION.RECORD_AUDIO, this.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS];
         this.participantList = {};
         this.SERVER_URL = "https://192.168.1.16:5442";
@@ -790,17 +793,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
 
       _createClass(MeetingSessionService, [{
-        key: "deleteSubscriber",
-        value: function deleteSubscriber(streamManager) {
-          var index = this.subscribers.indexOf(streamManager, 0);
-
-          if (index > -1) {
-            this.subscribers.splice(index, 1);
-          }
-        }
-      }, {
         key: "joinSession",
-        value: function joinSession(data_recv_server, obj) {
+        value: function joinSession(data_recv_server, obj, client_id) {
           var _this7 = this;
 
           console.log("JOINING SESSION");
@@ -820,10 +814,50 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               _this7.participantList[connection_id].videoStatus = data[1] === "1";
             }
           });
+          this.session.on('signal:private-chat', function (event) {
+            var from_connectionId = event.from.connectionId;
+
+            if (_this7.participantList[from_connectionId]) {
+              var message_append = {
+                from: _this7.participantList[from_connectionId].name,
+                to: _this7.name,
+                message: event.data,
+                isSentByMe: false,
+                createdAt: Date.now()
+              };
+
+              _this7.participantList[from_connectionId].chatMessages.push(message_append);
+
+              if (_this7.callbackChatListners[from_connectionId]) {
+                _this7.callbackChatListners[from_connectionId]();
+              }
+            }
+          });
+          this.session.on('signal:chat', function (event) {
+            var from_connection_id = event.from.connectionId;
+            var seprated_values = event.data.split(",");
+            var from_id = seprated_values[0];
+            var message_to_slice = event.data.slice(event.data.indexOf(","), event.data.length);
+            var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+
+            if (from_id !== _this7.user_id.toString()) {
+              var message_obj = {
+                from: _this7.participantList[from_connection_id].name,
+                to: 'Everybody',
+                message: message,
+                isSentByMe: false,
+                createdAt: Date.now()
+              };
+
+              _this7.chatMessagesEverybody.push(message_obj);
+            }
+
+            if (_this7.callbackEverybodyChat) {
+              _this7.callbackEverybodyChat();
+            }
+          });
           this.session.on('streamCreated', function (event) {
             var subscriber = _this7.session.subscribe(event.stream, undefined);
-
-            _this7.subscribers.push(subscriber);
 
             var nickname;
 
@@ -840,21 +874,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               chatMessages: [],
               videoStatus: true,
               audioStatus: true,
-              connectionObject: subscriber.stream.connection
+              connectionObject: subscriber.stream.connection,
+              subscriberObject: subscriber
             };
             _this7.participantList[connection_id] = participant_obj;
+
+            if (_this7.callbackSomeoneJoinLeave) {
+              _this7.callbackSomeoneJoinLeave();
+            }
           });
           this.session.on('streamDestroyed', function (event) {
-            // Remove the stream from 'subscribers' array
-            _this7.deleteSubscriber(event.stream.streamManager);
-
             delete _this7.participantList[event.stream.connection.connectionId];
+
+            if (_this7.callbackLeaveListners[event.stream.connection.connectionId]) {
+              _this7.callbackLeaveListners[event.stream.connection.connectionId]();
+            }
+
+            if (_this7.callbackSomeoneJoinLeave) {
+              _this7.callbackSomeoneJoinLeave();
+            }
           });
           this.session.on("connectionDestroyed", function (event) {
             delete _this7.participantList[event.connection.connectionId];
+
+            if (_this7.callbackLeaveListners[event.connection.connectionId]) {
+              _this7.callbackLeaveListners[event.connection.connectionId]();
+            }
+
+            if (_this7.callbackSomeoneJoinLeave) {
+              _this7.callbackSomeoneJoinLeave();
+            }
           });
           var token = data_recv_server.token;
           this.mySessionId = data_recv_server.session_id;
+          this.user_id = client_id;
 
           if (obj === "join") {
             this.meetingName = data_recv_server.meetingName;
@@ -887,6 +940,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             if (_this7.callbackVariables) {
               _this7.callbackVariables(_this7.meetingName, _this7.meetingCode, _this7.mySessionId, _this7.meetingDesc);
+            }
+
+            if (_this7.callbackSomeoneJoinLeave) {
+              _this7.callbackSomeoneJoinLeave();
             }
           })["catch"](function (error) {
             console.log('There was an error connecting to the session:', error.code, error.message);
@@ -927,7 +984,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             this.callbackAfterSessionLeave();
           }
 
-          this.subscribers = [];
           delete this.publisher;
           delete this.session;
           delete this.OV;
@@ -1081,36 +1137,106 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.callbackVariables = callback;
         }
       }, {
+        key: "setCallbackSomeoneJoinLeave",
+        value: function setCallbackSomeoneJoinLeave(callback) {
+          this.callbackSomeoneJoinLeave = callback;
+        }
+      }, {
+        key: "setCallbackChatOther",
+        value: function setCallbackChatOther(callback, connection_id) {
+          this.callbackChatListners[connection_id] = callback;
+        }
+      }, {
+        key: "setCallbackLeaveOther",
+        value: function setCallbackLeaveOther(callback, connection_id) {
+          this.callbackLeaveListners[connection_id] = callback;
+        }
+      }, {
+        key: "setCallbackEverybodyChat",
+        value: function setCallbackEverybodyChat(callback) {
+          this.callbackEverybodyChat = callback;
+        }
+      }, {
+        key: "removeCallbackEverybodyChat",
+        value: function removeCallbackEverybodyChat() {
+          this.callbackEverybodyChat = undefined;
+        }
+      }, {
         key: "setCallbackLeaveSession",
         value: function setCallbackLeaveSession(callback) {
           this.callbackAfterSessionLeave = callback;
         }
       }, {
-        key: "checkAndroidPermissions",
-        value: function checkAndroidPermissions() {
+        key: "removeCallbackOther",
+        value: function removeCallbackOther(connection_id) {
+          var chat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+          var leave = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+          if (chat) {
+            delete this.callbackChatListners[connection_id];
+          }
+
+          if (leave) {
+            delete this.callbackLeaveListners[connection_id];
+          }
+        }
+      }, {
+        key: "sendMessage",
+        value: function sendMessage(to, data, type) {
           var _this9 = this;
 
+          var new_data = data;
+
+          if (type === "chat") {
+            new_data = this.user_id + "," + data;
+          }
+
+          this.session.signal({
+            data: new_data,
+            to: to,
+            type: type
+          }).then(function () {
+            if (type === "chat") {
+              var data = {
+                sessionId: _this9.mySessionId,
+                from: _this9.name,
+                from_account: "",
+                to: "Everyone",
+                message: data
+              };
+
+              _this9.httpClient.post(_this9.SERVER_URL + "/session/saveMessage/", data, {
+                responseType: 'text'
+              });
+            }
+          });
+        }
+      }, {
+        key: "checkAndroidPermissions",
+        value: function checkAndroidPermissions() {
+          var _this10 = this;
+
           return new Promise(function (resolve, reject) {
-            _this9.platform.ready().then(function () {
-              _this9.androidPermissions.requestPermissions(_this9.ANDROID_PERMISSIONS).then(function () {
-                _this9.androidPermissions.checkPermission(_this9.androidPermissions.PERMISSION.CAMERA).then(function (camera) {
-                  _this9.androidPermissions.checkPermission(_this9.androidPermissions.PERMISSION.RECORD_AUDIO).then(function (audio) {
-                    _this9.androidPermissions.checkPermission(_this9.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS).then(function (modifyAudio) {
+            _this10.platform.ready().then(function () {
+              _this10.androidPermissions.requestPermissions(_this10.ANDROID_PERMISSIONS).then(function () {
+                _this10.androidPermissions.checkPermission(_this10.androidPermissions.PERMISSION.CAMERA).then(function (camera) {
+                  _this10.androidPermissions.checkPermission(_this10.androidPermissions.PERMISSION.RECORD_AUDIO).then(function (audio) {
+                    _this10.androidPermissions.checkPermission(_this10.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS).then(function (modifyAudio) {
                       if (camera.hasPermission && audio.hasPermission && modifyAudio.hasPermission) {
                         resolve();
                       } else {
                         reject(new Error('Permissions denied: ' + '\n' + ' CAMERA = ' + camera.hasPermission + '\n' + ' AUDIO = ' + audio.hasPermission + '\n' + ' AUDIO_SETTINGS = ' + modifyAudio.hasPermission));
                       }
                     })["catch"](function (err) {
-                      console.error('Checking permission ' + _this9.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS + ' failed');
+                      console.error('Checking permission ' + _this10.androidPermissions.PERMISSION.MODIFY_AUDIO_SETTINGS + ' failed');
                       reject(err);
                     });
                   })["catch"](function (err) {
-                    console.error('Checking permission ' + _this9.androidPermissions.PERMISSION.RECORD_AUDIO + ' failed');
+                    console.error('Checking permission ' + _this10.androidPermissions.PERMISSION.RECORD_AUDIO + ' failed');
                     reject(err);
                   });
                 })["catch"](function (err) {
-                  console.error('Checking permission ' + _this9.androidPermissions.PERMISSION.CAMERA + ' failed');
+                  console.error('Checking permission ' + _this10.androidPermissions.PERMISSION.CAMERA + ' failed');
                   reject(err);
                 });
               })["catch"](function (err) {
@@ -1298,8 +1424,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])()], UserVideoComponent.prototype, "streamManager", void 0);
     UserVideoComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
       selector: 'user-video',
-      template: "\n        <div>\n            <ov-video [streamManager]=\"streamManager\"></ov-video>\n            <div><p>{{nickname}}</p></div>\n        </div>",
-      styles: ["\n            ov-video {\n                width: 100%;\n                height: auto;\n                float: left;\n                cursor: pointer;\n            }\n            div div {\n                position: absolute;\n                background: #f8f8f8;\n                padding-left: 5px;\n                padding-right: 5px;\n                color: #777777;\n                font-weight: bold;\n                border-bottom-right-radius: 4px;\n            }\n            p {\n                margin: 0;\n            }\n        "]
+      template: "\n        <div class=\"ov-video-parent\">\n            <ov-video [streamManager]=\"streamManager\"></ov-video>\n            <div><p>{{nickname}}</p></div>\n        </div>",
+      styles: ["\n            ov-video {\n                width: 100%;\n                height: 100%;\n                float: left;\n                cursor: pointer;\n            }\n            .ov-video-parent {\n                height: 100%;\n                width: 100%;\n            }\n            div div {\n                position: absolute;\n                background: #f8f8f8;\n                padding-left: 5px;\n                padding-right: 5px;\n                color: #777777;\n                font-weight: bold;\n                border-bottom-right-radius: 4px;\n            }\n            p {\n                margin: 0;\n            }\n        "]
     })], UserVideoComponent);
     /***/
   },

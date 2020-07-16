@@ -9,32 +9,55 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="main-container">
-    <div id="participant-control-button-group">
-      <ion-button id="video-icon" (click)="toggleParticipantVideo()" class="white-text" expand="full">
-        <i class="fas fa-video" *ngIf="meetingService.participantList[connectionId].videoStatus"></i>
-        <i class="fas fa-video-slash" *ngIf="!meetingService.participantList[connectionId].videoStatus"></i>
-      </ion-button>
-      <ion-button id="audio-icon" (click)="toggleParticipantAudio()" class="white-text" expand="full">
-        <ion-icon name="mic" *ngIf="meetingService.participantList[connectionId].audioStatus"></ion-icon>
-        <ion-icon name="mic-off" *ngIf="!meetingService.participantList[connectionId].audioStatus"></ion-icon>
-      </ion-button>
-      <ion-button class="end-call-icon-background-red white-text" (click)="endParticipantCall()" expand="full">
-        <ion-icon name="call" class="end-call-icon"></ion-icon>
-      </ion-button>
-    </div>
-    <div id="chat-area">
-      
-    </div>
-    <div id="chat-input-container">
-      <ion-item>
-        <ion-label position="floating">Chat with {{ this.meetingService.participantList[this.connectionId].name }}</ion-label>
-        <ion-input clearInput type="text" [(ngModel)]="chatMessage"></ion-input>
-      </ion-item>
-      <ion-fab-button (click)="sendMessage()">
-        <ion-icon name="send"></ion-icon>
-      </ion-fab-button>
-    </div>
+<ion-content id="ion-content-parent">
+  <div id="participant-control-button-group">
+    <ion-button id="video-icon" (click)="toggleParticipantVideo()" class="white-text" expand="full">
+      <i class="fas fa-video" *ngIf="meetingService.participantList[connectionId].videoStatus"></i>
+      <i class="fas fa-video-slash" *ngIf="!meetingService.participantList[connectionId].videoStatus"></i>
+    </ion-button>
+    <ion-button id="audio-icon" (click)="toggleParticipantAudio()" class="white-text" expand="full">
+      <ion-icon name="mic" *ngIf="meetingService.participantList[connectionId].audioStatus"></ion-icon>
+      <ion-icon name="mic-off" *ngIf="!meetingService.participantList[connectionId].audioStatus"></ion-icon>
+    </ion-button>
+    <ion-button class="end-call-icon-background-red white-text" (click)="endParticipantCall()" expand="full">
+      <ion-icon name="call" class="end-call-icon"></ion-icon>
+    </ion-button>
   </div>
+  <ion-grid id="grid-messages">
+    <ion-row *ngFor="let message of this.meetingService.participantList[this.connectionId].chatMessages">
+      <ion-col size="9" *ngIf="!message.isSentByMe" class="message their-message">
+        <b>{{ message.from }}</b><br>
+        <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(convertMarkdownToHTML(message.message))" class="real-message"></div>
+        <div class="time" text-right>
+          {{ message.createdAt | date:'short' }}
+        </div>
+      </ion-col>
+
+      <ion-col offset="3" size="9" *ngIf="message.isSentByMe" class="message user-message">
+        <b>{{ message.from }}</b><br>
+        <div [innerHTML]="sanitizer.bypassSecurityTrustHtml(convertMarkdownToHTML(message.message))" class="real-message"></div>
+        <div class="time" text-right>
+          {{ message.createdAt | date:'short' }}
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar color="light">
+    <ion-row align-items-center no-padding>
+      <ion-col size="10" id="textarea-parent">
+        <textarea autosize maxRows="5" [(ngModel)]="chatMessage" id="message-input" 
+            placeholder="Chat with {{ this.meetingService.participantList[this.connectionId].name }}">
+        </textarea>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button expand="block" fill="clear" color="tertiary" [disabled]="chatMessage.trim() === ''" id="msg-send"
+          (click)="sendMessage()">
+          <ion-icon name="send" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-toolbar>
+</ion-footer>

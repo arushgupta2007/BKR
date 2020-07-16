@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { Platform } from '@ionic/angular';
 import { OpenVidu, StreamManager, Publisher, Session, SignalEvent, StreamEvent, Subscriber, ConnectionEvent } from 'openvidu-browser';
 import { Participant } from '../inerfaces/partipant-session'
+import { ChatMessage } from '../inerfaces/chat-message';
 declare var cordova;
 
 @Injectable({
@@ -22,9 +23,13 @@ export class MeetingSessionService {
   public session: Session;
   public publisher: StreamManager;
   public publisher_publisher: Publisher;
-  public subscribers: StreamManager[] = [];
+  public chatMessagesEverybody: ChatMessage[] = [];
   callbackAfterSessionLeave;
   callbackVariables;
+  callbackChatListners = {};
+  callbackLeaveListners = {};
+  callbackEverybodyChat;
+  callbackSomeoneJoinLeave;
 
   ANDROID_PERMISSIONS = [
     this.androidPermissions.PERMISSION.CAMERA,
@@ -50,16 +55,9 @@ export class MeetingSessionService {
     });
   }
 
-  private deleteSubscriber(streamManager: StreamManager): void {
-    const index = this.subscribers.indexOf(streamManager, 0);
-    if (index > -1) {
-      this.subscribers.splice(index, 1);
-    }
-  }
-
   joinSession(data_recv_server: any, obj: string, client_id: number) {
     console.log("JOINING SESSION");
-    
+
     this.OV = new OpenVidu();
     this.session = this.OV.initSession();
     this.session.on('signal:userControlMessage', (event: SignalEvent) => {
@@ -74,9 +72,44 @@ export class MeetingSessionService {
         this.participantList[connection_id].videoStatus = data[1] === "1";
       }
     })
+    this.session.on('signal:private-chat', (event: SignalEvent) => {
+      var from_connectionId = event.from.connectionId;
+      if (this.participantList[from_connectionId]) {
+        var message_append = {
+          from: this.participantList[from_connectionId].name,
+          to: this.name,
+          message: event.data,
+          isSentByMe: false,
+          createdAt: Date.now(),
+        }
+        this.participantList[from_connectionId].chatMessages.push(message_append)
+        if (this.callbackChatListners[from_connectionId]) {
+          this.callbackChatListners[from_connectionId]();
+        }
+      }
+    })
+    this.session.on('signal:chat', (event: SignalEvent) => {
+      var from_connection_id = event.from.connectionId;
+      var seprated_values = event.data.split(",");
+      var from_id = seprated_values[0];
+      var message_to_slice = event.data.slice(event.data.indexOf(","), event.data.length);
+      var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
+      if (from_id !== this.user_id.toString()) {
+        var message_obj = {
+          from: this.participantList[from_connection_id].name,
+          to: 'Everybody',
+          message: message,
+          isSentByMe: false,
+          createdAt: Date.now()
+        }
+        this.chatMessagesEverybody.push(message_obj);
+      }
+      if (this.callbackEverybodyChat) {
+        this.callbackEverybodyChat();
+      }
+    })
     this.session.on('streamCreated', (event: StreamEvent) => {
       const subscriber: Subscriber = this.session.subscribe(event.stream, undefined);
-      this.subscribers.push(subscriber);
       var nickname;
       try {
         nickname = JSON.parse(subscriber.stream.connection.data).clientData;
@@ -92,17 +125,31 @@ export class MeetingSessionService {
         videoStatus: true,
         audioStatus: true,
         connectionObject: subscriber.stream.connection,
+        subscriberObject: subscriber
       }
       this.participantList[connection_id] = participant_obj;
+      if (this.callbackSomeoneJoinLeave) {
+        this.callbackSomeoneJoinLeave();
+      }
     });
     this.session.on('streamDestroyed', (event: StreamEvent) => {
-      // Remove the stream from 'subscribers' array
-      this.deleteSubscriber(event.stream.streamManager);
       delete this.participantList[event.stream.connection.connectionId];
+      if (this.callbackLeaveListners[event.stream.connection.connectionId]) {
+        this.callbackLeaveListners[event.stream.connection.connectionId]();
+      }
+      if (this.callbackSomeoneJoinLeave) {
+        this.callbackSomeoneJoinLeave();
+      }
     });
 
     this.session.on("connectionDestroyed", (event: ConnectionEvent) => {
       delete this.participantList[event.connection.connectionId];
+      if (this.callbackLeaveListners[event.connection.connectionId]) {
+        this.callbackLeaveListners[event.connection.connectionId]();
+      }
+      if (this.callbackSomeoneJoinLeave) {
+        this.callbackSomeoneJoinLeave();
+      }
     })
 
     var token = data_recv_server.token;
@@ -134,6 +181,9 @@ export class MeetingSessionService {
         if (this.callbackVariables) {
           this.callbackVariables(this.meetingName, this.meetingCode, this.mySessionId, this.meetingDesc);
         }
+        if (this.callbackSomeoneJoinLeave) {
+          this.callbackSomeoneJoinLeave();
+        }
       })
       .catch(error => {
         console.log('There was an error connecting to the session:', error.code, error.message);
@@ -143,18 +193,18 @@ export class MeetingSessionService {
   initPublisher(audio_input, video_input) {
     if (this.OV) {
       const publisher: Publisher = this.OV.initPublisher(undefined, {
-        audioSource: undefined, 
-        videoSource: undefined, 
-        publishAudio: audio_input, 
-        publishVideo: video_input, 
-        resolution: '640x480', 
-        frameRate: 30, 
-        insertMode: 'APPEND', 
-        mirror: true 
+        audioSource: undefined,
+        videoSource: undefined,
+        publishAudio: audio_input,
+        publishVideo: video_input,
+        resolution: '640x480',
+        frameRate: 30,
+        insertMode: 'APPEND',
+        mirror: true
       });
-  
+
       this.publisher_publisher = publisher;
-      this.session.publish(publisher).then(() => {  
+      this.session.publish(publisher).then(() => {
         this.publisher = publisher;
         console.log(typeof publisher);
         console.log(typeof this.publisher);
@@ -167,16 +217,15 @@ export class MeetingSessionService {
       this.session.disconnect();
     }
 
-    if(this.callbackAfterSessionLeave) {
+    if (this.callbackAfterSessionLeave) {
       this.callbackAfterSessionLeave();
     }
-    this.subscribers = [];
     delete this.publisher;
     delete this.session;
     delete this.OV;
   }
 
-  getTokenCreate(name:string, meetingName:string, meetingCode:string, meetingDesc:string) {
+  getTokenCreate(name: string, meetingName: string, meetingCode: string, meetingDesc: string) {
     console.log("Getting Token Create");
     this.name = name;
     this.meetingName = meetingName;
@@ -194,7 +243,7 @@ export class MeetingSessionService {
       .toPromise()
   }
 
-  getTokenJoin(name:string, meetingId:number, meetingCode:string) {
+  getTokenJoin(name: string, meetingId: number, meetingCode: string) {
     console.log("Getting Token Join");
     this.name = name;
     this.mySessionId = meetingId;
@@ -278,7 +327,7 @@ export class MeetingSessionService {
     })
   }
 
-  sendUserCtrl(connection_id:string, type:string, value:string) {
+  sendUserCtrl(connection_id: string, type: string, value: string) {
     if (this.participantList[connection_id]) {
       this.session.signal({
         data: type + "," + value,
@@ -306,15 +355,60 @@ export class MeetingSessionService {
     this.callbackVariables = callback;
   }
 
+  setCallbackSomeoneJoinLeave(callback) {
+    this.callbackSomeoneJoinLeave = callback;
+  }
+
+  setCallbackChatOther(callback, connection_id) {
+    this.callbackChatListners[connection_id] = callback;
+  }
+
+  setCallbackLeaveOther(callback, connection_id) {
+    this.callbackLeaveListners[connection_id] = callback;
+  }
+
+  setCallbackEverybodyChat(callback) {
+    this.callbackEverybodyChat = callback;
+  }
+
+  removeCallbackEverybodyChat() {
+    this.callbackEverybodyChat = undefined;
+  }
+
   setCallbackLeaveSession(callback) {
     this.callbackAfterSessionLeave = callback;
   }
 
-  sendMessage(to:any, data:string, type:string) {
+  removeCallbackOther(connection_id: string, chat: boolean = true, leave: boolean = true) {
+    if (chat) {
+      delete this.callbackChatListners[connection_id];
+    }
+    if (leave) {
+      delete this.callbackLeaveListners[connection_id];
+    }
+  }
+
+  sendMessage(to: any, data: string, type: string) {
+    var new_data = data;
+    if (type === "chat") {
+      new_data = this.user_id + "," + data
+    }
     this.session.signal({
-      data: data,
+      data: new_data,
       to: to,
       type: type,
+    }).then(() => {
+      if (type === "chat") {
+        var data = {
+          sessionId: this.mySessionId,
+          from: this.name,
+          from_account: "",
+          to: "Everyone",
+          message: data,
+        }
+        this.httpClient.post(this.SERVER_URL + "/session/saveMessage/", 
+            data, { responseType: 'text' });
+      }
     })
   }
 

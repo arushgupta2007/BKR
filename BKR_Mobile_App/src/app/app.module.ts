@@ -14,6 +14,8 @@ import { UserVideoComponent } from './user-video.component';
 import { SessionPipe } from './session.pipe';
 import { OauthService } from './services/oauth.service';
 import { MeetingSessionService } from './services/meeting-session.service';
+import { AngularFireModule } from '@angular/fire';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [AppComponent, UserVideoComponent, OpenViduVideoComponent, SessionPipe],
@@ -25,6 +27,7 @@ import { MeetingSessionService } from './services/meeting-session.service';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
   ],
   providers: [
     StatusBar,
@@ -33,6 +36,7 @@ import { MeetingSessionService } from './services/meeting-session.service';
     AndroidPermissions,
     OauthService,
     MeetingSessionService,
+    ScreenOrientation
   ],
   bootstrap: [AppComponent]
 })
