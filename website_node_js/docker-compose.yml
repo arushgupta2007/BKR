@@ -1,6 +1,6 @@
-version: "3"
+version: "3.1"
 services: 
-    mongodb: 
+    mymongo: 
         image: "mongo"
 
     bkr_website:
@@ -9,5 +9,6 @@ services:
             - "5442:5442"
         environment: 
             - SERVER_PORT=5442
-            - OPENVIDU_URL=https://ec2-3-17-189-175.us-east-2.compute.amazonaws.com
+            - OPENVIDU_URL=https://192.168.1.16:4443
             - OPENVIDU_SECRET=BaatKarteRaho
+            - IS_LOCAL=1

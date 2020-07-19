@@ -2,8 +2,14 @@
 var OpenVidu = require("openvidu-node-client").OpenVidu;
 var OpenViduRole = require("openvidu-node-client").OpenViduRole;
 
+// Checking If Local
+var IS_LOCAL = parseInt(process.env.IS_LOCAL);
+console.log("IS LOCAL: " + IS_LOCAL);
+
 // Workaround to a problem
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+if (IS_LOCAL === 1) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 // Other Imports
 var express = require("express");
@@ -20,17 +26,32 @@ var userModel = require("./models/user_model");
 var meetingsModel = require("./models/meeting_model");
 
 // Connecting to local MongoDB
-var mongoDB = 'mongodb://localhost:27017/BKR';
-mongoose.connect(mongoDB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+if (IS_LOCAL === 1) {
+    console.log("IS_LOCAL: TRUE, MONGODB Connection To mymongo");
+    var mongoDB = 'mongodb://mymongo/BKR';
+    mongoose.connect(mongoDB, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+} else {
+    console.log("IS_LOCAL: FALSE, MONGODB Connection To localhost");
+    var mongoDB = 'mongodb://localhost:27017/BKR';
+    mongoose.connect(mongoDB, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+}
 
 // Initializing Express
 var app = express();
 
 // Starting http server with openvidu requirements
 var http = require("http").createServer(app);
+var options = {
+    key: fs.readFileSync("openvidukey.pem"),
+    cert: fs.readFileSync("openviducert.pem"),
+};
+var https = require('https').createServer(options, app);
 
 // Using cookie-session as default cookie
 app.use(cookieSession({
@@ -51,7 +72,7 @@ app.use(
     })
 );
 
-app.use(cors({origin: 'http://localhost'}));
+app.use(cors({ origin: 'http://localhost' }));
 // app.use(fileupload());
 
 // setting view engine as ejs
@@ -62,8 +83,6 @@ app.use('/favicon.ico', express.static('public/home/images/favicon.ico'));
 // Connecting to Openvidu Server
 var OPENVIDU_URL = process.env.OPENVIDU_URL;
 var OPENVIDU_SECRET = process.env.OPENVIDU_SECRET;
-// var OPENVIDU_URL = "https://localhost:4443";
-// var OPENVIDU_SECRET = "MY_SECRET";
 var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 
 // Storing all session objects in mapSessions Object
@@ -77,36 +96,11 @@ app.use("/static", express.static("public"));
 function deleteMeeting(session_id, meeting) {
     //delete from mapSession
     delete mapSessions[session_id];
-    // get users in meeting's user list in MongoDB
-    // usersArray = meeting.usersPrev;
-    // // delete this meeting from user's meeting list
-    // for (userId of usersArray) {
-    //     /* userModel.deleteOne({_id: user}, function(err){}); */
-    //     // find user in database with meeting in it's meeting list
-    //     userModel.findOne({_id: userId._id}, function (err, user) {
-    //         if (err) {
-    //             // log error if there
-    //             console.log(err);
-    //         }
-    //         // check if user exixts
-    //         if (user) {
-    //             // user exists
-    //             // find index of current meeting in meeting's list
-    //             var index_of_meeting = user.meetings.indexOf(meeting._id);
-    //             // remove current meeting from meeting's list
-    //             user.meetings.splice(index_of_meeting, 1);
-    //             // save user to MongoDB database
-    //             user.save();
-    //         }
-    //     })
-    // }
-    // delete meeting from MongoDB database
-    // meetingsModel.deleteOne({meetingID: session_id}).catch((err, b, c) => {})
     console.log("DELETED MEETING");
 }
 
 // GET request to / (home page)
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING HOME PAGE");
     // render home ejs file
@@ -138,7 +132,7 @@ app.get("/meetings-rooms/", (req, res) => {
 })
 
 // GET request to /join_us (sign in / sign up / log in)
-app.get("/join_us/", function(req, res) {
+app.get("/join_us/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING JOIN US PAGE");
     // render join_us ejs file
@@ -146,7 +140,7 @@ app.get("/join_us/", function(req, res) {
 });
 
 // GET request to /join_us/success (success of joining us above)
-app.get("/join_us/success/", function(req, res) {
+app.get("/join_us/success/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING JOIN US SUCCESS PAGE");
     // render success of joining us ejs file
@@ -154,13 +148,13 @@ app.get("/join_us/success/", function(req, res) {
 });
 
 // POST request to /join_us/addUser (adding user to MongoDB database)
-app.post("/join_us/addUser/", function(req, res) {
+app.post("/join_us/addUser/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("ADD USER CALLED");
     // find if there is existing user with same user id
     userModel.findOne({
         commonId: req.body.id_to_keep
-    }, function(err, user) {
+    }, function (err, user) {
         if (err) {
             // log error if there
             console.log(err);
@@ -229,7 +223,7 @@ app.post("/session/", (req, res) => {
             customSessionId: session_id.toString()
         };
 
-        OV.createSession(prop)
+        OV.createSession()
             .then((session) => {
                 console.log("SESSION CREATED");
                 // store session object to mapSessions
@@ -270,7 +264,7 @@ app.post("/session/", (req, res) => {
                                 console.log("FINDING SIGNED IN USER IN DATABASE");
                                 userModel.findOne({
                                     commonId: req.body.userId
-                                }, function(err, user) {
+                                }, function (err, user) {
                                     // if user was found continue
                                     if (user) {
                                         console.log("FOUND USER");
@@ -432,7 +426,7 @@ app.post("/session/", (req, res) => {
                                     console.log("FINDING LOGGED IN USER IN DATABASE");
                                     userModel.findOne({
                                         commonId: req.body.userId
-                                    }, function(err, user) {
+                                    }, function (err, user) {
                                         // check if user exists in the database
                                         if (user) {
                                             console.log("FOUND LOGGED IN USER IN DATABASE");
@@ -501,7 +495,7 @@ app.post("/session/saveMessage/", (req, res) => {
     // find meeting from data.sessionId
     meetingsModel.findOne({
         meetingID: data.sessionId
-    }, function(err, meeting) {
+    }, function (err, meeting) {
         if (err) {
             // log error if there
             console.log(err);
@@ -614,7 +608,6 @@ app.post("/leave-session", (req, res) => {
 
 app.post("/mobile-api/create-meeting-get-token", (req, res) => {
     console.log("GOT REQUEST FROM MOBILE");
-    console.log(req.body);
     var userName = req.body.userName;
     var meetingName = req.body.meetingName;
     var meetingCode = req.body.meetingCode;
@@ -674,7 +667,7 @@ app.post("/mobile-api/create-meeting-get-token", (req, res) => {
                             console.log("FINDING SIGNED IN USER IN DATABASE");
                             userModel.findOne({
                                 commonId: req.body.userId
-                            }, function(err, user) {
+                            }, function (err, user) {
                                 // if user was found continue
                                 if (user) {
                                     console.log("FOUND USER");
@@ -704,13 +697,128 @@ app.post("/mobile-api/create-meeting-get-token", (req, res) => {
                         }
                         res.send(JSON.stringify({
                             token: token,
-                            session_id: session_id
+                            session_id: session_id,
+                            user_id: 0,
                         }))
                     });
                 })
                 .catch((err) => console.log(err)); // log error if there
         })
         .catch((err) => console.log(err));
+})
+
+app.post("/mobile-api/join-meeting-and-get-token/", (req, res) => {
+    console.log("GOT REQUEST FROM MOBILE");
+    var userName = req.body.userName;
+    var meetingId = parseInt(req.body.meetingId);
+    var meetingCode = req.body.meetingCode;
+    var userId = req.body.userId;
+    var role = OpenViduRole.PUBLISHER;
+    // server data needed by OpenVidu
+    var serverData = JSON.stringify({
+        serverData: userName
+    });
+    // token configuration needed by OpenVidu
+    var tokenOptions = {
+        data: serverData,
+        role: role,
+        kurentoOptions: {
+            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter", "ChromaFilter"]
+        },
+    };
+    // user wants to join a ongoing meeting
+    // get sessionId
+    // find the meeting in MongoDB with that session id
+    console.log("FINDING MEETING FROM MEETING ID");
+    meetingsModel.findOne({
+        meetingID: meetingId
+    }).then((meetingToJoin) => {
+        // check if meeting exists
+        if (meetingToJoin) {
+            console.log("FOUND MEETING");
+            // meeting exists
+            // check if code given by user matches the one in the database
+            if (meetingToJoin.code === meetingCode) {
+                console.log("MEETING CODE WAS CORRECT");
+                // code matches
+                // get session object from mapSessions
+                var mySession = mapSessions[meetingId];
+                // get client id to put from database
+                var client_id = meetingToJoin.next_id;
+                // generate token for user needed by OpenVidu
+                mySession
+                    .generateToken(tokenOptions)
+                    .then((token) => {
+                        console.log("GENERATED TOKEN FOR USER");
+                        // push token to meeting's token array in MongoDB
+                        meetingToJoin.tokens.push(token);
+                        // Increment meeting's next Id in MongoDB
+                        meetingToJoin.next_id = meetingToJoin.next_id + 1;
+                        // saving changes of meeting to MongoDB
+                        meetingToJoin.save().then((meeting) => {
+                            // check if user is logged in
+                            if (req.body.userId !== "") {
+                                console.log("USER IS LOGGED IN");
+                                // user is logged in
+                                // find the user who is logged in in MongoDB
+                                console.log("FINDING LOGGED IN USER IN DATABASE");
+                                userModel.findOne({
+                                    commonId: req.body.userId
+                                }, function (err, user) {
+                                    // check if user exists in the database
+                                    if (user) {
+                                        console.log("FOUND LOGGED IN USER IN DATABASE");
+                                        // user exists
+                                        // check if user's meeting list contains current meeting
+                                        if (!user.meetings.includes(meeting._id)) {
+                                            console.log("MEETING NOT IN USER'S MEETING LIST");
+                                            // user's meeting list does not have the current meeting
+                                            // add current meeting to user's meeting list
+                                            user.meetings.push(meeting._id);
+                                            // save chages done to user in MongoDB
+                                            user.save();
+                                            // push user to meeting'suser list
+                                            meeting.usersPrev.push(user._id);
+                                            // save changes done to meeting in MongoDB
+                                            meeting.save();
+                                            console.log("ADDED MEETING IN USER'S MEETING LIST AND USER IN MEETING'S USER LIST");
+                                        }
+                                    } else {
+                                        // user does not exists in database
+                                        console.log("USER IS SIGNED IN BUT NOT FOUND IN DATABASE");
+                                    }
+                                });
+                            } else {
+                                // user is not logged in
+                                console.log("USER IS NOT LOGGED IN");
+                            }
+                            // render meeting ejs file with passing some data
+                            res.send(JSON.stringify({
+                                token: token,
+                                session_id: meetingId,
+                                meetingName: meetingToJoin.meetingName,
+                                meetingCode: meetingToJoin.code,
+                                meetingDesc: meetingToJoin.meetingDesc,
+                                user_id: client_id
+                            }))
+                        });
+                    })
+                    .catch((error) => {
+                        console.error(error); // log error if there
+                    });
+            } else {
+                // the meeting id or meeting code was incorrect
+                // redirect user to fill right values
+                console.log("WRONG MEETING ID OR MEETING CODE");
+                res.redirect("/?todo=join-wrong&name=" + name_client);
+            }
+        } else {
+            // meeting does not exist in MongoDB database, meetingId was incorrect
+            // redirect user to fill right values
+            console.log("WRONG MEETING ID");
+            res.redirect("/?todo=join-wrong&name=" + name_client);
+        }
+    });
 })
 
 // app.post("/user-api/file-share-chat/", (req, res) => {
@@ -731,7 +839,7 @@ app.post("/mobile-api/create-meeting-get-token", (req, res) => {
 //     }
 // })
 
-app.post("/user-api/check-id-code/", function(req, res) {
+app.post("/user-api/check-id-code/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("API CHECK ID AND CODE");
     var meeting_id = parseInt(req.body.meetingId);
@@ -755,7 +863,7 @@ app.post("/user-api/check-id-code/", function(req, res) {
     });
 });
 
-app.post("/user-api/user/prevMeetings/", function(req, res) {
+app.post("/user-api/user/prevMeetings/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("USER RQUESTED IT'S PREV MEETINGS");
     var userUid = req.body.userUID;
@@ -839,9 +947,27 @@ app.post("/user-api/prevMeeting/delete", (req, res) => {
 
 // start http server at port 8000
 console.log("PORT: " + process.env.SERVER_PORT);
-http.listen(process.env.SERVER_PORT, () => {
-    // log after server has started
-    console.log("+--------------------------------------------------+");
-    console.log("|          Started Server at port 5442             |");
-    console.log("+--------------------------------------------------+");
-});
+console.log(typeof IS_LOCAL);
+if (IS_LOCAL === 1) {
+    try {
+        https.listen(process.env.SERVER_PORT, () => {
+            // log after server has started
+            console.log("+--------------------------------------------------------+");
+            console.log("|          Started HTTPS Server at port 5442             |");
+            console.log("+--------------------------------------------------------+");
+        });
+    } catch (err) {
+        console.log(err);
+    }
+} else {
+    try {
+        http.listen(process.env.SERVER_PORT, () => {
+            // log after server has started
+            console.log("+-------------------------------------------------------+");
+            console.log("|          Started HTTP Server at port 5442             |");
+            console.log("+-------------------------------------------------------+");
+        });
+    } catch (err) {
+        console.log(err);
+    }
+}
