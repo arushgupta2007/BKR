@@ -14,6 +14,7 @@ document.write('\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>\
 <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-database.js"></script>\
+<script src="https://www.gstatic.com/firebasejs/7.15.0/firebase-messaging.js"></script>\
 <script>\
     var firebaseConfig = {\
         apiKey: "AIzaSyAAHNLr2B40uA5E_2VOFvpF7VxCs_jDjmI",\

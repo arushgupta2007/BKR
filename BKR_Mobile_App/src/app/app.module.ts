@@ -15,6 +15,7 @@ import { SessionPipe } from './session.pipe';
 import { OauthService } from './services/oauth.service';
 import { MeetingSessionService } from './services/meeting-session.service';
 import { AngularFireModule } from '@angular/fire';
+import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 
 @NgModule({
@@ -28,6 +29,7 @@ import { environment } from 'src/environments/environment';
     ReactiveFormsModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFireAuthModule
   ],
   providers: [
     StatusBar,

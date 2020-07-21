@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script> -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="/static/head_imports.js"></script>
 
@@ -20,6 +20,8 @@
     <!-- Firepad -->
     <link rel="stylesheet" href="https://firepad.io/releases/v1.5.10/firepad.css" />
     <script src="https://firepad.io/releases/v1.5.10/firepad.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
 
     <script src="/static/session/js/openvidu-browser-2.14.0.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
@@ -40,10 +42,11 @@
             <div class="modal-content" id="whiteboard-model-content">
                 <div class="modal-header">
                     <h3 class="modal-title" id="modalLabel">White Board</h3>
-                    <button class="btn btn-primary" id="clear-board">Clear board</button>
                 </div>
-                <div class="modal-body" id="canvas-container">
-                    <!-- <canvas id="whiteboard"></canvas> -->
+                <div class="modal-body">
+                    <div id="canvas-container">
+                        <!-- <canvas id="canvas-whiteboard"></canvas> -->
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="backToVideoAudio()">Close</button>
@@ -75,11 +78,30 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">collaboration</h4>
+                    <h4 class="modal-title">Collaboration</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div id="firepad"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="firepadDownload()">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mindmap_modal" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Mind Map</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="mindmap"></div>
+                    <button type="button" onclick="addNodeMindMap()" class="btn btn-primary">Add</button>
+                    <button type="button" onclick="removeNodeMindMap()" class="btn btn-primary">Remove</button>
                 </div>
             </div>
         </div>
@@ -147,22 +169,12 @@
         <div id="prevMeetingList_sideBar" class="d-flex justify-content-center"></div>
 
         <div class="inline-block" id="video_container">
-            <!-- <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item p-0">
-                    <a class="nav-link active" data-toggle="tab" href="#gridParticipants"><i class="fas fa-border-all in-white-back"></i> Grid View</a>
-                </li>
-                <li class="nav-item p-0">
-                    <a class="nav-link" data-toggle="tab" href="#pinnedVid"><i class="fas fa-thumbtack in-white-back"></i> Pinned</a>
-                </li>
-            </ul> -->
-            <!-- <div style="width: 100%; height: 100%;"> -->
-                <div id="gridParticipants" class="layout-videos layout-is-open">
-                    <div id="gridViewVideoContainer"></div>
-                </div>
-                <div id="pinnedVid" class="layout-videos">
-                    <div class="row" id="pinnedVideoContainer"></div>
-                </div>
-            <!-- </div> -->
+            <div id="gridParticipants" class="layout-videos layout-is-open">
+                <div id="gridViewVideoContainer"></div>
+            </div>
+            <div id="pinnedVid" class="layout-videos">
+                <div class="row" id="pinnedVideoContainer"></div>
+            </div>
         </div>
     </div>
     <div class="text-center" id="meetingOptionsButton_User">
@@ -189,6 +201,7 @@
                 <button class="btn dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
                 <button class="btn dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
                 <button class="btn dropdown-item" onclick="collabOpen()"><i class="fas fa-handshake" style="color:black;"></i> Collab</button>
+                <button class="btn dropdown-item" onclick="mindmapOpen()"><i class="fas fa-handshake" style="color:black;"></i> Mind Map</button>
             </div>
         </div>
         <buton class="btn pull-right" id="chat-open-close" onclick="toggleSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat" data-trigger="hover">
@@ -202,53 +215,10 @@
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+    <script src="https://unpkg.com/mmp/build/mmp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
     <script src="/static/session/js/main.js"></script>
-    <script>
-        // script to create whiteboard
-        // keep track of where the mouse has been dragged on
-        var array_of_mouse_loactions = [];
-
-        // sketch for p5 js
-        let sketch = function(p) {
-            document.getElementById("clear-board").addEventListener('click', function() {
-                clearWhiteBoard();
-            })
-
-            function clearWhiteBoard () {
-                p.background(0);
-            }
-
-            // setup function
-            p.setup = function(){
-                /* var width = window.document.getElementById("canvas-container").style.width;
-                // var height = $(window).width - 100; */
-                // create canvas with size 640, 480
-                p.createCanvas(640, 480);
-                // background of black color
-                p.background(0);
-            }
-            // function called when mouse is dragged
-            p.mouseDragged = function () {
-                // push mouse position to mouse positions array
-                array_of_mouse_loactions.push({x: p.mouseX, y: p.mouseY});
-            }
-            // draw function
-            p.draw = function () {
-                // check if mouse locations array has first item
-                if (array_of_mouse_loactions[0]) {
-                    // mouse location array has first item
-                    // draw circle around that location
-                    p.noStroke();
-                    p.fill(255);
-                    p.ellipse(array_of_mouse_loactions[0].x, array_of_mouse_loactions[0].y, 36, 36)
-                    // remove first element from mouse locations array
-                    array_of_mouse_loactions.shift();
-                }
-            }
-        };
-        // create new canvas with prev defined sketch in div of id canvas-container
-        new p5(sketch, 'canvas-container');
-    </script>
     <script>
         // script for main stuff
         // define publisher as global var
@@ -368,16 +338,95 @@
         var markdown_to_html_con = new showdown.Converter();
         var chat_audio_notification = document.getElementById("chat-audio");
         var mouse_on_meetingOptions = false;
+        var whiteBoardInstance = new Whiteboard("canvas-container")
         var meetingOptionUserimout;
         var notification_timeout;
+        var mind_map = mmp.create("mindmap", {
+            fontFamily: "Arial, Helvetica, sans-serif",
+            centerOnResize: true,
+            drag: false,
+            zoom: false,
+            defaultNode: {
+                name: "Default node name",
+                image: {
+                    src: "",
+                    size: 60
+                },
+                colors: {
+                    name: "#787878",
+                    background: "#f9f9f9",
+                    branch: "#577a96"
+                },
+                font: {
+                    size: 16,
+                    style: "normal",
+                    weight: "normal"
+                },
+                locked: true
+            },
+            rootNode: {
+                name: "Default root node name",
+                image: {
+                    src: "",
+                    size: 70
+                },
+                colors: {
+                    name: "#787878",
+                    background: "#f0f6f5",
+                    branch: ""
+                },
+                font: {
+                    size: 20,
+                    style: "normal",
+                    weight: "normal"
+                }
+            }
+        });
+
+        mind_map_add_lock = false;
+        mind_map_update_lock = false;
+        mind_map_remove_lock = false;
+
+        mind_map.on("nodeCreate", (node) => {
+            if (!mind_map_add_lock) {
+                mindmapCreate(node);
+            } else {
+                mind_map_add_lock = false;
+            }
+        })
+
+        mind_map.on("nodeUpdate", (node) => {
+            if (!mind_map_update_lock) {
+                mindmapUpdate(node);
+            } else {
+                mind_map_update_lock = false;
+            }
+        })
+
+        mind_map.on("nodeRemove", (node) => {
+            if (!mind_map_remove_lock) {
+                mindmapDel(node.id);
+            } else {
+                mind_map_remove_lock = false;
+            }
+        })
+
+        function addNodeMindMap() {
+            mind_map.addNode();
+        }
+
+        function removeNodeMindMap() {
+            mind_map.removeNode();
+        }
 
         $(".layout-videos").css("display", "none");
-        $("#gridParticipants").css("display", "block")
+        $("#gridParticipants").css("display", "block");
+        var firepad;
 
         $(document).ready(function () {
             var firepadRef = firebase.database().ref().child("firepad").child(sessionName);
             var codeMirror = CodeMirror(document.getElementById('firepad'), { lineWrapping: true });
-            var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror,
+            firepad = Firepad.fromCodeMirror(firepadRef, codeMirror,
                 { richTextShortcuts: true, richTextToolbar: true, defaultText: '' });
         });
 
@@ -739,6 +788,50 @@
             }
         })
 
+        session.on('signal:mindmap-create', (event) => {
+            var node = JSON.parse(event.data);
+            var props = {
+                name: node.name,
+                coordinates: node.coordinates,
+                image: node.image,
+                colors: node.colors,
+                font: node.font,
+                locked: node.locked,
+            }
+            mind_map_add_lock = true;
+            mind_map.addNode(props, node.parent);
+        });
+
+        session.on('signal:mindmap-update', (event) => {
+            var node = JSON.parse(event.data);
+            var props = {
+                name: node.name,
+                coordinates: node.coordinates,
+                imageSrc: node.image,
+                colors: node.colors,
+                font: node.font,
+                locked: node.locked,
+            }
+            mind_map_update_lock = true;
+            mind_map.updateNode("name", node.name, id=node.id);
+            mind_map.updateNode("locked", node.locked, id=node.id);
+            mind_map.updateNode("coordinates", node.coordinates, id=node.id);
+            mind_map.updateNode("imgSrc", node.image.src, id=node.id);
+            mind_map.updateNode("imgSize", node.image.size, id=node.id);
+            mind_map.updateNode("backgroundColor", node.colors.background, id=node.id);
+            mind_map.updateNode("branchColor", node.colors.branch, id=node.id);
+            mind_map.updateNode("fontWeight", node.font.weight, id=node.id);
+            mind_map.updateNode("fontStyle", node.font.style, id=node.id);
+            mind_map.updateNode("nameColor", node.color.name, id=node.id);
+        });
+
+        session.on('signal:mindmap-del', (event) => {
+            var nodeId = event.data;
+            console.log(nodeId);
+            mind_map_remove_lock = true;
+            mind_map.removeNode(nodeId);
+        });
+
         // function ran when new user connects
         session.on('streamCreated', (event) => {
             // subscribe to it's stream
@@ -769,6 +862,8 @@
                 video_return = "1";
             }
             sendStreamStatusMessage(audio_return + "," + video_return);
+            connection_list[subscriber.stream.connection.connectionId] = {connection: subscriber.stream.connection, audio: true, video: true};
+
         });
 
         // function ran when some user disconnect's stream the meeting
@@ -782,7 +877,6 @@
         // function ran when new connection is created
         session.on('connectionCreated', (event) => {
             // append to connection list
-            connection_list[event.connection.connectionId] = {connection: event.connection, audio: true, video: true};
         });
 
         // function ran when some user exits meeting
@@ -811,7 +905,7 @@
                     resolution: '640x480',
                     frameRate: 30,
                     insertMode: 'APPEND',
-                    mirror: true
+                    mirror: false
                 });
                 // create html template for user
                 var card_participant = document.createElement("div");
@@ -936,6 +1030,21 @@
             $("#chat-open-close").removeClass("red-chat");
         }
 
+        function firepadDownload() {
+            var text = firepad.getText();
+            var filename = "BKR-Collab.txt";
+            var element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+
+            element.style.display = 'none';
+            document.body.appendChild(element);
+
+            element.click();
+
+            document.body.removeChild(element);
+        }
+
         // toggle participant list function ran when user click participant list button
         function toggleParticipantList() {
             // check if taget element is open
@@ -1050,6 +1159,15 @@
             }
         }
 
+        function mindmapOpen() {
+            $("#mindmap_modal").modal({
+                keyboard: false
+            });
+            setTimeout(() => {
+                mind_map.center();
+            }, 250)
+        }
+
         // function ran when user clicks on whiteboard button
         function whiteboard_open() {
             $('#whiteboard_model').modal({
@@ -1069,6 +1187,44 @@
         // function ran when user clicks on share button
         function shareMeeting() {
             $("#share_meeting_modal").modal()
+        }
+
+        function mindmapCreate(node) {
+            var node_string = JSON.stringify(node);
+            var to = [];
+            for (const [key, value] in connection_list) {
+                to.push(key);
+            }
+            session.signal({
+                data: node_string,
+                type: "mindmap-create",
+                to: to
+            })
+        }
+
+        function mindmapUpdate(node) {
+            var node_string = JSON.stringify(node);
+            var to = [];
+            for (const [key, value] in connection_list) {
+                to.push(key);
+            }
+            session.signal({
+                data: node_string,
+                type: "mindmap-update",
+                to: to,
+            })
+        }
+
+        function mindmapDel(nodeId) {
+            var to = [];
+            for (const [key, value] in connection_list) {
+                to.push(key);
+            }
+            session.signal({
+                data: nodeId,
+                type: "mindmap-del",
+                to: to,
+            })
         }
 
         // function ran when user clicks on send message button
@@ -1130,35 +1286,6 @@
             message_textarea.value("");
         }
 
-        // function sendFileChat () {
-        //     var file_to_send = document.getElementById('fileShare');
-        //     if (file_to_send.files.length !== 0) {
-        //         var real_file = file_to_send[0];
-        //         var formData = new FormData();
-        //         formData.append("fileShare", real_file);
-        //         axios.post("/user-api/file-share-chat/", formData)
-        //         .then(function (res) {
-        //             console.log(res);
-        //             var ok_not_ok = res.data.split(",")[0];
-        //             if(ok_not_ok === "ok") {
-        //                 var to = $(".chat-person.active").attr("id");
-        //                 if (to === "everybody") {
-        //                     session.signal({
-        //                         data: nickName + "," + userName + "," + res.split(",")[1],
-        //                         to: [],
-        //                         type: "fileShare",
-        //                     })
-        //                 } else {
-        //
-        //                 }
-        //             }
-        //         })
-        //         .catch(function (err) {
-        //             console.log(err);
-        //         });
-        //     }
-        // }
-
         // send streamStatus message
         function sendStreamStatusMessage(streamStatus) {
             // send stream status to everybody
@@ -1219,7 +1346,7 @@
         // function ran at whiteboard_open()
         function whiteboard_share() {
             // get canvas's video track at 30 fps
-            var canvasStream = document.getElementById('defaultCanvas0').captureStream(30).getVideoTracks()[0];
+            var canvasStream = document.getElementById('canvas-whiteboard').captureStream(30).getVideoTracks()[0];
             OV.getUserMedia({
                 audioSource: undefined,
                 videoSource: canvasStream,

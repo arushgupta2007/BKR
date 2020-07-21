@@ -139,6 +139,18 @@ app.get("/join_us/", function (req, res) {
     res.render(__dirname + "/public/join_us/join_us.ejs");
 });
 
+// GET request to /friends (friends page)
+app.get("/friends/", function (req, res) {
+    console.log("--------------------------------------------------------");
+    console.log("RENDERING FRIENDS PAGE");
+    // render join_us ejs file
+    res.render(__dirname + "/public/friends/friends.ejs");
+});
+
+app.get("/firebase-messaging-sw.js", (req, res) => {
+    res.sendFile(__dirname + "/firebase-messaging-sw.js")
+})
+
 // GET request to /join_us/success (success of joining us above)
 app.get("/join_us/success/", function (req, res) {
     console.log("--------------------------------------------------------");
@@ -214,26 +226,16 @@ app.post("/session/", (req, res) => {
         // create unique meeting id of length 10 digits
         var session_id = Date.now();
 
-        /* id_tracker[session_id.toString()] = 0;
-        var client_id = id_tracker[session_id.toString()];
-        id_tracker[session_id.toString()] = 1; */
-
         // create OpenVidu session
         var prop = {
             customSessionId: session_id.toString()
         };
 
-        OV.createSession()
+        OV.createSession(prop)
             .then((session) => {
                 console.log("SESSION CREATED");
                 // store session object to mapSessions
                 mapSessions[session_id] = session;
-
-                /* mapSessionNamesTokens[session_id] = [];
-                name_codes[session_id] = {
-                    name: name_meeting,
-                    code: session_code,
-                }; */
 
                 // generate token for user needed by OpenVidu
                 session

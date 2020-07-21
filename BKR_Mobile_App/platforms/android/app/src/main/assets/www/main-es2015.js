@@ -593,6 +593,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _session_pipe__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./session.pipe */ "./src/app/session.pipe.ts");
 /* harmony import */ var _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/oauth.service */ "./src/app/services/oauth.service.ts");
 /* harmony import */ var _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/meeting-session.service */ "./src/app/services/meeting-session.service.ts");
+/* harmony import */ var _angular_fire__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @angular/fire */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire.js");
+/* harmony import */ var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @angular/fire/auth */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
+/* harmony import */ var src_environments_environment__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! src/environments/environment */ "./src/environments/environment.ts");
+
+
+
 
 
 
@@ -623,6 +629,8 @@ AppModule = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
             _angular_common_http__WEBPACK_IMPORTED_MODULE_9__["HttpClientModule"],
             _angular_forms__WEBPACK_IMPORTED_MODULE_10__["ReactiveFormsModule"],
             _angular_forms__WEBPACK_IMPORTED_MODULE_10__["FormsModule"],
+            _angular_fire__WEBPACK_IMPORTED_MODULE_17__["AngularFireModule"].initializeApp(src_environments_environment__WEBPACK_IMPORTED_MODULE_19__["environment"].firebaseConfig),
+            _angular_fire_auth__WEBPACK_IMPORTED_MODULE_18__["AngularFireAuthModule"]
         ],
         providers: [
             _ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_6__["StatusBar"],
@@ -1204,11 +1212,47 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OauthService", function() { return OauthService; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/fire/auth */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
+/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! firebase/app */ "./node_modules/firebase/app/dist/index.cjs.js");
+/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(firebase_app__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
+
+
+
 
 
 let OauthService = class OauthService {
-    constructor() { }
+    constructor(afAuth, router) {
+        this.afAuth = afAuth;
+        this.router = router;
+    }
+    joinWithGoogle() {
+        const provider = new firebase_app__WEBPACK_IMPORTED_MODULE_3__["auth"].GoogleAuthProvider();
+        return this.socialSignIn(provider);
+    }
+    socialSignIn(provider) {
+        return this.afAuth.signInWithPopup(provider).then((cred) => {
+            var _a, _b, _c;
+            if ((_a = cred.additionalUserInfo) === null || _a === void 0 ? void 0 : _a.isNewUser) {
+                console.log((_b = cred.user) === null || _b === void 0 ? void 0 : _b.uid);
+                // do something if new user
+            }
+            else {
+                // do something if old user
+                console.log((_c = cred.user) === null || _c === void 0 ? void 0 : _c.uid);
+            }
+        }).then(() => {
+            this.router.navigate(["/"]);
+        });
+    }
+    returnAuthState() {
+        return this.afAuth.authState;
+    }
 };
+OauthService.ctorParameters = () => [
+    { type: _angular_fire_auth__WEBPACK_IMPORTED_MODULE_2__["AngularFireAuth"] },
+    { type: _angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"] }
+];
 OauthService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
         providedIn: 'root'
@@ -1312,7 +1356,16 @@ __webpack_require__.r(__webpack_exports__);
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 const environment = {
-    production: false
+    production: false,
+    firebaseConfig: {
+        apiKey: "AIzaSyAAHNLr2B40uA5E_2VOFvpF7VxCs_jDjmI",
+        authDomain: "baatkarteraho2007.firebaseapp.com",
+        databaseURL: "https://baatkarteraho2007.firebaseio.com",
+        projectId: "baatkarteraho2007",
+        storageBucket: "baatkarteraho2007.appspot.com",
+        messagingSenderId: "642785637257",
+        appId: "1:642785637257:web:075ac911b75774ad7fe758"
+    }
 };
 /*
  * For easier debugging in development mode, you can import the following file

@@ -21,7 +21,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     /* harmony default export */
 
 
-    __webpack_exports__["default"] = "<ion-header>\n  <ion-toolbar>\n    <ion-title>join-us</ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content>\n\n</ion-content>\n";
+    __webpack_exports__["default"] = "<ion-header>\n  <ion-toolbar>\n    <ion-title>Join Us</ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content>\n  <ion-button (click)=\"joinWithGoogle()\">Join With Google</ion-button>\n</ion-content>\n";
     /***/
   },
 
@@ -209,19 +209,38 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(
     /*! @angular/core */
     "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+    /* harmony import */
+
+
+    var _services_oauth_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
+    /*! ../services/oauth.service */
+    "./src/app/services/oauth.service.ts");
 
     var JoinUsPage = /*#__PURE__*/function () {
-      function JoinUsPage() {
+      function JoinUsPage(oauthService) {
         _classCallCheck(this, JoinUsPage);
+
+        this.oauthService = oauthService;
       }
 
       _createClass(JoinUsPage, [{
         key: "ngOnInit",
         value: function ngOnInit() {}
+      }, {
+        key: "joinWithGoogle",
+        value: function joinWithGoogle() {
+          this.oauthService.joinWithGoogle();
+        }
       }]);
 
       return JoinUsPage;
     }();
+
+    JoinUsPage.ctorParameters = function () {
+      return [{
+        type: _services_oauth_service__WEBPACK_IMPORTED_MODULE_2__["OauthService"]
+      }];
+    };
 
     JoinUsPage = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
       selector: 'app-join-us',

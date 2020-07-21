@@ -9,7 +9,7 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ("<ion-header>\n  <ion-toolbar>\n    <ion-title>join-us</ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content>\n\n</ion-content>\n");
+/* harmony default export */ __webpack_exports__["default"] = ("<ion-header>\n  <ion-toolbar>\n    <ion-title>Join Us</ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content>\n  <ion-button (click)=\"joinWithGoogle()\">Join With Google</ion-button>\n</ion-content>\n");
 
 /***/ }),
 
@@ -117,13 +117,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinUsPage", function() { return JoinUsPage; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
+/* harmony import */ var _services_oauth_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/oauth.service */ "./src/app/services/oauth.service.ts");
+
 
 
 let JoinUsPage = class JoinUsPage {
-    constructor() { }
-    ngOnInit() {
+    constructor(oauthService) {
+        this.oauthService = oauthService;
+    }
+    ngOnInit() { }
+    joinWithGoogle() {
+        this.oauthService.joinWithGoogle();
     }
 };
+JoinUsPage.ctorParameters = () => [
+    { type: _services_oauth_service__WEBPACK_IMPORTED_MODULE_2__["OauthService"] }
+];
 JoinUsPage = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
         selector: 'app-join-us',
