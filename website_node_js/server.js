@@ -212,8 +212,8 @@ app.post("/session/", (req, res) => {
         data: serverData,
         role: role,
         kurentoOptions: {
-            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter", "ChromaFilter"]
-        },
+            allowedFilters: ["GStreamerFilter", "FaceOverlayFilter"]
+        }
     };
     // check objective of user
     if (objective === "create") {

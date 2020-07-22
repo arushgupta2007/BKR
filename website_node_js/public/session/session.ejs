@@ -40,13 +40,11 @@
     <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" id="whiteboard-model-content">
-                <div class="modal-header">
+                <div class="modal-header" id="whiteboard-screen-list-parent">
                     <h3 class="modal-title" id="modalLabel">White Board</h3>
                 </div>
-                <div class="modal-body">
-                    <div id="canvas-container">
-                        <!-- <canvas id="canvas-whiteboard"></canvas> -->
-                    </div>
+                <div class="modal-body" id="whiteboard-screen-container">
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="backToVideoAudio()">Close</button>
@@ -198,10 +196,10 @@
             <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: transparent; color: white; font-size: 175%; height: 30px;">
             </button>
             <div class="dropdown-menu">
-                <button class="btn dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
-                <button class="btn dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
-                <button class="btn dropdown-item" onclick="collabOpen()"><i class="fas fa-handshake" style="color:black;"></i> Collab</button>
-                <button class="btn dropdown-item" onclick="mindmapOpen()"><i class="fas fa-handshake" style="color:black;"></i> Mind Map</button>
+                <button class="dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
+                <button class="dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
+                <button class="dropdown-item" onclick="collabOpen()"><i class="fas fa-handshake" style="color:black;"></i> Collab</button>
+                <button class="dropdown-item" onclick="mindmapOpen()"><i class="fas fa-handshake" style="color:black;"></i> Mind Map</button>
             </div>
         </div>
         <buton class="btn pull-right" id="chat-open-close" onclick="toggleSidePanel()" data-toggle="tooltip" data-placement="top" title="Chat" data-trigger="hover">
@@ -338,7 +336,7 @@
         var markdown_to_html_con = new showdown.Converter();
         var chat_audio_notification = document.getElementById("chat-audio");
         var mouse_on_meetingOptions = false;
-        var whiteBoardInstance = new Whiteboard("canvas-container")
+        // var whiteBoardInstance = new Whiteboard("canvas-container")
         var meetingOptionUserimout;
         var notification_timeout;
         var mind_map = mmp.create("mindmap", {
@@ -938,6 +936,10 @@
                 console.warn('There was an error connecting to the session:', error.code, error.message);
             });
 
+        var whiteboard_screen_instance = new WhiteboardScreen("whiteboard-screen-container", "whiteboard-screen-list-parent", (canvas_stream) => {
+            whiteboard_share(canvas_stream);
+        })
+
         // function ran when user presses exit meeting button
         function leaveSession() {
             // disconnet the session
@@ -1170,11 +1172,10 @@
 
         // function ran when user clicks on whiteboard button
         function whiteboard_open() {
+            whiteboard_screen_instance.showWhiteboard(1);
             $('#whiteboard_model').modal({
                 keyboard: false
             });
-            // initialize stream of white board
-            whiteboard_share();
         }
 
         // function ran when user clicks on collab
@@ -1344,9 +1345,9 @@
         }
 
         // function ran at whiteboard_open()
-        function whiteboard_share() {
+        function whiteboard_share(canvasStream) {
             // get canvas's video track at 30 fps
-            var canvasStream = document.getElementById('canvas-whiteboard').captureStream(30).getVideoTracks()[0];
+            // var canvasStream = document.getElementById('canvas-whiteboard').captureStream(30).getVideoTracks()[0];
             OV.getUserMedia({
                 audioSource: undefined,
                 videoSource: canvasStream,
