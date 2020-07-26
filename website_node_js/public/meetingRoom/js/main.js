@@ -73,9 +73,15 @@ class MessageClass {
 }
 
 $(document).ready(function () {
+    // if (true) {  // local or not
+    //     meetingApiUrl = "https://" + window.location.hostname + ":" + window.location.port + ":5442/user-api/user/prevMeetings/";
+    // } else {
+    //     meetingApiUrl = "https://" + window.location.hostname + "/user-api/user/prevMeetings/";
+    // }
+
     $("#user-sign-out-navbar").click(function () {
         firebase.auth().signOut();
-        window.location.href = "https://" + window.location.hostname;
+        window.location.href = "https://" + window.location.hostname + ":" + window.location.port;
     });
 
     $("#searchMeetings").on("keyup", function() {
@@ -106,7 +112,7 @@ $(document).ready(function () {
                 userUID: uid,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + "/user-api/user/prevMeetings/",
+                url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/prevMeetings/",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -122,7 +128,7 @@ $(document).ready(function () {
 
             });
         } else {
-            window.location.replace("https://" + window.location.hostname + "/join_us/");
+            window.location.replace("https://" + window.location.hostname + ":" + window.location.port + "/join_us/");
         }
     }, function(error) {
         console.log(error);
@@ -145,7 +151,7 @@ function openMeeting(id_meeting, id_open_meeting, id_list_group_button, uid) {
             meetingId: id_meeting
         };
         $.ajax({
-            url: "https://" + window.location.hostname + "/user-api/prevMeeting/chats/",
+            url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/prevMeeting/chats/",
             type: "POST",
             data: data_ajax,
             error: function (err) {
@@ -199,7 +205,7 @@ function realDeleteMeeting(id_meeting, uid) {
         meetingId: id_meeting
     };
     $.ajax({
-        url: "https://" + window.location.hostname + "/user-api/prevMeeting/delete",
+        url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/prevMeeting/delete",
         type: "POST",
         data: data_del_meeting,
         error: function (err) {

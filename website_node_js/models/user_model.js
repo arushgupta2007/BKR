@@ -6,7 +6,9 @@ const userSchema = new Schema({
     profilePhoto: String,
     phoneNo: String,
     commonId:String,
+    email: String,
     meetings: [{ type: Schema.Types.ObjectId, ref: 'meeting' }],
+    friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }],
 });
 
 const User = mongoose.model("user", userSchema);

@@ -85,9 +85,10 @@ class Whiteboard {
         this.toolbar = document.createElement("div");
         this.toolbar.setAttribute("id", canvas_parent_id + "-whiteboard-toolbar");
         this.toolbar.style.width = "100%";
+        this.toolbar.style.height = "35px";
         this.toolbar.style.display = "inline-flex";
         this.toolbar.style.justifyContent = "space-around";
-        this.toolbar.className = "col pr-0 mb-3";
+        this.toolbar.className = "col pr-0 mb-1";
         this.canvas_parent.appendChild(this.toolbar);
 
         this.colorPickerParent = document.createElement("div");

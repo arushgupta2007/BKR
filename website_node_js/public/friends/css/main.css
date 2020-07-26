@@ -1,0 +1,144 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    font-family: 'Questrial', sans-serif;
+}
+
+#navbar {
+    z-index: 5;
+}
+
+#dropdown-user-data {
+    background-color: #50565c;
+}
+
+#dropdown-user-data a, #dropdown-user-data button {
+    color: white;
+}
+
+#dropdown-user-data .dropdown-item:hover {
+    background-color: #717579;
+}
+
+#user-extra {
+    padding-left: 0 !important;
+    color: white;
+}
+
+#joinUsLink {
+    color: white;
+}
+
+#main-container {
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+}
+
+#friends-list li {
+    /* cursor: pointer; */
+    opacity: 0.85;
+}
+
+#friends-list li:hover {
+    opacity: 1;
+}
+
+.height-100 {
+    height: 100%;
+}
+
+.width-100 {
+    width: 100%;
+}
+
+#none-selected {
+    padding: 20px;
+    overflow: auto;
+} 
+
+#invite-email {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.invite-for-user span {
+    font-size: 1.1rem;
+    align-self: center;
+}
+
+#friends {
+    overflow: auto;
+    background-color: gray;
+    padding-top: 20px;
+}
+
+/* #none-selected {
+    background-image: url();
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+} */
+
+.friend {
+    display: none;
+    flex-direction: column;
+}
+
+.real-main-chat-area {
+    height: 100%;
+    position: relative;
+    padding: 20px;
+    overflow: auto;
+}
+
+.message-input-parent {
+    display: flex;
+    flex-direction: row;
+}
+
+.message-input {
+    width: 100%;
+    resize: none;
+}
+
+.spinner-chat-area {
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    top: calc(50% - 25px);
+    left: calc(50% - 25px);
+}
+
+.message {
+    color: black;
+    padding-left: 15px;
+    border-radius: 50px;
+    margin-bottom: 15px;
+}
+
+.message .from-name {
+    font-size: 0.9rem;
+}
+
+.message * {
+    margin: 0;
+}
+
+.goBack-button {
+    display: none;
+}
+
+.join-form {
+    display: inline-block;
+}
+
+@media only screen and (max-width: 576px) {
+    .goBack-button {
+        display: block;
+    }
+}

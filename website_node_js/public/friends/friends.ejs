@@ -10,9 +10,40 @@
 <body>
     <script src="/static/navbar.js"></script>
     <div id="main-container" class="container-fluid">
-        
+        <div id="friends-row" class="overflow height-100 row">
+            <div class="col-lg-3 col-sm-4 col-12 height-100" id="friends">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchFriends" placeholder="Friends">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+                <br>
+                <ul class="list-group" id="friends-list">
+                    <li class="list-group-item list-friend-item active" onclick="showInvites()" id="invites-item-friends" style="cursor: pointer;">
+                        Your Invites
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-9 col-sm-8 col-12 height-100 p-0 d-none d-sm-block" id="friends-chat-parent">
+                <div id="none-selected" class="height-100 width-100">
+                    <div class="width-100 d-flex justify-content-center">
+                        <input type="email" id="invite-email" size="50" placeholder="Invitee Email">
+                        <input type="hidden" id="user-uid" class="uid-input">
+                        <button onclick="inviteUser()" class="btn btn-warning">Invite!</button>
+                    </div>
+                    <hr>
+                    <div id="invitations-recv">
+                        <ul class="list-group" id="invites-list">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="/static/scripts_end_of_body.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.0/showdown.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/static/friends/js/main.js"></script>
 </body>
 </html>

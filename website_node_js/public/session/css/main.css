@@ -4,6 +4,14 @@
     overflow: hidden;
 }
 
+.pull-left {
+    float: left;
+}
+
+.pull-right {
+    float: right;
+}
+
 .editor-toolbar i {
     color: black !important;
 }
@@ -109,11 +117,9 @@ p.userName {
     text-align: left;
 }
 
-
-/* xs ans md screen resolutions*/
-
 .sidePanel {
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
     height: 100%;
     width: 0;
     position: fixed;
@@ -204,16 +210,16 @@ canvas {
 .whiteboard-stroke-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 25px;
-    height: 25px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: #4CAF50;
     cursor: pointer;
 }
 
 .whiteboard-stroke-slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: #4CAF50;
     cursor: pointer;
@@ -303,6 +309,54 @@ canvas {
 #message-to-send {
     width: 100%;
     padding: 7px;
+}
+
+:root {
+    --ck-z-default: 100;
+    --ck-z-modal: calc( var(--ck-z-default) + 999 );
+}
+
+.ck-content .table {
+    width: auto;
+}
+
+.message_sent table {
+    border-collapse: collapse;
+}
+
+.message_sent table td,
+.message_sent table th {
+    border: 1px solid #b3b3b3;
+    padding: 8px;
+}
+
+.message_sent blockquote {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    margin-left: 0;
+    margin-right: 0;
+    font-style: italic;
+    border-left: 5px solid #ccc;
+    overflow: hidden;
+}
+
+.message_sent blockquote * {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.message_sent table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: hsla(0,0%,0%,5%);
+    color: white;
+}
+.message_sent #test {
+    max-width: 100%;
+}
+#message-to-send-parent-parent .ck-editor__editable_inline {
+    height: 75px;
 }
 
 #sumbit-new-message {

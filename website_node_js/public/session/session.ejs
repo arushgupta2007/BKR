@@ -40,10 +40,10 @@
     <div class="modal fade" id="whiteboard_model" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content" id="whiteboard-model-content">
-                <div class="modal-header" id="whiteboard-screen-list-parent">
+                <div class="modal-header p-2 pl-3" id="whiteboard-screen-list-parent">
                     <h3 class="modal-title" id="modalLabel">White Board</h3>
                 </div>
-                <div class="modal-body" id="whiteboard-screen-container">
+                <div class="modal-body pt-1" id="whiteboard-screen-container">
                     
                 </div>
                 <div class="modal-footer">
@@ -119,8 +119,9 @@
                     <div class="chat-messages" id="chat-everybody"></div>
                 </div>
                 <div class="card-footer">
-                    <div class="form-group">
-                        <textarea id="message-to-send" rows="4" class="mb-3 form-control"></textarea>
+                    <div class="form-group" id="message-to-send-parent-parent">
+                        <div id="message-to-send-parent"></div>
+                        <!-- <textarea id="message-to-send" rows="4" class="mb-3 form-control"></textarea> -->
                     </div>
                     <button class="btn btn-primary btn-lg" id="sumbit-new-message" onclick="sendMessage()"><i class="fas fa-location-arrow" style="transform: rotate(40deg)"></i></button>
                     <!-- <div class="form-group">
@@ -216,6 +217,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
     <script src="https://unpkg.com/mmp/build/mmp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/20.0.0/classic/ckeditor.js"></script>
     <script src="/static/session/js/main.js"></script>
     <script>
         // script for main stuff
@@ -256,7 +258,7 @@
                 userUID: accountID,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + "/user-api/user/prevMeetings",
+                url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/prevMeetings",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -310,7 +312,7 @@
                             meetingId: item.meeting_id
                         }
                         $.ajax({
-                            url: "https://" + window.location.hostname + "/user-api/prevMeeting/delete",
+                            url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/prevMeeting/delete",
                             type: "POST",
                             data: data_del_meeting,
                             error: function (err) {
@@ -339,6 +341,18 @@
         // var whiteBoardInstance = new Whiteboard("canvas-container")
         var meetingOptionUserimout;
         var notification_timeout;
+        var chat_message_input;
+        var draft_message_list = {everybody: ""};
+
+        ClassicEditor
+            .create(document.querySelector('#message-to-send-parent'))
+            .then((editor) => {
+                chat_message_input = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         var mind_map = mmp.create("mindmap", {
             fontFamily: "Arial, Helvetica, sans-serif",
             centerOnResize: true,
@@ -431,8 +445,8 @@
         // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
         // set url of #share_meeting_link
-        $("#share_meeting_link").html(" https://" + window.location.hostname + "/?todo=join&id_=" + sessionName);
-        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + "/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").html(" https://" + window.location.hostname + ":" + window.location.port + "/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":" + window.location.port + "/?todo=join&id_=" + sessionName);
 
         $("#refreshButton").attr("disabled", true);
 
@@ -456,6 +470,11 @@
         $("#chat-everybody").show();
 
         $("#everybody").click(function () {
+            var currentSelectedId = $(".chat-person.active").attr('id');
+            var draft = chat_message_input.getData();
+            draft_message_list[currentSelectedId] = draft;
+            var message_to_put = draft_message_list["everybody"];
+            chat_message_input.setData(message_to_put);
             $(".chat-person").removeClass("active");
             $(this).addClass("active");
             $(".chat-messages").hide();
@@ -465,11 +484,11 @@
             $("#everybody").removeClass("new-message-came");
         })
 
-        var message_textarea = new EasyMDE({
-            hideIcons: ["guide","image", "fullscreen", "side-by-side", "horizontal-rule", "table"],
-            element: $("#message-to-send")[0],
-            placeholder: "Send a message",
-        });
+        // var message_textarea = new EasyMDE({
+        //     hideIcons: ["guide","image", "fullscreen", "side-by-side", "horizontal-rule", "table"],
+        //     element: $("#message-to-send")[0],
+        //     placeholder: "Send a message",
+        // });
 
         $("#main-container").click( function () {
             closeSidePanel();
@@ -537,9 +556,9 @@
             // create html template of message
             var html_string;
             if (from_id === userName.toString()) {
-                html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">You:</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
+                html_string = '<div class="card shadow-sm message_sent" style="background-color:#5cb3db; white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">You:</p> ' + message + '</div></div>'
             } else {
-                html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p>' + markdown_to_html_con.makeHtml(message) + '</div></div>'
+                html_string = '<div class="card message_sent shadow-sm"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p>' + message + '</div></div>'
             }
             // append html template with message in DOM
             $("#chat-everybody").append(html_string);
@@ -589,7 +608,7 @@
             var message = message_to_slice.slice(message_to_slice.indexOf(",") + 1, message_to_slice.length);
             message = message.replace("\n", "<br>");
             // create html template
-            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> ' + markdown_to_html_con.makeHtml(message) + '</div></div>'
+            var html_string = '<div class="card shadow-sm message_sent" style="white-space: pre;"><div class="card-body text-wrap p-1"><p style="font-family: Questrial, sans-serif;" class="user-name-chat-message">' + from_name + ':</p> ' + message + '</div></div>'
             // append html template with message to DOM
             $("#chat-" + event.from.connectionId).append(html_string);
             // scroll to bottom when new message has been recv
@@ -1024,9 +1043,12 @@
         function openSidePanel() {
             if ($(window).width() < 576) {
                 document.getElementById("sidePanel").style.width = $(window).width().toString() + "px";
+                var chat_content_width = $(window).width() * 0.75;
+                $(".chat-content").width(chat_content_width);
                 $("#meetingOptionsButton_User").animate({right: $(window).width().toString() + "px"});
             } else {
                 document.getElementById("sidePanel").style.width = "400px";
+                $(".chat-content").width(300);
                 $("#meetingOptionsButton_User").animate({right: "400px"});
             }
             $("#chat-open-close").removeClass("red-chat");
@@ -1232,7 +1254,7 @@
         function sendMessage() {
             // get message
 //            var message = $("#message-to-send").val();
-            var message = message_textarea.value() + " ";
+            var message = chat_message_input.getData() + " ";
             // check if message is empty
             if (message.trim() !== "") {
                 // get recver of message
@@ -1254,7 +1276,7 @@
                         }
                         $.ajax({
                             type: "POST",
-                            url: "https://" + window.location.hostname + "/session/saveMessage/",
+                            url: "https://" + window.location.hostname + ":" + window.location.port + "/session/saveMessage/",
                             data: data,
                             success: function () {},
                             error: function(err) {console.log(err);}
@@ -1284,7 +1306,10 @@
             }
             // reset message value
 //            $("#message-to-send").val("");
-            message_textarea.value("");
+            var currentSelectedId = $(".chat-person.active").attr('id');
+            var draft = chat_message_input.getData();            
+            draft_message_list[currentSelectedId] = "";
+            chat_message_input.setData("");
         }
 
         // send streamStatus message
@@ -1506,12 +1531,20 @@
                 $("#tabs-chat").append('<button class="chat-person text-truncate" id="' + nodeId + '">' + clientData + '</button>');
                 $("#all-chats").append('<div class="chat-messages private-chat" id="chat-' + nodeId + '"></div>');
                 $('#' + nodeId).click(function () {
+                    var currentSelectedId = $(".chat-person.active").attr('id');
+                    var draft = chat_message_input.getData();
+                    draft_message_list[currentSelectedId] = draft;
+                    if (draft_message_list[nodeId]) {
+                        chat_message_input.setData(draft_message_list[nodeId]);
+                    } else {
+                        chat_message_input.setData("");
+                    }
                     $(".chat-person").removeClass("active");
                     $(this).addClass("active");
                     $(".chat-messages").hide();
                     $("#chat-" + nodeId).show();
                     //$("#message-to-send").attr("placeholder", "Talk with " + clientData);
-                    $("#card-header-chat").text(clientData);
+                    $("#card-header-chat").html(clientData + ' <button class="btn pull-right" onclick="closeSidePanel()"><i class="fas fa-times-circle" style="color: red;"></i></button>');
                     $("#" + nodeId).removeClass("new-message-came");
                 })
             }

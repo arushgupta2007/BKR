@@ -24,11 +24,13 @@ var cors = require('cors');
 // MongoDB models
 var userModel = require("./models/user_model");
 var meetingsModel = require("./models/meeting_model");
+var friendsModel = require("./models/friends_model");
+var friendsInviteModel = require("./models/friendInvitation_model");
 
 // Connecting to local MongoDB
 if (IS_LOCAL === 1) {
     console.log("IS_LOCAL: TRUE, MONGODB Connection To mymongo");
-    var mongoDB = 'mongodb://mymongo/BKR';
+    var mongoDB = 'mongodb://localhost:27017/BKR';
     mongoose.connect(mongoDB, {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -52,6 +54,12 @@ var options = {
     cert: fs.readFileSync("openviducert.pem"),
 };
 var https = require('https').createServer(options, app);
+var io;
+if (IS_LOCAL === 1) {
+    io = require("socket.io")(https);
+} else {
+    io = require("socket.io")(http);
+}
 
 // Using cookie-session as default cookie
 app.use(cookieSession({
@@ -93,11 +101,76 @@ app.use("/static", express.static("public"));
 
 // helper functions
 // function to delete meeting
-function deleteMeeting(session_id, meeting) {
+function deleteMeeting(session_id) {
     //delete from mapSession
     delete mapSessions[session_id];
     console.log("DELETED MEETING");
 }
+
+// SOCKET REQUESTS
+io.sockets.on("connection", (socket) => {
+    socket.on("join", (data) => {
+        console.log("User JOINED WEBSOCKETS");
+        socket.join(data.user_id)
+    });
+
+    socket.on("newMessage", (data) => {
+        console.log(data);
+        userModel.findOne({commonId: data.from}, (err, user) => {
+            if (user) {
+                var user_mongo_id = new mongoose.Types.ObjectId(user._id);
+                var friendId = new mongoose.Types.ObjectId(data.friend_id);
+                friendsModel.find({participants: user_mongo_id}, (err, friends) => {
+                    if (friends) {
+                        var friendMongoDocumentId;
+                        for (var i=0; i<friends.length;i++) {
+                            var friend = friends[i];
+                            if (friend.participants.includes(friendId) || friend.participants.includes(data.friend_id)) {
+                                friendMongoDocumentId = friend._id;
+                                break;
+                            }
+                        }
+                        if (friendMongoDocumentId) {
+                            friendsModel.findById(friendMongoDocumentId, (err, friendModel) => {
+                                if (friendModel) {
+                                    var message_data = {
+                                        from: user.name,
+                                        from_account: user.commonId,
+                                        message: data.message,
+                                    }
+                                    friendModel.chatMessages.push(message_data);
+                                    friendModel.save();
+                                    userModel.findById(data.friend_id, (err, friend_user) => {
+                                        if (friend_user) {
+                                            var friend_common_id = friend_user.commonId;
+                                            var message_data_sockets = {
+                                                from: user.name,
+                                                from_account: user.commonId,
+                                                message: data.message,
+                                                friend_id: user._id
+                                            }
+                                            io.sockets.in(friend_common_id).emit("newMessageYouRecv", message_data_sockets);
+                                        } else {
+                                            console.log("No such firend found");
+                                        }
+                                    })
+                                } else {
+                                    console.log("ERR3");
+                                }
+                            })
+                        }
+                    } else {
+                        console.log("ERR2");
+                    }
+                })
+            } else {
+                console.log("ERR1");
+            }
+        })
+    })
+})
+
+// HTTP(s) REQUESTS
 
 // GET request to / (home page)
 app.get("/", function (req, res) {
@@ -180,9 +253,10 @@ app.post("/join_us/addUser/", function (req, res) {
                 name: req.body.name,
                 profilePhoto: req.body.photoUrl,
                 phoneNo: req.body.phone_no,
+                email: req.body.email,
                 commonId: req.body.id_to_keep,
                 meetings: [],
-            }).save().then(user => {
+            }).save().then(() => {
                 console.log("USER HAS BEEN SUCCESSFULLY ADDED TO DATABASE");
             });
         }
@@ -349,7 +423,7 @@ app.post("/session/", (req, res) => {
                             });
                     } else {
                         var prop = {
-                            customSessionId: session_id.toString()
+                            customSessionId: sessionID.toString()
                         };
                         OV.createSession(prop)
                             .then((session) => {
@@ -541,7 +615,7 @@ app.post("/session/refresh", (req, res) => {
                     if (meeting_recv.tokens.length === 0) {
                         // there are no more users in the meeting
                         // delete entire meeting
-                        deleteMeeting(sessionName, meeting_recv);
+                        deleteMeeting(sessionName);
                     }
                 });
             } else {
@@ -591,7 +665,7 @@ app.post("/leave-session", (req, res) => {
                     if (meeting_recv.tokens.length === 0) {
                         // there are no more users in the meeting
                         // delete entire meeting
-                        deleteMeeting(sessionName, meeting_recv);
+                        deleteMeeting(sessionName);
                     }
                 });
             } else {
@@ -614,7 +688,6 @@ app.post("/mobile-api/create-meeting-get-token", (req, res) => {
     var meetingName = req.body.meetingName;
     var meetingCode = req.body.meetingCode;
     var meetingDesc = req.body.meetingDesc;
-    var userId = req.body.userId;
     var role = OpenViduRole.PUBLISHER;
     // server data needed by OpenVidu
     var serverData = JSON.stringify({
@@ -714,7 +787,6 @@ app.post("/mobile-api/join-meeting-and-get-token/", (req, res) => {
     var userName = req.body.userName;
     var meetingId = parseInt(req.body.meetingId);
     var meetingCode = req.body.meetingCode;
-    var userId = req.body.userId;
     var role = OpenViduRole.PUBLISHER;
     // server data needed by OpenVidu
     var serverData = JSON.stringify({
@@ -946,6 +1018,197 @@ app.post("/user-api/prevMeeting/delete", (req, res) => {
         }
     });
 });
+
+app.post("/user-api/user/friends/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR IT'S FRIENDS");
+    var uid = req.body.userUID;
+    userModel.findOne({commonId: uid}, (err, user) => {
+        if (user) {
+            console.log("User Found");
+            var user_mongo_id = new mongoose.Types.ObjectId(user._id);
+            friendsModel.find({participants: user_mongo_id}, (err, docs) => {
+                if (docs) {
+                    console.log("Docs Found");
+                    console.log(docs);
+                    docs.forEach((doc) => {
+                        delete doc.chatMessages;
+                        for (var i=0; i < doc.participants.length; i++) {
+                            var participant = doc.participants[i].toString();
+                            if (participant === user._id.toString()) {
+                                doc.participants.splice(i, 1);
+                                break;
+                            }
+                        }
+                    });
+                    res.send(docs)
+                } else {
+                    res.send([])
+                }
+            })
+        } else {
+            res.send([]);
+        }
+    })
+});
+
+app.post("/user-api/user/friends/name/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR THIER FRIEND'S NAME");
+    var friendId = req.body.friend_id;
+    console.log(friendId);
+    userModel.findById(friendId, (err, user) => {
+        if (user) {
+            console.log(user);
+            res.send(user.name);
+        } else {
+            res.send("Unknown")
+        }
+    })
+});
+
+app.post("/user-api/friends/chats/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR THIER FRIEND'S CHATS");
+    var uid_user = req.body.userId;
+    var friend_id = req.body.friend_UserId;
+    console.log(friend_id);
+    userModel.findOne({commonId: uid_user}, (err, user) => {
+        if (user) {
+            var user_mongo_id = new mongoose.Types.ObjectId(user._id);
+            friendsModel.find({participants: user_mongo_id}, (err, friends) => {
+                if (friends) {
+                    console.log(friends);
+                    var id_friends_target;
+                    for (var i=0; i<friends.length;i++) {
+                        var friend = friends[i];
+                        var particpiant_target_found;
+                        for (var j=0; j<friend.participants.length; j++) {
+                            var participant = friend.participants[j].toString();
+                            if (participant === friend_id) {
+                                particpiant_target_found = true;
+                                break;
+                            }
+                        }
+                        if (particpiant_target_found) {
+                            id_friends_target = friend._id;
+                            break;
+                        }
+                    }
+                    if (id_friends_target) {
+                        friendsModel.findById(id_friends_target, (err, friendModelInstance) => {
+                            if (friendModelInstance) {
+                                res.send(friendModelInstance.chatMessages);
+                            } else {
+                                res.send([]);
+                                console.log("ERR4");
+                            }
+                        })
+                    } else {
+                        res.send([]);
+                        console.log("ERR3");
+                    }
+                } else {
+                    res.send([]);
+                    console.log("ERR2");
+                }
+            })
+        } else {
+            res.send([]);
+            console.log("ERR1");
+        }
+    })
+})
+
+app.post("/user-api/user/invitation-for-me/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR IT'S INVITATIONS");
+    var uid = req.body.userId;
+    userModel.findOne({commonId: uid}, (err, user) => {
+        if (user) {
+            var object_id = new mongoose.Types.ObjectId(user._id);
+            console.log(object_id);
+            friendsInviteModel.find({to: object_id, accepted: false}, (err, invites) => {
+                console.log(invites);
+                res.send(invites);
+            })
+        }
+    })
+})
+
+app.post("/user-api/make-invitation/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR MAKING INVITATION");
+    var uid = req.body.userId;
+    var friend_mail = req.body.friend_email;
+    userModel.findOne({email: friend_mail}, (err, friend_user) => {
+        if (friend_user) {
+            userModel.findOne({commonId: uid}, (err, user) => {
+                if (user) {
+                    friendsInviteModel.findOne({to: user._id, from: friend_user._id}, (err, invite) => {
+                        if (!invite) {
+                            console.log(user._id);
+                            console.log(friend_user._id);
+                            friendsInviteModel({
+                                to: friend_user._id,
+                                from: user._id,
+                                accepted: false,
+                            }).save().then(() => {
+                                res.send(":)(:")
+                            })
+                        } else {
+                            res.send(")::(")
+                        }
+                    })
+                } else {
+                    res.send("You!");
+                }
+            })
+        } else {
+            res.send("Fri");
+        }
+    })
+});
+
+app.post("/user-api/accept-invitation/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR ACCEPTING INVITATION");
+    var id_invite = req.body.id_invite;
+    var user_id = req.body.userId;
+    var friend_id = req.body.friend_id;
+    friendsInviteModel.findById(id_invite, (err, invite) => {
+        if (invite) {
+            invite.accepted = true;
+            invite.save().then(() => {
+                userModel.findById(user_id, (err, user) => {
+                    if (user) {
+                        userModel.findById(friend_id, (err, friend) => {
+                            if (friend) {
+                                friendsModel({
+                                    participants: [user._id, friend._id],
+                                    chatMessages: [],
+                                }).save().then(() => {
+                                    res.send(":)");
+                                })
+                            } else {
+                                res.send(":(")
+                                console.log("Friend not found");
+                            }
+                        })
+                    } else {
+                        res.send(":(");
+                        console.log("user not found");
+                    }
+                })
+            })
+        } else {
+            res.send(":(");
+            console.log("meeting not found");
+        }
+    })
+})
+
+
 
 // start http server at port 8000
 console.log("PORT: " + process.env.SERVER_PORT);
