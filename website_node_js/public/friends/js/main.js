@@ -1,6 +1,6 @@
-var markdownToHtmlConverter = new showdown.Converter();
 const socket = io();
 var connected_socket = false;
+var editor_object = {}
 
 class FriendArea {
     constructor(uid_friend, friend_name, uid_user) {
@@ -17,8 +17,8 @@ class FriendArea {
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <div class="message-input-parent">
-            <textarea class="message-input" id="message-input-${uid_friend}"></textarea>
+        <div class="message-input-parent-parent">
+            <div class="message-input" id="message-input-parent-${uid_friend}"></div>
             <button class="btn btn-light" onclick="sendMessage('${uid_friend}', '${uid_user}')"><i class="fas fa-paper-plane"></i></button>
         </div>
         `;
@@ -40,6 +40,14 @@ class FriendArea {
         friend_list.setAttribute("id", "friend-list-button-" + uid_friend);
         friend_list.innerHTML = html_list_template;
         document.getElementById("friends-list").appendChild(friend_list);
+        ClassicEditor
+            .create( document.querySelector( '#message-input-parent-' + uid_friend ) )
+            .then( editor => {
+                editor_object[uid_friend] = editor;
+            } )
+            .catch( error => {
+                console.error( error );
+            } );
     }
 }
 
@@ -48,7 +56,7 @@ class MessageClass {
         message = message.replace("\n", "<br>");
         var html_template = `
         <div class="card-body p-2">
-            <span class="from-name">${from_name}:</span> ${markdownToHtmlConverter.makeHtml(message)}
+            <span class="from-name">${from_name}:</span> ${message}
         </div>
         `;
         var card = document.createElement("div");
@@ -81,6 +89,7 @@ socket.on("newMessageYouRecv", (data) => {
         from = "You";
     }
     new MessageClass(from, real_message, uid_friend, color_card);
+    $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight")}, 200);
 });
 
 $(document).ready(function () {
@@ -175,53 +184,6 @@ $(document).ready(function () {
                     })
                 })
             });
-            var html_template_invite_list = `
-                <span class="mr-auto"><b>Arush Gupta</b> sent you an invite</span>
-                <div>
-                    <button class="btn btn-success"><i class="fas fa-check"></i> Accept</button>
-                    <button class="btn btn-danger"><i class="fas fa-times"></i>  Decline</button>
-                <div>
-            `
-            var li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
-            li_invite = document.createElement("li");
-            li_invite.className = "list-group-item d-flex justify-content-center pr-2 invite-for-user";
-            li_invite.innerHTML = html_template_invite_list;
-            document.getElementById("invites-list").appendChild(li_invite);
             if (connected_socket) {
                 socket.emit("join", { user_id: uid })
             }
@@ -243,6 +205,9 @@ function openFriend(uid_friend, id_open_friend, id_list_group_button, uid) {
     $("#friends").addClass("d-sm-block");
     $("#friends-chat-parent").removeClass("d-none");
     $("#friends-chat-parent").removeClass("d-sm-block");
+    // $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight")}, 20);
+    var real_chat_area = document.getElementById("real-chat-area-" + uid_friend);
+    real_chat_area.scrollTop = real_chat_area.scrollHeight;
     if (!$("#chat-area-" + uid_friend.toString()).hasClass("chat-loaded")) {
         var data_ajax = {
             userId: uid,
@@ -318,8 +283,8 @@ function acceptInvite(uid, from_uid, invite_id) {
 }
 
 function sendMessage(uid_friend, user_uid) {
-    var textarea_input = $("#message-input-" + uid_friend).val();
-    console.log(textarea_input);
+    // var textarea_input = $("#message-input-" + uid_friend).val();
+    var textarea_input = editor_object[uid_friend].getData();
     if (connected_socket) {
         var data_message = {
             from: user_uid,
@@ -330,6 +295,8 @@ function sendMessage(uid_friend, user_uid) {
         new MessageClass("You", textarea_input, uid_friend, "#5cb3db");
         $("#message-input-" + uid_friend).val("")
     }
+    $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight")}, 200);
+    editor_object[uid_friend].setData("");
 }
 
 function showInvites() {

@@ -640,6 +640,10 @@ app.post("/leave-session", (req, res) => {
     var sessionName = req.body.sessionname;
     // get user's token
     var token = req.body.token;
+    var redirect = req.body.redirect;
+    if (!redirect) {
+        redirect = "/"
+    }
 
     /* var name_client = req.body.nickName; */
 
@@ -671,14 +675,14 @@ app.post("/leave-session", (req, res) => {
             } else {
                 // token was not valid
                 // redirect user to home page
-                res.redirect("/");
+                res.redirect(redirect);
             }
             // redirect users after process
-            res.redirect("/");
+            res.redirect(redirect);
         });
     } else {
         // there was no session object in mapSession
-        res.redirect("/");
+        res.redirect(redirect);
     }
 });
 

@@ -1,5 +1,3 @@
-var markdown_to_html_converter = new showdown.Converter();
-
 class MeetingRoomChat {
     constructor(id_meeting, name_meeting, uid, meeting_code, name_user) {
         var html_template = `
@@ -61,7 +59,7 @@ class MessageClass {
         message = message.replace("\n", "<br>");
         var html_template = `
         <div class="card-body p-2">
-            <span class="from-name">${from_name}:</span> ${markdown_to_html_converter.makeHtml(message)}
+            <span class="from-name">${from_name}:</span> ${message}
         </div>
         `;
         var card = document.createElement("div");

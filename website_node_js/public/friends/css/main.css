@@ -96,14 +96,61 @@ html, body {
     overflow: auto;
 }
 
-.message-input-parent {
+.message-input-parent-parent {
     display: flex;
     flex-direction: row;
 }
 
-.message-input {
-    width: 100%;
-    resize: none;
+.message-input-parent-parent > .ck {
+    width: 100% !important;
+}
+
+:root {
+    --ck-z-default: 100;
+    --ck-z-modal: calc( var(--ck-z-default) + 999 );
+}
+
+.ck-content .table {
+    width: auto;
+}
+
+.message table {
+    border-collapse: collapse;
+}
+
+.message table td,
+.message table th {
+    border: 1px solid #b3b3b3;
+    padding: 8px;
+}
+
+.message blockquote {
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    margin-left: 0;
+    margin-right: 0;
+    font-style: italic;
+    border-left: 5px solid #ccc;
+    overflow: hidden;
+}
+
+.message blockquote * {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.message table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: hsla(0,0%,0%,5%);
+    color: white;
+}
+.message #test {
+    max-width: 100%;
+}
+#message-to-send-parent-parent .ck-editor__editable_inline {
+    max-height: 100px;
 }
 
 .spinner-chat-area {

@@ -189,6 +189,7 @@
         <form action="/leave-session" method="post" style="display: inline-block; margin-bottom: 0;">
             <input type="hidden" name="sessionname" value="<%= sessionName %>" />
             <input type="hidden" name="token" value="<%= token %>" />
+            <input type="hidden" name="redirect" id="redirect_url" value="/">
             <button id="buttonLeaveSession" class="btn btn-danger" type="submit" onclick="leaveSession()" data-toggle="tooltip" data-placement="top" title="Leave Call" data-trigger="hover">
                 <i class="fas fa-phone" style="transform: rotate(-135deg);"></i>
             </button>
@@ -323,6 +324,7 @@
                 });
                 document.getElementById("prevMeetingList_sideBar").appendChild(prev_meeting_container);
             });
+            $("#redirect_url").val("/meetings-rooms/");
           }
         }, function(error) {
           console.log(error);
@@ -880,7 +882,15 @@
             }
             sendStreamStatusMessage(audio_return + "," + video_return);
             connection_list[subscriber.stream.connection.connectionId] = {connection: subscriber.stream.connection, audio: true, video: true};
-
+            subscriber.on("streamAudioVolumeChange", (event_speaking) => {
+                if (event_speaking.value.newValue > -25) {
+                    var first_video_person = document.getElementById("gridViewVideoContainer").children.item(0);
+                    var speaking_person = document.getElementById("video-parent-grid-" + subscriber.stream.connection.connectionId);
+                    if (!InView(speaking_person)) {
+                        speaking_person.parentNode.insertBefore(speaking_person, first_video_person);
+                    }
+                }
+            })
         });
 
         // function ran when some user disconnect's stream the meeting
@@ -948,6 +958,17 @@
                     appendUserData(video, userData, card_participant);
                     $(video).prop('muted', true);
                     session.publish(publisher);
+                    setTimeout(() => {
+                        publisher.on("streamAudioVolumeChange", (event) => {
+                            if (event.value.newValue > -32) {
+                                var first_video_person = document.getElementById("gridViewVideoContainer").children.item(0);
+                                var speaking_person = document.getElementById("video-parent-grid-mine");
+                                if (!InView(speaking_person)) {
+                                    speaking_person.parentNode.insertBefore(speaking_person, first_video_person);
+                                }
+                            }
+                        })
+                    }, 5000)
                 }, 5000);
             })
             .catch(error => {
@@ -1449,6 +1470,17 @@
             } else if (elem.msRequestFullscreen) { /* IE/Edge */
                 elem.msRequestFullscreen();
             }
+        }
+
+        function InView(elem) {
+            var container = $(elem.parentNode);
+            var contHeight = container.height();
+            var contTop = container.scrollTop();
+            var contBottom = contTop + contHeight ;
+            var elemTop = $(elem).offset().top - container.offset().top;
+            var elemBottom = elemTop + $(elem).height();
+            var isTotal = (elemTop >= 0 && elemBottom <=contHeight);
+            return  isTotal;
         }
 
         // function ran when user joins meeting or other user joins meeting
