@@ -5,5 +5,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-button (click)="joinWithGoogle()">Join With Google</ion-button>
+  {{ displayName }}
+  <ion-button (click)="signInWithGoogle()">Login</ion-button>  
+  <ion-button (click)="signOut()">Logout</ion-button>
 </ion-content>

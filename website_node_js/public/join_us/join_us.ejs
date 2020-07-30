@@ -9,25 +9,14 @@
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css" />
     <link rel="stylesheet" href="/static/join_us/css/main.css" />
     <script type="text/javascript">
-        var LOCAL = true;
-        var PORT = ":5442";
         // $("#user-sign").css("display", "none");
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                if (LOCAL) {
-                    window.location.replace("https://" + window.location.hostname + PORT + "/join_us/success/");
-                } else {
-                    window.location.replace("https://" + window.location.hostname + "/join_us/success/");
-                }
+                window.location.replace("https://" + window.location.hostname + window.location.port + "/join_us/success/");
             }
         })
         // FirebaseUI config.
-        var signInSuccessURL;
-        if (LOCAL) {
-            signInSuccessURL = 'https://' + window.location.hostname + PORT + '/join_us/success/';
-        } else {
-            signInSuccessURL = 'https://' + window.location.hostname + '/join_us/success/';
-        }
+        var signInSuccessURL = 'https://' + window.location.hostname + window.location.port + '/join_us/success/';
         var uiConfig = {
             signInSuccessUrl: signInSuccessURL,
             signInOptions: [

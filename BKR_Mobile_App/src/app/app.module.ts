@@ -15,6 +15,7 @@ import { SessionPipe } from './session.pipe';
 import { OauthService } from './services/oauth.service';
 import { MeetingSessionService } from './services/meeting-session.service';
 import { AngularFireModule } from '@angular/fire';
+import { AngularFireDatabaseModule, AngularFireDatabase } from '@angular/fire/database';
 import { AngularFireAuthModule } from '@angular/fire/auth';
 import { environment } from 'src/environments/environment';
 
@@ -29,6 +30,7 @@ import { environment } from 'src/environments/environment';
     ReactiveFormsModule,
     FormsModule,
     AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFireDatabaseModule,
     AngularFireAuthModule
   ],
   providers: [
@@ -38,7 +40,8 @@ import { environment } from 'src/environments/environment';
     AndroidPermissions,
     OauthService,
     MeetingSessionService,
-    ScreenOrientation
+    ScreenOrientation,
+    AngularFireDatabase,
   ],
   bootstrap: [AppComponent]
 })

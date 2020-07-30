@@ -1,37 +1,32 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { auth } from 'firebase/app';
-import { Router } from '@angular/router';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OauthService {
-  constructor(
-    private afAuth: AngularFireAuth,
-    private router: Router
-  ) { }
+  ui: any;
+  constructor() {
 
-  joinWithGoogle() {
-    const provider = new auth.GoogleAuthProvider();
-    return this.socialSignIn(provider);
   }
 
-  private socialSignIn(provider) {
-    this.afAuth.signInWithPopup(provider).then((cred) => {
-      if (cred.additionalUserInfo?.isNewUser) {
-        console.log(cred.user?.uid);
-        // do something if new user
-      } else {
-        // do something if old user
-        console.log(cred.user?.uid);
-      }
-    }).then(() => {
-      this.router.navigate(["/"]);
+  signInWithGoogle() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithRedirect(provider).then(function () {
+      return firebase.auth().getRedirectResult();
+    }).then(function (result) {
+      // The signed-in user info.
+      var user = result.user;
+      console.log(user);
+      
+      // ...
+    }).catch(function (error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      console.log(errorCode);
+      console.log(errorMessage);      
     });
-  }
-
-  returnAuthState() {
-    return this.afAuth.authState;
   }
 }

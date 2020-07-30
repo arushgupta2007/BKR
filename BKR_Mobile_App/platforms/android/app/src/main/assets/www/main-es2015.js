@@ -530,6 +530,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ionic_angular__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ionic/angular */ "./node_modules/@ionic/angular/__ivy_ngcc__/fesm2015/ionic-angular.js");
 /* harmony import */ var _ionic_native_splash_screen_ngx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ionic-native/splash-screen/ngx */ "./node_modules/@ionic-native/splash-screen/__ivy_ngcc__/ngx/index.js");
 /* harmony import */ var _ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ionic-native/status-bar/ngx */ "./node_modules/@ionic-native/status-bar/__ivy_ngcc__/ngx/index.js");
+/* harmony import */ var firebase_auth__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! firebase/auth */ "./node_modules/firebase/auth/dist/index.esm.js");
+
 
 
 
@@ -594,8 +596,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./services/oauth.service */ "./src/app/services/oauth.service.ts");
 /* harmony import */ var _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./services/meeting-session.service */ "./src/app/services/meeting-session.service.ts");
 /* harmony import */ var _angular_fire__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! @angular/fire */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire.js");
-/* harmony import */ var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @angular/fire/auth */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
-/* harmony import */ var src_environments_environment__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! src/environments/environment */ "./src/environments/environment.ts");
+/* harmony import */ var _angular_fire_database__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! @angular/fire/database */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-database.js");
+/* harmony import */ var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! @angular/fire/auth */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
+/* harmony import */ var src_environments_environment__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! src/environments/environment */ "./src/environments/environment.ts");
+
 
 
 
@@ -629,8 +633,9 @@ AppModule = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
             _angular_common_http__WEBPACK_IMPORTED_MODULE_9__["HttpClientModule"],
             _angular_forms__WEBPACK_IMPORTED_MODULE_10__["ReactiveFormsModule"],
             _angular_forms__WEBPACK_IMPORTED_MODULE_10__["FormsModule"],
-            _angular_fire__WEBPACK_IMPORTED_MODULE_17__["AngularFireModule"].initializeApp(src_environments_environment__WEBPACK_IMPORTED_MODULE_19__["environment"].firebaseConfig),
-            _angular_fire_auth__WEBPACK_IMPORTED_MODULE_18__["AngularFireAuthModule"]
+            _angular_fire__WEBPACK_IMPORTED_MODULE_17__["AngularFireModule"].initializeApp(src_environments_environment__WEBPACK_IMPORTED_MODULE_20__["environment"].firebaseConfig),
+            _angular_fire_database__WEBPACK_IMPORTED_MODULE_18__["AngularFireDatabaseModule"],
+            _angular_fire_auth__WEBPACK_IMPORTED_MODULE_19__["AngularFireAuthModule"]
         ],
         providers: [
             _ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_6__["StatusBar"],
@@ -639,7 +644,8 @@ AppModule = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
             _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"],
             _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"],
             _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"],
-            ScreenOrientation
+            ScreenOrientation,
+            _angular_fire_database__WEBPACK_IMPORTED_MODULE_18__["AngularFireDatabase"],
         ],
         bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_7__["AppComponent"]]
     })
@@ -1212,47 +1218,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OauthService", function() { return OauthService; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/__ivy_ngcc__/fesm2015/core.js");
-/* harmony import */ var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/fire/auth */ "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
-/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! firebase/app */ "./node_modules/firebase/app/dist/index.cjs.js");
-/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(firebase_app__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
-
+/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! firebase/app */ "./node_modules/firebase/app/dist/index.cjs.js");
+/* harmony import */ var firebase_app__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(firebase_app__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var firebase_auth__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! firebase/auth */ "./node_modules/firebase/auth/dist/index.esm.js");
 
 
 
 
 let OauthService = class OauthService {
-    constructor(afAuth, router) {
-        this.afAuth = afAuth;
-        this.router = router;
+    constructor() {
     }
-    joinWithGoogle() {
-        const provider = new firebase_app__WEBPACK_IMPORTED_MODULE_3__["auth"].GoogleAuthProvider();
-        return this.socialSignIn(provider);
-    }
-    socialSignIn(provider) {
-        return this.afAuth.signInWithPopup(provider).then((cred) => {
-            var _a, _b, _c;
-            if ((_a = cred.additionalUserInfo) === null || _a === void 0 ? void 0 : _a.isNewUser) {
-                console.log((_b = cred.user) === null || _b === void 0 ? void 0 : _b.uid);
-                // do something if new user
-            }
-            else {
-                // do something if old user
-                console.log((_c = cred.user) === null || _c === void 0 ? void 0 : _c.uid);
-            }
-        }).then(() => {
-            this.router.navigate(["/"]);
+    signInWithGoogle() {
+        var provider = new firebase_app__WEBPACK_IMPORTED_MODULE_2___default.a.auth.GoogleAuthProvider();
+        firebase_app__WEBPACK_IMPORTED_MODULE_2___default.a.auth().signInWithRedirect(provider).then(function () {
+            return firebase_app__WEBPACK_IMPORTED_MODULE_2___default.a.auth().getRedirectResult();
+        }).then(function (result) {
+            // The signed-in user info.
+            var user = result.user;
+            console.log(user);
+            // ...
+        }).catch(function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            console.log(errorCode);
+            console.log(errorMessage);
         });
     }
-    returnAuthState() {
-        return this.afAuth.authState;
-    }
 };
-OauthService.ctorParameters = () => [
-    { type: _angular_fire_auth__WEBPACK_IMPORTED_MODULE_2__["AngularFireAuth"] },
-    { type: _angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"] }
-];
 OauthService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
         providedIn: 'root'
@@ -1364,8 +1357,9 @@ const environment = {
         projectId: "baatkarteraho2007",
         storageBucket: "baatkarteraho2007.appspot.com",
         messagingSenderId: "642785637257",
-        appId: "1:642785637257:web:075ac911b75774ad7fe758"
-    }
+        appId: "1:642785637257:web:4f3d1d888a5f55517fe758",
+        measurementId: "G-EY45VY1BE9"
+    },
 };
 /*
  * For easier debugging in development mode, you can import the following file

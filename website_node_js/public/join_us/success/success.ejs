@@ -10,16 +10,7 @@
     <script
     src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
-
-        var LOCAL = true
-        var PORT = ":5442";
-        var addUserUrl;
-        if (LOCAL) {
-            addUserUrl = "https://" + window.location.hostname + PORT +  "/join_us/addUser/";
-        } else {
-            addUserUrl = "https://" + window.location.hostname + "/join_us/addUser/";
-        }
-
+        var addUserUrl = "https://" + window.location.hostname + "/join_us/addUser/";
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 var displayName = user.displayName;

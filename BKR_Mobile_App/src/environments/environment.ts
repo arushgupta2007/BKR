@@ -11,8 +11,9 @@ export const environment = {
     projectId: "baatkarteraho2007",
     storageBucket: "baatkarteraho2007.appspot.com",
     messagingSenderId: "642785637257",
-    appId: "1:642785637257:web:075ac911b75774ad7fe758"
-  }
+    appId: "1:642785637257:web:4f3d1d888a5f55517fe758",
+    measurementId: "G-EY45VY1BE9"
+  },
 };
 
 /*

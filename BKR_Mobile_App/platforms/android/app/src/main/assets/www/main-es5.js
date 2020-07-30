@@ -362,6 +362,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     var _ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
     /*! @ionic-native/status-bar/ngx */
     "./node_modules/@ionic-native/status-bar/__ivy_ngcc__/ngx/index.js");
+    /* harmony import */
+
+
+    var firebase_auth__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(
+    /*! firebase/auth */
+    "./node_modules/firebase/auth/dist/index.esm.js");
 
     var AppComponent = /*#__PURE__*/function () {
       function AppComponent(platform, splashScreen, statusBar) {
@@ -541,13 +547,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     /* harmony import */
 
 
-    var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(
+    var _angular_fire_database__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(
+    /*! @angular/fire/database */
+    "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-database.js");
+    /* harmony import */
+
+
+    var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(
     /*! @angular/fire/auth */
     "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
     /* harmony import */
 
 
-    var src_environments_environment__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(
+    var src_environments_environment__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(
     /*! src/environments/environment */
     "./src/environments/environment.ts");
 
@@ -558,11 +570,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     AppModule = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["NgModule"])({
       declarations: [_app_component__WEBPACK_IMPORTED_MODULE_7__["AppComponent"], _user_video_component__WEBPACK_IMPORTED_MODULE_13__["UserVideoComponent"], _ov_video_component__WEBPACK_IMPORTED_MODULE_12__["OpenViduVideoComponent"], _session_pipe__WEBPACK_IMPORTED_MODULE_14__["SessionPipe"]],
       entryComponents: [],
-      imports: [_angular_platform_browser__WEBPACK_IMPORTED_MODULE_2__["BrowserModule"], _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["IonicModule"].forRoot(), _app_routing_module__WEBPACK_IMPORTED_MODULE_8__["AppRoutingModule"], _angular_common_http__WEBPACK_IMPORTED_MODULE_9__["HttpClientModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_10__["ReactiveFormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_10__["FormsModule"], _angular_fire__WEBPACK_IMPORTED_MODULE_17__["AngularFireModule"].initializeApp(src_environments_environment__WEBPACK_IMPORTED_MODULE_19__["environment"].firebaseConfig), _angular_fire_auth__WEBPACK_IMPORTED_MODULE_18__["AngularFireAuthModule"]],
+      imports: [_angular_platform_browser__WEBPACK_IMPORTED_MODULE_2__["BrowserModule"], _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["IonicModule"].forRoot(), _app_routing_module__WEBPACK_IMPORTED_MODULE_8__["AppRoutingModule"], _angular_common_http__WEBPACK_IMPORTED_MODULE_9__["HttpClientModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_10__["ReactiveFormsModule"], _angular_forms__WEBPACK_IMPORTED_MODULE_10__["FormsModule"], _angular_fire__WEBPACK_IMPORTED_MODULE_17__["AngularFireModule"].initializeApp(src_environments_environment__WEBPACK_IMPORTED_MODULE_20__["environment"].firebaseConfig), _angular_fire_database__WEBPACK_IMPORTED_MODULE_18__["AngularFireDatabaseModule"], _angular_fire_auth__WEBPACK_IMPORTED_MODULE_19__["AngularFireAuthModule"]],
       providers: [_ionic_native_status_bar_ngx__WEBPACK_IMPORTED_MODULE_6__["StatusBar"], _ionic_native_splash_screen_ngx__WEBPACK_IMPORTED_MODULE_5__["SplashScreen"], {
         provide: _angular_router__WEBPACK_IMPORTED_MODULE_3__["RouteReuseStrategy"],
         useClass: _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["IonicRouteStrategy"]
-      }, _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"], _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"], _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"], ScreenOrientation],
+      }, _ionic_native_android_permissions_ngx__WEBPACK_IMPORTED_MODULE_11__["AndroidPermissions"], _services_oauth_service__WEBPACK_IMPORTED_MODULE_15__["OauthService"], _services_meeting_session_service__WEBPACK_IMPORTED_MODULE_16__["MeetingSessionService"], ScreenOrientation, _angular_fire_database__WEBPACK_IMPORTED_MODULE_18__["AngularFireDatabase"]],
       bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_7__["AppComponent"]]
     })], AppModule);
     /***/
@@ -1320,75 +1332,47 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     /* harmony import */
 
 
-    var _angular_fire_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
-    /*! @angular/fire/auth */
-    "./node_modules/@angular/fire/__ivy_ngcc__/fesm2015/angular-fire-auth.js");
-    /* harmony import */
-
-
-    var firebase_app__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(
+    var firebase_app__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(
     /*! firebase/app */
     "./node_modules/firebase/app/dist/index.cjs.js");
     /* harmony import */
 
 
-    var firebase_app__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(firebase_app__WEBPACK_IMPORTED_MODULE_3__);
+    var firebase_app__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(firebase_app__WEBPACK_IMPORTED_MODULE_2__);
     /* harmony import */
 
 
-    var _angular_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(
-    /*! @angular/router */
-    "./node_modules/@angular/router/__ivy_ngcc__/fesm2015/router.js");
+    var firebase_auth__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(
+    /*! firebase/auth */
+    "./node_modules/firebase/auth/dist/index.esm.js");
 
     var OauthService = /*#__PURE__*/function () {
-      function OauthService(afAuth, router) {
+      function OauthService() {
         _classCallCheck(this, OauthService);
-
-        this.afAuth = afAuth;
-        this.router = router;
       }
 
       _createClass(OauthService, [{
-        key: "joinWithGoogle",
-        value: function joinWithGoogle() {
-          var provider = new firebase_app__WEBPACK_IMPORTED_MODULE_3__["auth"].GoogleAuthProvider();
-          return this.socialSignIn(provider);
-        }
-      }, {
-        key: "socialSignIn",
-        value: function socialSignIn(provider) {
-          var _this11 = this;
-
-          return this.afAuth.signInWithPopup(provider).then(function (cred) {
-            var _a, _b, _c;
-
-            if ((_a = cred.additionalUserInfo) === null || _a === void 0 ? void 0 : _a.isNewUser) {
-              console.log((_b = cred.user) === null || _b === void 0 ? void 0 : _b.uid); // do something if new user
-            } else {
-              // do something if old user
-              console.log((_c = cred.user) === null || _c === void 0 ? void 0 : _c.uid);
-            }
-          }).then(function () {
-            _this11.router.navigate(["/"]);
+        key: "signInWithGoogle",
+        value: function signInWithGoogle() {
+          var provider = new firebase_app__WEBPACK_IMPORTED_MODULE_2___default.a.auth.GoogleAuthProvider();
+          firebase_app__WEBPACK_IMPORTED_MODULE_2___default.a.auth().signInWithRedirect(provider).then(function () {
+            return firebase_app__WEBPACK_IMPORTED_MODULE_2___default.a.auth().getRedirectResult();
+          }).then(function (result) {
+            // The signed-in user info.
+            var user = result.user;
+            console.log(user); // ...
+          })["catch"](function (error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            console.log(errorCode);
+            console.log(errorMessage);
           });
-        }
-      }, {
-        key: "returnAuthState",
-        value: function returnAuthState() {
-          return this.afAuth.authState;
         }
       }]);
 
       return OauthService;
     }();
-
-    OauthService.ctorParameters = function () {
-      return [{
-        type: _angular_fire_auth__WEBPACK_IMPORTED_MODULE_2__["AngularFireAuth"]
-      }, {
-        type: _angular_router__WEBPACK_IMPORTED_MODULE_4__["Router"]
-      }];
-    };
 
     OauthService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
       providedIn: 'root'
@@ -1548,7 +1532,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         projectId: "baatkarteraho2007",
         storageBucket: "baatkarteraho2007.appspot.com",
         messagingSenderId: "642785637257",
-        appId: "1:642785637257:web:075ac911b75774ad7fe758"
+        appId: "1:642785637257:web:4f3d1d888a5f55517fe758",
+        measurementId: "G-EY45VY1BE9"
       }
     };
     /*

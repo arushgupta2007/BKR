@@ -97,9 +97,30 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <div id="mindmap"></div>
-                    <button type="button" onclick="addNodeMindMap()" class="btn btn-primary">Add</button>
-                    <button type="button" onclick="removeNodeMindMap()" class="btn btn-primary">Remove</button>
+                    <div id="mindmap-parent">
+                        <div id="mindmap-toolbar">
+                            <button type="button" onclick="addNodeMindMap()" class="btn btn-light"><i class="fas fa-plus" style="color: black;"></i></button>
+                            <button type="button" onclick="removeNodeMindMap()" class="btn btn-light"><i class="fas fa-trash" style="color: black;"></i></button>
+                            <button type="button" onclick="zoomInMindMap()" class="btn btn-light"><i class="fas fa-search-plus" style="color: black;"></i></button>
+                            <button type="button" onclick="zoomOutMindMap()" class="btn btn-light"><i class="fas fa-search-minus" style="color: black;"></i></button>
+                        </div>
+                        <div id="mindmap-color-bar">
+                            <button class="btn btn-light" type="button">
+                                <i class="fas fa-font" style="color:black;"></i>&nbsp;&nbsp;&nbsp;
+                                <div id="pickr-font-color-mind-map"></div>
+                            </button>
+                            <button class="btn btn-light" type="button">
+                                <i class="fas fa-fill-drip" style="color:black;"></i>&nbsp;&nbsp;&nbsp;
+                                <div id="pickr-background-color-mind-map"></div>
+                            </button>
+                            <button class="btn btn-light" type="button">
+                                <i class="fab fa-pagelines" style="color:black;"></i>&nbsp;&nbsp;&nbsp;
+                                <div id="pickr-branch-color-mind-map"></div>
+                            </button>
+                        </div>
+                        <button type="button" onclick="centerMindmap()" id="centerMindmapButton" class="btn btn-dark"><i class="fas fa-crosshairs" style="color: white;"></i></button>
+                        <div id="mindmap"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -198,6 +219,7 @@
             <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: transparent; color: white; font-size: 175%; height: 30px;">
             </button>
             <div class="dropdown-menu">
+                <!-- <button class="dropdown-item" id="recording-button" onclick="toggleRecording()"><i class="fas fa-circle" style="color:black;"></i></i> Record</button> -->
                 <button class="dropdown-item" onclick="screenShare()"><i class="fas fa-share-square in-white-back"></i> Share Screen</button>
                 <button class="dropdown-item" onclick="whiteboard_open()"><i class="fas fa-pencil-alt in-white-back"></i> Whiteboard</button>
                 <button class="dropdown-item" onclick="collabOpen()"><i class="fas fa-handshake" style="color:black;"></i> Collab</button>
@@ -215,8 +237,10 @@
     <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
-    <script src="https://unpkg.com/mmp/build/mmp.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script> -->
+    <!-- <script src="https://unpkg.com/mmp/build/mmp.min.js"></script> -->
+    <script src="/static/libs/d3.min.js"></script>
+    <script src="/static/libs/mmp.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/20.0.0/classic/ckeditor.js"></script>
     <script src="/static/session/js/main.js"></script>
@@ -234,6 +258,7 @@
         var userName = <%- JSON.stringify(userName) %> ;
         // get meeting name to display on navbar
         var meetingName = <%- JSON.stringify(meetingName) %> ;
+        var code = <%- JSON.stringify(code) %>;
 
         // check if user is signed in
         var signName = nickName;
@@ -333,6 +358,7 @@
         // keep track of video and audio status using booleans
         var audio = true;
         var video = true;
+        var recording = false;
         // keep connection list for private chat and others
         var connection_list = {};
         // keep list for active user to be displayed on main container
@@ -345,6 +371,8 @@
         var notification_timeout;
         var chat_message_input;
         var draft_message_list = {everybody: ""};
+        var mind_map_selected_node;
+        var just_joined_mindmap_lock = false;
 
         ClassicEditor
             .create(document.querySelector('#message-to-send-parent'))
@@ -358,10 +386,10 @@
         var mind_map = mmp.create("mindmap", {
             fontFamily: "Arial, Helvetica, sans-serif",
             centerOnResize: true,
-            drag: false,
-            zoom: false,
+            drag: true,
+            zoom: true,
             defaultNode: {
-                name: "Default node name",
+                name: "Node",
                 image: {
                     src: "",
                     size: 60
@@ -379,7 +407,7 @@
                 locked: true
             },
             rootNode: {
-                name: "Default root node name",
+                name: "Root",
                 image: {
                     src: "",
                     size: 70
@@ -397,40 +425,117 @@
             }
         });
 
-        mind_map_add_lock = false;
-        mind_map_update_lock = false;
-        mind_map_remove_lock = false;
+        var pickrMindMapConfig = {
+            theme: 'classic',
+            default: '#000000',
+            defaultRepresentation: 'HEX',
+            position: 'top-middle',
+            swatches: [
+                'rgb(244, 67, 54)',
+                'rgb(233, 30, 99)',
+                'rgb(156, 39, 176)',
+                'rgb(103, 58, 183)',
+                'rgb(63, 81, 181)',
+                'rgb(33, 150, 243)',
+                'rgb(3, 169, 244)',
+                'rgb(0, 188, 212)',
+                'rgb(0, 150, 136)',
+                'rgb(76, 175, 80)',
+                'rgb(139, 195, 74)',
+                'rgb(205, 220, 57)',
+                'rgb(255, 235, 59)',
+                'rgb(255, 193, 7,)'
+            ],
+            components: {
+                // Main components
+                preview: true,
+                opacity: false,
+                hue: true,
+
+                // Input / output Options
+                interaction: {
+                    hex: true,
+                    rgba: false,
+                    hsla: false,
+                    hsva: false,
+                    cmyk: false,
+                    input: true,
+                    clear: false,
+                    save: false
+                }
+            }
+        }
+
+        var pickrFontColorMindMapConfig = pickrMindMapConfig;
+        pickrFontColorMindMapConfig["el"] = "#pickr-font-color-mind-map";
+        var pickrFontColorMindMap = Pickr.create(pickrFontColorMindMapConfig);
+        pickrFontColorMindMap.on("change", () => {
+            var color = pickrFontColorMindMap.getColor();
+            mind_map.updateNode("nameColor", "#" + color.toHEXA()[0] + color.toHEXA()[1] + color.toHEXA()[2]);
+        });
+
+        var pickrBackgroundColorMindMapConfig = pickrMindMapConfig;
+        pickrBackgroundColorMindMapConfig["el"] = "#pickr-background-color-mind-map";
+        var pickrBackgroundColorMindMap = Pickr.create(pickrBackgroundColorMindMapConfig);
+        pickrBackgroundColorMindMap.on("change", () => {
+            var color = pickrBackgroundColorMindMap.getColor();
+            mind_map.updateNode("backgroundColor", "#" + color.toHEXA()[0] + color.toHEXA()[1] + color.toHEXA()[2]);
+        });
+
+        var pickrBranchColorMindMapConfig = pickrMindMapConfig;
+        pickrBranchColorMindMapConfig["el"] = "#pickr-branch-color-mind-map";
+        var pickrBranchColorMindMap = Pickr.create(pickrBranchColorMindMapConfig);
+        pickrBranchColorMindMap.on("change", () => {
+            var color = pickrBranchColorMindMap.getColor();
+            mind_map.updateNode("branchColor", "#" + color.toHEXA()[0] + color.toHEXA()[1] + color.toHEXA()[2]);
+        });
 
         mind_map.on("nodeCreate", (node) => {
-            if (!mind_map_add_lock) {
-                mindmapCreate(node);
-            } else {
-                mind_map_add_lock = false;
-            }
+            mindmapCreate(node);
+            console.log("Created Node, Sent to everybody, nodeId: " + node.id);
         })
 
         mind_map.on("nodeUpdate", (node) => {
-            if (!mind_map_update_lock) {
-                mindmapUpdate(node);
-            } else {
-                mind_map_update_lock = false;
-            }
+            mindmapUpdate(node);
+            console.log("Updated Node, Sent to everybody, nodeId: " + node.id);
         })
 
         mind_map.on("nodeRemove", (node) => {
-            if (!mind_map_remove_lock) {
-                mindmapDel(node.id);
-            } else {
-                mind_map_remove_lock = false;
-            }
+            mindmapDel(node.id);
+            console.log("Deleted Node, Sent to everybody, nodeId: " + node.id);
         })
 
+        mind_map.on("nodeSelect", (node) => {
+            $("#mindmap-color-bar").css("display", "flex");
+            mind_map_selected_node = node;
+            pickrFontColorMindMap.setColor(node.colors.name);
+            pickrBackgroundColorMindMap.setColor(node.colors.background);
+            pickrBranchColorMindMap.setColor(node.colors.branch);
+        });
+
+        mind_map.on("nodeDeselect", () => {
+            $("#mindmap-color-bar").hide();
+        });
+        $("#mindmap-color-bar").hide();
+
         function addNodeMindMap() {
-            mind_map.addNode();
+            mind_map.addNode({locked: false}, undefined, Date.now().toString());
         }
 
         function removeNodeMindMap() {
             mind_map.removeNode();
+        }
+
+        function zoomInMindMap() {
+            mind_map.zoomIn(100);
+        }
+
+        function zoomOutMindMap() {
+            mind_map.zoomOut(100);
+        }
+
+        function centerMindmap() {
+            mind_map.center("position", 100);
         }
 
         $(".layout-videos").css("display", "none");
@@ -631,7 +736,7 @@
                 } else {
                     div.className = "snackbar-info text-truncate show";
                 }
-                div.innerHTML = "<i class='fas fa-comment-alt red-chat'></i> New Group Message"
+                div.innerHTML = "<i class='fas fa-comment-alt red-chat'></i> New Private Message"
                 $(".snackbar-info").remove();
                 document.getElementById("snackbar-info-container").appendChild(div);
                 clearTimeout(notification_timeout);
@@ -811,18 +916,23 @@
             var node = JSON.parse(event.data);
             var props = {
                 name: node.name,
-                coordinates: node.coordinates,
+                // coordinates: node.coordinates,
                 image: node.image,
                 colors: node.colors,
                 font: node.font,
                 locked: node.locked,
             }
-            mind_map_add_lock = true;
-            mind_map.addNode(props, node.parent);
+            mind_map.addNode(props, node.parent, node.id);
+            // mind_map.selectNode(node.id);
+            console.log("Recv Create Node, nodeId: " + node.id + ", parent: " + node.parent);
         });
 
         session.on('signal:mindmap-update', (event) => {
-            var node = JSON.parse(event.data);
+            var split_string = event.data.split(",");
+            if (split_string[0] === userName.toString()) {return;}
+            var index_first_comma = event.data.indexOf(",");
+            var json_mind_map = event.data.slice(index_first_comma + 1, event.data.length);
+            var node = JSON.parse(json_mind_map);
             var props = {
                 name: node.name,
                 coordinates: node.coordinates,
@@ -831,25 +941,59 @@
                 font: node.font,
                 locked: node.locked,
             }
-            mind_map_update_lock = true;
-            mind_map.updateNode("name", node.name, id=node.id);
-            mind_map.updateNode("locked", node.locked, id=node.id);
-            mind_map.updateNode("coordinates", node.coordinates, id=node.id);
-            mind_map.updateNode("imgSrc", node.image.src, id=node.id);
-            mind_map.updateNode("imgSize", node.image.size, id=node.id);
-            mind_map.updateNode("backgroundColor", node.colors.background, id=node.id);
-            mind_map.updateNode("branchColor", node.colors.branch, id=node.id);
-            mind_map.updateNode("fontWeight", node.font.weight, id=node.id);
-            mind_map.updateNode("fontStyle", node.font.style, id=node.id);
-            mind_map.updateNode("nameColor", node.color.name, id=node.id);
+            mind_map.updateNode("name", node.name, undefined, node.id);
+            mind_map.updateNode("locked", node.locked, undefined, node.id);
+            // mind_map.updateNode("coordinates", node.coordinates, undefined, node.id);
+            mind_map.updateNode("imgSrc", node.image.src, undefined, node.id);
+            mind_map.updateNode("imgSize", node.image.size, undefined, node.id);
+            mind_map.updateNode("backgroundColor", node.colors.background, undefined, node.id);
+            mind_map.updateNode("branchColor", node.colors.branch, undefined, node.id);
+            mind_map.updateNode("fontWeight", node.font.weight, undefined, node.id);
+            mind_map.updateNode("fontStyle", node.font.style, undefined, node.id);
+            mind_map.updateNode("nameColor", node.color.name, undefined, node.id);
+            console.log("Recv Create Node, nodeId: " + node.id);
         });
 
         session.on('signal:mindmap-del', (event) => {
             var nodeId = event.data;
             console.log(nodeId);
-            mind_map_remove_lock = true;
             mind_map.removeNode(nodeId);
+            console.log("Recv Create Node, nodeId: " + nodeId);
         });
+
+        session.on("signal:mindmap-new-joined", (event) => {
+            var json_mind_map = JSON.parse(event.data);
+            // console.error(json_mind_map);
+            // mind_map.new(json_mind_map);
+            //"mindmap_node_0"
+            if (!just_joined_mindmap_lock) {
+                just_joined_mindmap_lock = true;
+                mind_map.nodeChildren("mindmap_node_0").forEach((child_node) => {
+                    mind_map.removeNode(child_node.id);
+                });
+                var length_of_mindmap_to_make = Object.keys(json_mind_map).length;
+                for (var i=0; i < length_of_mindmap_to_make; i++) {
+                    if (i !== 0) {
+                        var current_obj = json_mind_map[i];
+                        console.error(current_obj);
+                        mind_map.addNode({
+                            name:current_obj.name,
+                            image:current_obj.image,
+                            colors:current_obj.colors,
+                            font:current_obj.font,
+                            locked:current_obj.locked,
+                        }, current_obj.parent, current_obj.id)
+                        // mind_map.addNode({
+                        //     name: current_obj.name,
+                        //     image: current_obj.img,
+                        //     colors: current_obj.colors,
+                        //     font: current_obj.font,
+                        //     locked: current_obj.locked
+                        // }, current_obj.parent, current_obj.id)
+                    }
+                }
+            }
+        })
 
         // function ran when new user connects
         session.on('streamCreated', (event) => {
@@ -890,7 +1034,25 @@
                         speaking_person.parentNode.insertBefore(speaking_person, first_video_person);
                     }
                 }
-            })
+            });
+            try {
+                var temp_json = mind_map.exportAsJSON();
+                delete temp_json[0];
+                if (Object.keys(temp_json).length !== 0) {
+                    setTimeout(() => {
+                        session.signal({
+                            data: JSON.stringify(mind_map.exportAsJSON()),
+                            type: "mindmap-new-joined",
+                            to: [subscriber.stream.connection]
+                        });
+                        console.error("mindmap data sent");
+                    }, 1000);
+                } else {
+                    console.error(temp_json);
+                }
+            } catch (err) {
+                console.error(err);
+            }
         });
 
         // function ran when some user disconnect's stream the meeting
@@ -917,6 +1079,16 @@
                 $("#refreshButton").click();
             }
         });
+
+        session.on("recordingStarted", (event) => {
+            recording = true;
+            $("#recording-button").html('<i class="fas fa-stop-circle"></i> Stop Recording');
+        });
+
+        session.on("recordingStopped", (event) => {
+            recording = false;
+            $("#recording-button").html('<i class="fas fa-circle"></i> Record');
+        })
 
         // join meeting
         session.connect(token, {
@@ -1253,7 +1425,7 @@
                 to.push(key);
             }
             session.signal({
-                data: node_string,
+                data: userName + "," +  node_string,
                 type: "mindmap-update",
                 to: to,
             })
@@ -1416,6 +1588,26 @@
                 console.log(err);
             })
         }
+
+        // function toggleRecording() {
+        //     var url_append = "start"
+        //     if (recording) {
+        //         url_append = "stop";
+        //     }
+        //     $.ajax({
+        //         url: "https://" + window.location.hostname + "/session/recording/" + url_append,
+        //         type: "POST",
+        //         data: {
+        //             sessionId: sessionName,
+        //             sessionCode: code,
+        //         },
+        //         error: function (err) {
+        //             console.log(err);
+        //         }
+        //     }).then((res) => {
+        //         console.log(res);
+        //     })
+        // }
 
         // function to swicth back to video and audio ran at screenShare() and
         // when user clicks close at whiteboard model

@@ -145,7 +145,7 @@ class Whiteboard {
             <div><b> - </b></div>
             <input type="range" min="1" max="100" value="5" class="whiteboard-stroke-slider" 
                 id="${this.canvas_parent_id}-whiteboard-stroke-slider">
-            <div><b> + </b></div>"
+            <div><b> + </b></div>
         `;
 
 

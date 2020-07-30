@@ -1,6 +1,9 @@
 // Importing OpenVidu
 var OpenVidu = require("openvidu-node-client").OpenVidu;
 var OpenViduRole = require("openvidu-node-client").OpenViduRole;
+var RecordingMode = require("openvidu-node-client").RecordingMode;
+var RecordingLayout = require("openvidu-node-client").RecordingLayout;
+var Recording = require("openvidu-node-client").Recording;
 
 // Checking If Local
 var IS_LOCAL = parseInt(process.env.IS_LOCAL);
@@ -95,6 +98,8 @@ var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 
 // Storing all session objects in mapSessions Object
 var mapSessions = {};
+
+var mapRecordings = {};
 
 // setting all files of public to be hosted on /static
 app.use("/static", express.static("public"));
@@ -302,7 +307,9 @@ app.post("/session/", (req, res) => {
 
         // create OpenVidu session
         var prop = {
-            customSessionId: session_id.toString()
+            customSessionId: session_id.toString(),
+            recordingMode: RecordingMode.MANUAL,
+            defaultOutputMode: Recording.OutputMode.BEST_FIT
         };
 
         OV.createSession(prop)
@@ -423,7 +430,9 @@ app.post("/session/", (req, res) => {
                             });
                     } else {
                         var prop = {
-                            customSessionId: sessionID.toString()
+                            customSessionId: sessionID.toString(),
+                            recordingMode: RecordingMode.MANUAL,
+                            defaultOutputMode: Recording.OutputMode.BEST_FIT
                         };
                         OV.createSession(prop)
                             .then((session) => {
@@ -632,6 +641,59 @@ app.post("/session/refresh", (req, res) => {
     }
 });
 
+// app.post("/session/recording/start/", (req, res) => {
+//     console.log("--------------------------------------------------------");
+//     console.log("RECORDING SESSION");
+//     var sessionId = req.body.sessionId;
+//     var sessionCode = req.body.sessionCode;
+//     console.log(typeof sessionId);
+//     console.log(sessionCode);
+//     meetingsModel.findOne({meetingID: parseInt(sessionId)}, (err, meeting) => {
+//         if (meeting) {
+//             if (meeting.code === sessionCode) {
+//                 if (!mapRecordings[sessionId]) {
+//                     OV.startRecording(sessionId, {
+//                         outputMode: Recording.OutputMode.COMPOSED,
+//                         name: sessionId + "-" + meeting.meetingName + "-" + Date.now().toString(),
+//                         recordingLayout: RecordingLayout.BEST_FIT
+//                     }).then(response => mapRecordings[sessionId] = response)
+//                     .catch(err => console.log(err));
+//                 } else {
+//                     res.send(":((")
+//                 }
+//             } else {
+//                 res.send("::((")
+//             }
+//         } else {
+//             res.send(":(")
+//         }
+//     })
+// })
+
+// app.post("/session/recording/stop/", (req, res) => {
+//     console.log("--------------------------------------------------------");
+//     console.log("STOP RECORDING SESSION");
+//     var sessionId = req.body.sessionId;
+//     var sessionCode = req.body.sessionCode;
+//     meetingsModel.findOne({meetingID: parseInt(sessionId)}, (err, meeting) => {
+//         if (meeting) {
+//             if (meeting.code === sessionCode) {
+//                 if (mapRecordings[sessionId]) {
+//                     OV.stopRecording(mapRecordings[sessionId].id)
+//                     .then(response => delete mapRecordings[sessionId])
+//                     .catch(err => console.log(err));
+//                 } else {
+//                     res.send(":((")
+//                 }
+//             } else {
+//                 res.send("::((")
+//             }
+//         } else {
+//             res.send(":(")
+//         }
+//     })
+// })
+
 // POST request to /leave-session (leave the current session)
 app.post("/leave-session", (req, res) => {
     console.log("--------------------------------------------------------");
@@ -709,7 +771,9 @@ app.post("/mobile-api/create-meeting-get-token", (req, res) => {
 
     // create OpenVidu session
     var prop = {
-        customSessionId: session_id.toString()
+        customSessionId: session_id.toString(),
+        recordingMode: RecordingMode.MANUAL,
+        defaultOutputMode: Recording.OutputMode.BEST_FIT
     };
     OV.createSession(prop)
         .then((session) => {
