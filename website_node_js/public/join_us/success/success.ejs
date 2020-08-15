@@ -10,7 +10,11 @@
     <script
     src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
-        var addUserUrl = "https://" + window.location.hostname + "/join_us/addUser/";
+        var https_link = "https://" + window.location.hostname
+        if (window.location.port === '5442') {
+            https_link = https_link + ":" + window.location.port
+        }
+        var addUserUrl = https_link + "/join_us/addUser/";
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 var displayName = user.displayName;
@@ -30,14 +34,14 @@
                     type: "POST",
                     data: data,
                     success: function() {
-                        window.location.replace("https://" + window.location.hostname + "/");              
+                        window.location.replace(https_link + "/");              
                     },
                     error: function (error) {
                         console.log("Error: " + error);
                     }
                 })
             } else {
-                window.location.replace("https://" + window.location.hostname + "/join_us/");
+                window.location.replace(https_link + "/join_us/");
             }
         })
     </script>

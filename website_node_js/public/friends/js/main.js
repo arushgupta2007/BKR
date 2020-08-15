@@ -1,6 +1,10 @@
 const socket = io();
 var connected_socket = false;
 var editor_object = {}
+var https_url = "https://" + window.location.hostname
+if (window.location.port) {
+    https_url = https_url + ":" + window.location.port
+}
 
 class FriendArea {
     constructor(uid_friend, friend_name, uid_user) {
@@ -41,13 +45,13 @@ class FriendArea {
         friend_list.innerHTML = html_list_template;
         document.getElementById("friends-list").appendChild(friend_list);
         ClassicEditor
-            .create( document.querySelector( '#message-input-parent-' + uid_friend ) )
-            .then( editor => {
+            .create(document.querySelector('#message-input-parent-' + uid_friend))
+            .then(editor => {
                 editor_object[uid_friend] = editor;
-            } )
-            .catch( error => {
-                console.error( error );
-            } );
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
 }
 
@@ -89,13 +93,13 @@ socket.on("newMessageYouRecv", (data) => {
         from = "You";
     }
     new MessageClass(from, real_message, uid_friend, color_card);
-    $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight")}, 200);
+    $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight") }, 200);
 });
 
 $(document).ready(function () {
     $("#user-sign-out-navbar").click(function () {
         firebase.auth().signOut();
-        window.location.href = "https://" + window.location.hostname + ":" + window.location.port;
+        window.location.href = https_url;
     });
 
     $("#searchFriends").on("keyup", function () {
@@ -126,7 +130,7 @@ $(document).ready(function () {
                 userUID: uid,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/friends/",
+                url: https_url + "/user-api/user/friends/",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -138,7 +142,7 @@ $(document).ready(function () {
                     console.log(item.participants);
                     var friend_id = item.participants[0].toString();
                     $.ajax({
-                        url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/friends/name/",
+                        url: https_url + "/user-api/user/friends/name/",
                         type: "POST",
                         data: { friend_id: friend_id },
                         error: function (err) {
@@ -154,7 +158,7 @@ $(document).ready(function () {
 
             });
             $.ajax({
-                url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/invitation-for-me/",
+                url: https_url + "/user-api/user/invitation-for-me/",
                 type: "POST",
                 data: { userId: uid },
                 error: function (err) {
@@ -163,7 +167,7 @@ $(document).ready(function () {
             }).then((list_of_invites) => {
                 list_of_invites.forEach((invite, index) => {
                     $.ajax({
-                        url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/friends/name/",
+                        url: https_url + "/user-api/user/friends/name/",
                         type: "POST",
                         data: { friend_id: invite.from },
                         error: function (err) {
@@ -188,7 +192,7 @@ $(document).ready(function () {
                 socket.emit("join", { user_id: uid })
             }
         } else {
-            window.location.replace("https://" + window.location.hostname + ":" + window.location.port + "/join_us/");
+            window.location.replace(https_url + "/join_us/");
         }
     }, function (error) {
         console.log(error);
@@ -214,7 +218,7 @@ function openFriend(uid_friend, id_open_friend, id_list_group_button, uid) {
             friend_UserId: uid_friend,
         };
         $.ajax({
-            url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/friends/chats/",
+            url: https_url + "/user-api/friends/chats/",
             type: "POST",
             data: data_ajax,
             error: function (err) {
@@ -255,7 +259,7 @@ function inviteUser() {
         friend_email: invite_email
     }
     $.ajax({
-        url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/make-invitation/",
+        url: https_url + "/user-api/make-invitation/",
         type: "POST",
         data: data_ajax,
         error: function (err) {
@@ -270,7 +274,7 @@ function inviteUser() {
 function acceptInvite(uid, from_uid, invite_id) {
     console.log(uid);
     $.ajax({
-        url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/accept-invitation/",
+        url: https_url + "/user-api/accept-invitation/",
         type: "POST",
         data: { id_invite: invite_id, userId: uid, friend_id: from_uid },
         error: function (err) {
@@ -295,7 +299,7 @@ function sendMessage(uid_friend, user_uid) {
         new MessageClass("You", textarea_input, uid_friend, "#5cb3db");
         $("#message-input-" + uid_friend).val("")
     }
-    $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight")}, 200);
+    $("#real-chat-area-" + uid_friend).animate({ scrollTop: $('#real-chat-area-' + uid_friend).prop("scrollHeight") }, 200);
     editor_object[uid_friend].setData("");
 }
 

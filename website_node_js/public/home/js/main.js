@@ -378,7 +378,7 @@ $(document).ready( function () {
                 data.y += data.dy;
             }
         }
-        // animate();
+        animate();
         var urlParams = new URLSearchParams(window.location.search);
         var todo = urlParams.get('todo');
         if (todo === "join") {

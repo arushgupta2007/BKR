@@ -29,6 +29,7 @@ var userModel = require("./models/user_model");
 var meetingsModel = require("./models/meeting_model");
 var friendsModel = require("./models/friends_model");
 var friendsInviteModel = require("./models/friendInvitation_model");
+const { use } = require("passport");
 
 // Connecting to local MongoDB
 if (IS_LOCAL === 1) {
@@ -99,8 +100,6 @@ var OV = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
 // Storing all session objects in mapSessions Object
 var mapSessions = {};
 
-var mapRecordings = {};
-
 // setting all files of public to be hosted on /static
 app.use("/static", express.static("public"));
 
@@ -112,6 +111,29 @@ function deleteMeeting(session_id) {
     console.log("DELETED MEETING");
 }
 
+Date.prototype.yyyymmdd = function () {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+
+    return [this.getFullYear(),
+    (mm > 9 ? '' : '0') + mm,
+    (dd > 9 ? '' : '0') + dd
+    ].join('-');
+};
+
+Date.prototype.yyyymmddhhss = function () {
+    var mm = this.getMonth() + 1; // getMonth() is zero-based
+    var dd = this.getDate();
+    var hh = this.getHours()
+    var ss = this.getSeconds();
+    return [this.getFullYear(),
+    (mm > 9 ? '' : '0') + mm,
+    (dd > 9 ? '' : '0') + dd,
+    (hh > 9 ? '' : '0') + hh,
+    (ss > 9 ? '' : '0') + ss
+    ].join('-');
+};
+
 // SOCKET REQUESTS
 io.sockets.on("connection", (socket) => {
     socket.on("join", (data) => {
@@ -121,14 +143,14 @@ io.sockets.on("connection", (socket) => {
 
     socket.on("newMessage", (data) => {
         console.log(data);
-        userModel.findOne({commonId: data.from}, (err, user) => {
+        userModel.findOne({ commonId: data.from }, (err, user) => {
             if (user) {
                 var user_mongo_id = new mongoose.Types.ObjectId(user._id);
                 var friendId = new mongoose.Types.ObjectId(data.friend_id);
-                friendsModel.find({participants: user_mongo_id}, (err, friends) => {
+                friendsModel.find({ participants: user_mongo_id }, (err, friends) => {
                     if (friends) {
                         var friendMongoDocumentId;
-                        for (var i=0; i<friends.length;i++) {
+                        for (var i = 0; i < friends.length; i++) {
                             var friend = friends[i];
                             if (friend.participants.includes(friendId) || friend.participants.includes(data.friend_id)) {
                                 friendMongoDocumentId = friend._id;
@@ -221,9 +243,17 @@ app.get("/join_us/", function (req, res) {
 app.get("/friends/", function (req, res) {
     console.log("--------------------------------------------------------");
     console.log("RENDERING FRIENDS PAGE");
-    // render join_us ejs file
+    // render friends ejs file
     res.render(__dirname + "/public/friends/friends.ejs");
 });
+
+// GET request to /stats (stats page)
+app.get("/stats/", function (req, res) {
+    console.log("--------------------------------------------------------");
+    console.log("RENDERING STATS PAGE");
+    // render sats ejs file
+    res.render(__dirname + "/public/stats/stats.ejs")
+})
 
 app.get("/firebase-messaging-sw.js", (req, res) => {
     res.sendFile(__dirname + "/firebase-messaging-sw.js")
@@ -261,6 +291,7 @@ app.post("/join_us/addUser/", function (req, res) {
                 email: req.body.email,
                 commonId: req.body.id_to_keep,
                 meetings: [],
+                stats: {}
             }).save().then(() => {
                 console.log("USER HAS BEEN SUCCESSFULLY ADDED TO DATABASE");
             });
@@ -358,6 +389,8 @@ app.post("/session/", (req, res) => {
                                             // meeting does not exixt in user's meeting list
                                             // push meeting in user's meeting list
                                             user.meetings.push(newMeeting._id);
+                                            //user.stats.push({time: new Date().yyyymmddhhss(), meeting: newMeeting._id})
+                                            user.stats.set(new Date().yyyymmddhhss(), newMeeting._id)
                                             // save user to MongoDB
                                             user.save();
                                             // store users in meeting's user list
@@ -401,6 +434,16 @@ app.post("/session/", (req, res) => {
                 console.log("FOUND MEETING");
                 if (meetingToJoin.code === session_code) {
                     console.log("MEETING CODE WAS CORRECT");
+                    console.log("FINDING USER");
+                    console.log(req.body.userId);
+                    userModel.findOne({ commonId: req.body.userId }).then(function (user) {
+                        if (user) {
+                            console.log("FOUND USER");
+                            //user.stats.push({time: new Date().yyyymmddhhss(), meeting: meetingToJoin._id})
+                            user.stats.set(new Date().yyyymmddhhss(), meetingToJoin._id)
+                            user.save()
+                        }
+                    })
                     var client_id = meetingToJoin.next_id;
                     if (mapSessions[sessionID]) {
                         mapSessions[sessionID]
@@ -522,6 +565,8 @@ app.post("/session/", (req, res) => {
                                                 // user's meeting list does not have the current meeting
                                                 // add current meeting to user's meeting list
                                                 user.meetings.push(meeting._id);
+                                                // user.stats.push({time: new Date().yyyymmddhhss(), meeting: meeting._id})
+                                                user.stats.set(new Date().yyyymmddhhss(), meeting._id)
                                                 // save chages done to user in MongoDB
                                                 user.save();
                                                 // push user to meeting'suser list
@@ -821,6 +866,8 @@ app.post("/mobile-api/create-meeting-get-token", (req, res) => {
                                         // meeting does not exixt in user's meeting list
                                         // push meeting in user's meeting list
                                         user.meetings.push(newMeeting._id);
+                                        // user.stats.push({time: new Date().yyyymmddhhss(), meeting: newMeeting._id})
+                                        user.stats.set(new Date().yyyymmddhhss(), newMeeting._id)
                                         // save user to MongoDB
                                         user.save();
                                         // store users in meeting's user list
@@ -917,6 +964,8 @@ app.post("/mobile-api/join-meeting-and-get-token/", (req, res) => {
                                             // user's meeting list does not have the current meeting
                                             // add current meeting to user's meeting list
                                             user.meetings.push(meeting._id);
+                                            // user.stats.push({time: new Date().yyyymmddhhss(), meeting: meeting._id})
+                                            user.stats.set(new Date().yyyymmddhhss(), meeting._id)
                                             // save chages done to user in MongoDB
                                             user.save();
                                             // push user to meeting'suser list
@@ -1091,17 +1140,17 @@ app.post("/user-api/user/friends/", (req, res) => {
     console.log("---------------------------------------");
     console.log("USER REQUESTED FOR IT'S FRIENDS");
     var uid = req.body.userUID;
-    userModel.findOne({commonId: uid}, (err, user) => {
+    userModel.findOne({ commonId: uid }, (err, user) => {
         if (user) {
             console.log("User Found");
             var user_mongo_id = new mongoose.Types.ObjectId(user._id);
-            friendsModel.find({participants: user_mongo_id}, (err, docs) => {
+            friendsModel.find({ participants: user_mongo_id }, (err, docs) => {
                 if (docs) {
                     console.log("Docs Found");
                     console.log(docs);
                     docs.forEach((doc) => {
                         delete doc.chatMessages;
-                        for (var i=0; i < doc.participants.length; i++) {
+                        for (var i = 0; i < doc.participants.length; i++) {
                             var participant = doc.participants[i].toString();
                             if (participant === user._id.toString()) {
                                 doc.participants.splice(i, 1);
@@ -1141,17 +1190,17 @@ app.post("/user-api/friends/chats/", (req, res) => {
     var uid_user = req.body.userId;
     var friend_id = req.body.friend_UserId;
     console.log(friend_id);
-    userModel.findOne({commonId: uid_user}, (err, user) => {
+    userModel.findOne({ commonId: uid_user }, (err, user) => {
         if (user) {
             var user_mongo_id = new mongoose.Types.ObjectId(user._id);
-            friendsModel.find({participants: user_mongo_id}, (err, friends) => {
+            friendsModel.find({ participants: user_mongo_id }, (err, friends) => {
                 if (friends) {
                     console.log(friends);
                     var id_friends_target;
-                    for (var i=0; i<friends.length;i++) {
+                    for (var i = 0; i < friends.length; i++) {
                         var friend = friends[i];
                         var particpiant_target_found;
-                        for (var j=0; j<friend.participants.length; j++) {
+                        for (var j = 0; j < friend.participants.length; j++) {
                             var participant = friend.participants[j].toString();
                             if (participant === friend_id) {
                                 particpiant_target_found = true;
@@ -1192,11 +1241,11 @@ app.post("/user-api/user/invitation-for-me/", (req, res) => {
     console.log("---------------------------------------");
     console.log("USER REQUESTED FOR IT'S INVITATIONS");
     var uid = req.body.userId;
-    userModel.findOne({commonId: uid}, (err, user) => {
+    userModel.findOne({ commonId: uid }, (err, user) => {
         if (user) {
             var object_id = new mongoose.Types.ObjectId(user._id);
             console.log(object_id);
-            friendsInviteModel.find({to: object_id, accepted: false}, (err, invites) => {
+            friendsInviteModel.find({ to: object_id, accepted: false }, (err, invites) => {
                 console.log(invites);
                 res.send(invites);
             })
@@ -1209,11 +1258,11 @@ app.post("/user-api/make-invitation/", (req, res) => {
     console.log("USER REQUESTED FOR MAKING INVITATION");
     var uid = req.body.userId;
     var friend_mail = req.body.friend_email;
-    userModel.findOne({email: friend_mail}, (err, friend_user) => {
+    userModel.findOne({ email: friend_mail }, (err, friend_user) => {
         if (friend_user) {
-            userModel.findOne({commonId: uid}, (err, user) => {
+            userModel.findOne({ commonId: uid }, (err, user) => {
                 if (user) {
-                    friendsInviteModel.findOne({to: user._id, from: friend_user._id}, (err, invite) => {
+                    friendsInviteModel.findOne({ to: user._id, from: friend_user._id }, (err, invite) => {
                         if (!invite) {
                             console.log(user._id);
                             console.log(friend_user._id);
@@ -1272,6 +1321,109 @@ app.post("/user-api/accept-invitation/", (req, res) => {
         } else {
             res.send(":(");
             console.log("meeting not found");
+        }
+    })
+})
+
+function getPrevDay(day) {
+    var d = new Date();
+    if (day === 0) { // Monday
+        d.setDate(d.getDate() - (d.getDay() + 6) % 7);
+    } else if (day === 1) { // Tuesday
+        d.setDate(d.getDate() - (d.getDay() + 5) % 7);
+    } else if (day === 2) { // Wednesday
+        d.setDate(d.getDate() - (d.getDay() + 4) % 7);
+    } else if (day === 3) { // Thursday
+        d.setDate(d.getDate() - (d.getDay() + 3) % 7);
+    } else if (day === 4) { // Friday
+        d.setDate(d.getDate() - (d.getDay() + 2) % 7);
+    } else if (day === 5) { // Saturday
+        d.setDate(d.getDate() - (d.getDay() + 1) % 7);
+    } else if (day === 6) { // Sunday
+        d.setDate(d.getDate() - (d.getDay()) % 7);
+    }
+    return d.yyyymmdd();
+}
+
+app.post("/user-api/stats/", (req, res) => {
+    console.log("---------------------------------------");
+    console.log("USER REQUESTED FOR STATS");
+    var uid = req.body.userId;
+    var timeFrame = req.body.timeFrame
+    var to_return = {}
+    userModel.findOne({ commonId: uid }).populate("meetings").then((user) => {
+        if (user) {
+            console.log("FOUND USER");
+            console.log("WANTS " + timeFrame);
+            switch (parseInt(timeFrame)) {
+                case 0: // no meeting in week per day
+                    console.log("Case 0");
+                    var array_of_day = []
+                    var name_day = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                    var monday_to_search = getPrevDay(0);
+                    for (var i = 0; i < 7; i++) {
+                        var term_to_search = getPrevDay(i);
+                        if (parseInt(term_to_search.slice(-2, term_to_search.length)) < parseInt(monday_to_search.slice(-2, monday_to_search.length))) {
+                            array_of_day.push(0)
+                            console.log(i);
+                        } else {
+                            var this_day_array = Object.keys(Object.fromEntries(user.stats)).filter((currentValue) => {
+                                return currentValue.includes(term_to_search)
+                            });
+                            array_of_day.push(this_day_array.length)
+                        }
+                    }
+                    to_return.name = name_day
+                    to_return.count = array_of_day
+                    break;
+                case 1: // no meeting in month per day
+                    console.log("Case 1");
+                    var array_of_day = []
+                    var date_name = []
+                    var d = new Date()
+                    var current_date = parseInt(d.getDate());
+                    var noOfDaysInThisMonth = new Date(d.getMonth() + 1, d.getFullYear(), 0).getDate()
+                    for (var i=0; i<noOfDaysInThisMonth + 1; i++) {
+                        if (i < current_date + 1) {
+                            var temp_add = i > 9 ? '' : '0'
+                            var term_to_search = d.yyyymmdd().slice(0, -2) + temp_add + i.toString()
+                            var this_day_array = Object.keys(Object.fromEntries(user.stats)).filter((currentValue) => {
+                                return currentValue.includes(term_to_search)
+                            });
+                            array_of_day.push(this_day_array.length)
+                        } else {
+                            array_of_day.push(0)
+                        }
+                        date_name.push(i.toString() + "/" + d.getMonth() + "/" + d.getFullYear())
+                    }
+                    to_return.name = date_name
+                    to_return.count = array_of_day
+                    break;
+                case 2: // no meeting in year per month
+                    console.log("Case 2");
+                    var arr_of_month = []
+                    var month_name = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "July", "Aug", "Sep", "Oct", "Nov", "Dec"]
+                    var d = new Date()
+                    for (var i=0; i<13; i++) {
+                        if (d.getMonth() < i) {
+                            arr_of_month.push(0)
+                        } else {
+                            var temp_add = i + 1 > 9 ? '' : '0'
+                            var term_to_search = d.yyyymmdd().slice(0, -5) + temp_add + (i + 1).toString();
+                            console.log(term_to_search);
+                            var this_day_array = Object.keys(Object.fromEntries(user.stats)).filter((currentValue) => {
+                                return currentValue.includes(term_to_search)
+                            });
+                            arr_of_month.push(this_day_array.length)
+                        }
+                    }
+                    to_return.name = month_name
+                    to_return.count = arr_of_month
+                    break;
+            }
+            res.send(to_return)
+        } else {
+            res.send(":(")
         }
     })
 })

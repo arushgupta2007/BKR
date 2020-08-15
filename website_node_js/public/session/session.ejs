@@ -260,6 +260,11 @@
         var meetingName = <%- JSON.stringify(meetingName) %> ;
         var code = <%- JSON.stringify(code) %>;
 
+        var https_link = "https://" + window.location.hostname
+        if (window.location.port === '5442') {
+            https_link = https_link + ":" + window.location.port
+        }
+
         // check if user is signed in
         var signName = nickName;
         var accountID = "";
@@ -284,7 +289,7 @@
                 userUID: accountID,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/user/prevMeetings",
+                url: https_link + "/user-api/user/prevMeetings",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -338,7 +343,7 @@
                             meetingId: item.meeting_id
                         }
                         $.ajax({
-                            url: "https://" + window.location.hostname + ":" + window.location.port + "/user-api/prevMeeting/delete",
+                            url: https_link + "/user-api/prevMeeting/delete",
                             type: "POST",
                             data: data_del_meeting,
                             error: function (err) {
@@ -552,8 +557,8 @@
         // activate all tooltips
         $('[data-toggle="tooltip"]').tooltip();
         // set url of #share_meeting_link
-        $("#share_meeting_link").html(" https://" + window.location.hostname + ":" + window.location.port + "/?todo=join&id_=" + sessionName);
-        $("#share_meeting_link").attr("href", "https://" + window.location.hostname + ":" + window.location.port + "/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").html(" " + https_link + "/?todo=join&id_=" + sessionName);
+        $("#share_meeting_link").attr("href", https_link + "/?todo=join&id_=" + sessionName);
 
         $("#refreshButton").attr("disabled", true);
 
@@ -1469,7 +1474,7 @@
                         }
                         $.ajax({
                             type: "POST",
-                            url: "https://" + window.location.hostname + ":" + window.location.port + "/session/saveMessage/",
+                            url: https_link + "/session/saveMessage/",
                             data: data,
                             success: function () {},
                             error: function(err) {console.log(err);}

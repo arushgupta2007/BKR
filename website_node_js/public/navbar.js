@@ -34,6 +34,7 @@ document.write('\
           <a class="dropdown-item" href="/profile/"><i class="fas fa-user-circle"></i> Profile</a>\
           <a class="dropdown-item" href="/meetings-rooms/"><i class="fas fa-history"></i> Meeting Rooms</a>\
           <a class="dropdown-item" href="/friends/"><i class="fas fa-users"></i> Friends</a>\
+          <a class="dropdown-item" href="/stats/"><i class="far fa-chart-bar"></i> Stats</a>\
           <div class="dropdown-divider"></div>\
           <button class="dropdown-item" id="user-sign-out-navbar"><i class="fas fa-sign-out-alt"></i> Sign Out</button>\
         </div>\

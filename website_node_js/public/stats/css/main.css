@@ -1,0 +1,57 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+    font-family: 'Questrial', sans-serif;
+/*    cursor: url('/static/home/images/awesomeface.png'), auto;*/
+}
+
+#navbar {
+    z-index: 5;
+}
+
+#dropdown-user-data {
+    background-color: #50565c;
+    color: white;
+}
+
+#dropdown-user-data .dropdown-item:hover {
+    background-color: #717579;
+}
+
+#user-extra {
+    padding-left: 0 !important;
+    color: white;
+}
+
+#joinUsLink {
+    color: white;
+}
+
+#dropdown-user-data .dropdown-item {
+    color: white;
+}
+
+#main-container {
+    overflow: auto;
+}
+
+#statsChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#chart-button-container {
+    display: flex;
+    align-items: center;
+}
+
+.side-button-chart {
+    opacity: 0.5;
+}
+
+.side-button-chart.active {
+    opacity: 1;
+    background-color: #007bff;
+    color: white;
+}

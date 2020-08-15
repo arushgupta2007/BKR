@@ -9,6 +9,7 @@ const userSchema = new Schema({
     email: String,
     meetings: [{ type: Schema.Types.ObjectId, ref: 'meeting' }],
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }],
+    stats: {type: Map, of: String} //[{ time: String, meeting: { type: Schema.Types.ObjectId, ref: 'meeting' } }]
 });
 
 const User = mongoose.model("user", userSchema);

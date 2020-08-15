@@ -9,6 +9,6 @@ services:
         network_mode: host
         environment: 
             - SERVER_PORT=5442
-            - OPENVIDU_URL=https://192.168.1.16:4443/
+            - OPENVIDU_URL=https://192.168.1.23:4443/
             - OPENVIDU_SECRET=BaatKarteRaho
             - IS_LOCAL=1

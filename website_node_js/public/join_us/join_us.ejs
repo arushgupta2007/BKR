@@ -9,14 +9,18 @@
     <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css" />
     <link rel="stylesheet" href="/static/join_us/css/main.css" />
     <script type="text/javascript">
+        var https_link = "https://" + window.location.hostname
+        if (window.location.port === '5442') {
+            https_link = https_link + ":" + window.location.port
+        }
         // $("#user-sign").css("display", "none");
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                window.location.replace("https://" + window.location.hostname + window.location.port + "/join_us/success/");
+                window.location.replace(https_link + "/join_us/success/");
             }
         })
         // FirebaseUI config.
-        var signInSuccessURL = 'https://' + window.location.hostname + window.location.port + '/join_us/success/';
+        var signInSuccessURL = https_link + '/join_us/success/';
         var uiConfig = {
             signInSuccessUrl: signInSuccessURL,
             signInOptions: [
@@ -29,10 +33,10 @@
             // tosUrl and privacyPolicyUrl accept either url string or a callback
             // function.
             // Terms of service url/callback.
-            tosUrl: 'https://' + window.location.hostname,
+            tosUrl: https_link,
             // Privacy policy url/callback.
             privacyPolicyUrl: function() {
-                window.location.assign('https://' + window.location.hostname);
+                window.location.assign(https_link);
             }
         };
 

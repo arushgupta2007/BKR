@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>BKR Video Chat</title>
+	<script src="/static/head_imports.js"></script>
+    <link rel="stylesheet" href="/static/stats/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js" 
+        integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous">
+    </script>
+</head>
+
+<body>
+    <script src="/static/navbar.js"></script>
+    <div id="main-container" class="container-fluid">
+        <div class="row">
+            <div class="col-4 col-md-3 col-lg-2 col-xl-2" id="chart-button-container">
+                <ul class="nav nav-pill flex-column">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active btn side-button-chart"
+                            onclick="chartOpen('0', 'week-button')" id="week-button">Week</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link btn side-button-chart"
+                            onclick="chartOpen('1', 'month-button')" id="month-button">Month</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link btn side-button-chart"
+                            onclick="chartOpen('2', 'year-button')" id="year-button">Year</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-8 col-md-9 col-lg-10 col-xl-10">
+                <canvas id="statsChart"></canvas>
+            </div>
+        </div>
+        <input type="hidden" id="uid-html">
+    </div>
+	<script src="/static/scripts_end_of_body.js"></script>
+	<script src="/static/stats/js/main.js"></script>
+</body>
+
+</html>

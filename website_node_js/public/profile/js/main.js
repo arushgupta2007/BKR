@@ -1,4 +1,8 @@
 $(document).ready(function () {
+    var https_url = "https://" + window.location.hostname
+    if (window.location.port) {
+        https_url = https_url + ":" + window.location.port
+    }
     $("#main-container").scroll(function () {
         var scrollTop = $("#main-container").scrollTop();
         if (scrollTop < $("#landing-section").height()) {
@@ -44,7 +48,7 @@ $(document).ready(function () {
                 userUID: uid,
             }
             $.ajax({
-                url: "https://" + window.location.hostname + "/user-api/user/prevMeetings/",
+                url: https_url + "/user-api/user/prevMeetings/",
                 type: "POST",
                 data: data_ajax,
                 error: function (err) {
@@ -60,7 +64,7 @@ $(document).ready(function () {
             });
             // initEveryTime();
         } else {
-            window.location.replace("https://" + window.location.hostname + "/join_us/")
+            window.location.replace(https_url + "/join_us/")
         }
     }, function(error) {
         console.log(error);
